@@ -13,13 +13,47 @@
   z-index: var(--z-dropdown);
 }
 
-/* Header Section */
+/* Header Section - Forest Entrance */
 .navHeader {
   margin-bottom: 3rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid var(--border-primary);
   text-align: center;
   position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  display: block;
+}
+
+.navHeader:hover {
+  transform: translateY(-2px);
+}
+
+.navHeader:hover .title {
+  text-shadow: 0 0 15px var(--glow-purple), 0 0 25px var(--glow-purple);
+}
+
+.navHeader:hover .subtitle {
+  color: var(--text-primary);
+}
+
+.navHeader:hover .forestIcon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 15px var(--glow-purple));
+}
+
+.forestIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  filter: drop-shadow(0 0 8px var(--shadow-light));
+  animation: sway 4s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
 }
 
 .navHeader::after {
@@ -36,34 +70,68 @@
 
 .title {
   font-family: var(--font-header);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: var(--text-primary);
   margin: 0;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.08em;
   text-shadow: 0 0 10px var(--glow-purple);
 }
 
 .subtitle {
   font-family: var(--font-header);
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0.25rem 0 0 0;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   font-weight: 400;
+  font-style: italic;
 }
 
-/* Navigation List */
+/* Navigation List - Forest Paths */
 .navList {
   list-style: none;
   padding: 0;
   margin: 0;
   flex: 1;
+  position: relative;
+}
+
+.navList::before {
+  content: '🌿';
+  position: absolute;
+  top: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  opacity: 0.5;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
 }
 
 .navItem {
   margin-bottom: 0.75rem;
   transition: transform var(--timing-hover) var(--ease-in-out);
+  position: relative;
+}
+
+.navItem::before {
+  content: '→';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  color: var(--accent-purple-light);
+}
+
+.navItem:hover::before {
+  opacity: 1;
+  left: -10px;
 }
 
 .navItem:hover {

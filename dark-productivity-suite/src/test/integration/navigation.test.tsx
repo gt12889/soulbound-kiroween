@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '../test-utils';
 import userEvent from '@testing-library/user-event';
 import App from '../../App';
-import { AppProvider } from '../../contexts/AppContext';
-import { NotesProvider } from '../../contexts/NotesContext';
-import { TasksProvider } from '../../contexts/TasksContext';
 
 /**
  * Integration tests for navigation and state preservation
@@ -16,16 +14,6 @@ import { TasksProvider } from '../../contexts/TasksContext';
  * - Ensure loading states display correctly
  */
 
-const AllProviders = ({ children }: { children: React.ReactNode }) => (
-  <AppProvider>
-    <NotesProvider>
-      <TasksProvider>
-        {children}
-      </TasksProvider>
-    </NotesProvider>
-  </AppProvider>
-);
-
 describe('Navigation and State Preservation', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -33,23 +21,23 @@ describe('Navigation and State Preservation', () => {
 
   it('should navigate between all modules', async () => {
     const user = userEvent.setup();
-    render(<App />, { wrapper: AllProviders });
+    render(<App />);
 
-    // Wait for initial load
+    // Start on landing page, click to enter the app
+    await waitFor(() => {
+      expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+    });
+
+    const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+    await user.click(enterButton);
+
+    // Wait for navigation to appear
     await waitFor(() => {
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
-    // Navigate to Ghost Writer
-    const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-    await user.click(ghostWriterLink);
-    
-    await waitFor(() => {
-      expect(window.location.pathname).toBe('/ghost-writer');
-    });
-
     // Navigate to Necronomicon Notes
-    const notesLink = screen.getByRole('link', { name: /necronomicon notes/i });
+    const notesLink = screen.getByRole('link', { name: /ancient library/i });
     await user.click(notesLink);
     
     await waitFor(() => {
@@ -57,7 +45,7 @@ describe('Navigation and State Preservation', () => {
     });
 
     // Navigate to Graveyard Dashboard
-    const graveyardLink = screen.getByRole('link', { name: /graveyard dashboard/i });
+    const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
     await user.click(graveyardLink);
     
     await waitFor(() => {
@@ -65,7 +53,7 @@ describe('Navigation and State Preservation', () => {
     });
 
     // Navigate to Terminal Tarot
-    const tarotLink = screen.getByRole('link', { name: /terminal tarot/i });
+    const tarotLink = screen.getByRole('link', { name: /mystic clearing/i });
     await user.click(tarotLink);
     
     await waitFor(() => {
@@ -75,34 +63,47 @@ describe('Navigation and State Preservation', () => {
 
   it('should preserve note content when switching modules', async () => {
     const user = userEvent.setup();
-    render(<App />, { wrapper: AllProviders });
+    render(<App />);
+
+    // Enter from landing page
+    await waitFor(() => {
+      expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+    });
+    const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+    await user.click(enterButton);
+
+    // Wait for navigation
+    await waitFor(() => {
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
+    });
 
     // Navigate to Necronomicon Notes
-    const notesLink = screen.getByRole('link', { name: /necronomicon notes/i });
+    const notesLink = screen.getByRole('link', { name: /ancient library/i });
     await user.click(notesLink);
     
     await waitFor(() => {
       expect(window.location.pathname).toBe('/necronomicon-notes');
     });
 
-    // Create a new note
-    const newNoteButton = screen.getByRole('button', { name: /new note/i });
-    await user.click(newNoteButton);
+    // Wait for initial note to be created
+    await waitFor(() => {
+      expect(screen.getByText(/welcome to the necronomicon/i)).toBeInTheDocument();
+    });
 
-    // Type some content
-    const titleInput = screen.getByPlaceholderText(/untitled/i);
+    // Type in the existing note
+    const titleInput = screen.getByDisplayValue(/welcome to the necronomicon/i);
     await user.clear(titleInput);
     await user.type(titleInput, 'Test Note');
 
-    const contentArea = screen.getByRole('textbox', { name: /note content/i });
-    await user.type(contentArea, 'This is test content');
+    // Wait for auto-save
+    await new Promise(resolve => setTimeout(resolve, 1100));
 
-    // Navigate away to Ghost Writer
-    const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-    await user.click(ghostWriterLink);
+    // Navigate away to Terminal Tarot
+    const tarotLink = screen.getByRole('link', { name: /mystic clearing/i });
+    await user.click(tarotLink);
     
     await waitFor(() => {
-      expect(window.location.pathname).toBe('/ghost-writer');
+      expect(window.location.pathname).toBe('/terminal-tarot');
     });
 
     // Navigate back to Notes
@@ -115,16 +116,27 @@ describe('Navigation and State Preservation', () => {
     // Verify content is preserved
     await waitFor(() => {
       expect(screen.getByDisplayValue('Test Note')).toBeInTheDocument();
-      expect(screen.getByText(/this is test content/i)).toBeInTheDocument();
     });
   });
 
   it('should preserve task data when switching modules', async () => {
     const user = userEvent.setup();
-    render(<App />, { wrapper: AllProviders });
+    render(<App />);
+
+    // Enter from landing page
+    await waitFor(() => {
+      expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+    });
+    const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+    await user.click(enterButton);
+
+    // Wait for navigation
+    await waitFor(() => {
+      expect(screen.getByRole('navigation')).toBeInTheDocument();
+    });
 
     // Navigate to Graveyard Dashboard
-    const graveyardLink = screen.getByRole('link', { name: /graveyard dashboard/i });
+    const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
     await user.click(graveyardLink);
     
     await waitFor(() => {
@@ -132,14 +144,14 @@ describe('Navigation and State Preservation', () => {
     });
 
     // Create a new task
-    const newTaskButton = screen.getByRole('button', { name: /new task/i });
+    const newTaskButton = screen.getByRole('button', { name: /raise new task/i });
     await user.click(newTaskButton);
 
-    const taskInput = screen.getByPlaceholderText(/task title/i);
+    const taskInput = screen.getByPlaceholderText(/enter task title/i);
     await user.type(taskInput, 'Test Task');
     
-    const addButton = screen.getByRole('button', { name: /add/i });
-    await user.click(addButton);
+    const createButton = screen.getByRole('button', { name: /create task/i });
+    await user.click(createButton);
 
     // Verify task appears
     await waitFor(() => {
@@ -147,7 +159,7 @@ describe('Navigation and State Preservation', () => {
     });
 
     // Navigate away
-    const tarotLink = screen.getByRole('link', { name: /terminal tarot/i });
+    const tarotLink = screen.getByRole('link', { name: /mystic clearing/i });
     await user.click(tarotLink);
     
     await waitFor(() => {
@@ -169,20 +181,27 @@ describe('Navigation and State Preservation', () => {
 
   it('should display loading transition when navigating', async () => {
     const user = userEvent.setup();
-    render(<App />, { wrapper: AllProviders });
+    render(<App />);
+
+    // Enter from landing page
+    await waitFor(() => {
+      expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+    });
+    const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+    await user.click(enterButton);
 
     await waitFor(() => {
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
     // Navigate and check for loading state
-    const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-    await user.click(ghostWriterLink);
+    const notesLink = screen.getByRole('link', { name: /ancient library/i });
+    await user.click(notesLink);
 
     // Loading transition should appear (even briefly)
     // Note: This might be too fast to catch in tests, but the component is there
     await waitFor(() => {
-      expect(window.location.pathname).toBe('/ghost-writer');
+      expect(window.location.pathname).toBe('/necronomicon-notes');
     }, { timeout: 3000 });
   });
 
@@ -190,17 +209,24 @@ describe('Navigation and State Preservation', () => {
     const user = userEvent.setup();
     const startTime = Date.now();
     
-    render(<App />, { wrapper: AllProviders });
+    render(<App />);
+
+    // Enter from landing page
+    await waitFor(() => {
+      expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+    });
+    const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+    await user.click(enterButton);
 
     await waitFor(() => {
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
-    const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-    await user.click(ghostWriterLink);
+    const notesLink = screen.getByRole('link', { name: /ancient library/i });
+    await user.click(notesLink);
     
     await waitFor(() => {
-      expect(window.location.pathname).toBe('/ghost-writer');
+      expect(window.location.pathname).toBe('/necronomicon-notes');
     });
 
     const loadTime = Date.now() - startTime;

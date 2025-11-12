@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navigation from './components/common/Navigation';
 import LoadingTransition from './components/common/LoadingTransition';
 import AudioController from './components/common/AudioController';
+import LandingPage from './components/landing/LandingPage';
 import TerminalTarot from './components/terminal-tarot/TerminalTarot';
-import GhostWriter from './components/ghost-writer/GhostWriter';
 import NecronomiconNotes from './components/necronomicon-notes/NecronomiconNotes';
 import { GraveyardDashboard } from './components/graveyard-dashboard/GraveyardDashboard';
 import './App.css';
@@ -12,6 +12,7 @@ import './App.css';
 const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
+  const isLandingPage = location.pathname === '/';
 
   // Trigger loading transition on route change
   useEffect(() => {
@@ -25,18 +26,17 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app">
-      <Navigation />
-      <main className="main-content">
+      {!isLandingPage && <Navigation />}
+      <main className={isLandingPage ? 'landing-content' : 'main-content'}>
         <LoadingTransition isLoading={isLoading} minDisplayTime={500} />
         <Routes>
-          <Route path="/" element={<Navigate to="/terminal-tarot" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/terminal-tarot" element={<TerminalTarot />} />
-          <Route path="/ghost-writer" element={<GhostWriter />} />
           <Route path="/necronomicon-notes" element={<NecronomiconNotes />} />
           <Route path="/graveyard-dashboard" element={<GraveyardDashboard />} />
         </Routes>
       </main>
-      <AudioController />
+      {!isLandingPage && <AudioController />}
     </div>
   );
 };

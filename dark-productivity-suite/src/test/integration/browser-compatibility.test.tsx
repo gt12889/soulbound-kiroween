@@ -1,10 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from '../test-utils';
 import userEvent from '@testing-library/user-event';
 import App from '../../App';
-import { AppProvider } from '../../contexts/AppContext';
-import { NotesProvider } from '../../contexts/NotesContext';
-import { TasksProvider } from '../../contexts/TasksContext';
 import { storageService } from '../../services/storageService';
 
 /**
@@ -17,16 +15,6 @@ import { storageService } from '../../services/storageService';
  * - Test LocalStorage compatibility
  * - Ensure consistent visual rendering
  */
-
-const AllProviders = ({ children }: { children: React.ReactNode }) => (
-  <AppProvider>
-    <NotesProvider>
-      <TasksProvider>
-        {children}
-      </TasksProvider>
-    </NotesProvider>
-  </AppProvider>
-);
 
 describe('Browser Compatibility', () => {
   beforeEach(() => {
@@ -89,14 +77,14 @@ describe('Browser Compatibility', () => {
 
     it('should handle audio controls in UI', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
       // Audio controller should be present
-      const audioToggle = screen.getByRole('button', { name: /toggle audio/i });
+      const audioToggle = screen.getByRole('button', { name: /audio/i });
       expect(audioToggle).toBeInTheDocument();
 
       // Should toggle without errors
@@ -110,21 +98,21 @@ describe('Browser Compatibility', () => {
 
     it('should handle missing Web Audio API gracefully', () => {
       // Simulate browser without Web Audio API
-      const originalAudioContext = global.AudioContext;
-      (global as any).AudioContext = undefined;
+      const originalAudioContext = (globalThis as any).AudioContext;
+      (globalThis as any).AudioContext = undefined;
 
       expect(() => {
-        render(<App />, { wrapper: AllProviders });
+        render(<App />);
       }).not.toThrow();
 
       // Restore
-      global.AudioContext = originalAudioContext;
+      (globalThis as any).AudioContext = originalAudioContext;
     });
   });
 
   describe('CSS and Rendering Compatibility', () => {
     it('should render all main components', async () => {
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -135,7 +123,7 @@ describe('Browser Compatibility', () => {
     });
 
     it('should handle CSS modules correctly', async () => {
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -148,7 +136,7 @@ describe('Browser Compatibility', () => {
 
     it('should support CSS animations', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -168,7 +156,7 @@ describe('Browser Compatibility', () => {
   describe('Event Handling Compatibility', () => {
     it('should handle click events', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -181,19 +169,21 @@ describe('Browser Compatibility', () => {
 
     it('should handle keyboard events', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon notes/i });
+      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
       await user.click(notesLink);
 
       await waitFor(() => {
         expect(window.location.pathname).toBe('/necronomicon-notes');
       });
 
-      const newNoteButton = screen.getByRole('button', { name: /new note/i });
-      await user.click(newNoteButton);
+      // Wait for initial note
+      await waitFor(() => {
+        expect(screen.getByText(/welcome to the necronomicon/i)).toBeInTheDocument();
+      });
 
-      const titleInput = screen.getByPlaceholderText(/untitled/i);
+      const titleInput = screen.getByDisplayValue(/welcome to the necronomicon/i);
       
       // Should handle typing
       expect(() => user.type(titleInput, 'Test')).not.toThrow();
@@ -201,9 +191,9 @@ describe('Browser Compatibility', () => {
 
     it('should handle drag events', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard dashboard/i });
+      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
       await user.click(graveyardLink);
 
       await waitFor(() => {
@@ -211,14 +201,14 @@ describe('Browser Compatibility', () => {
       });
 
       // Create a task
-      const newTaskButton = screen.getByRole('button', { name: /new task/i });
+      const newTaskButton = screen.getByRole('button', { name: /raise new task/i });
       await user.click(newTaskButton);
 
-      const taskInput = screen.getByPlaceholderText(/task title/i);
+      const taskInput = screen.getByPlaceholderText(/enter task title/i);
       await user.type(taskInput, 'Draggable Task');
       
-      const addButton = screen.getByRole('button', { name: /add/i });
-      await user.click(addButton);
+      const createButton = screen.getByRole('button', { name: /create task/i });
+      await user.click(createButton);
 
       // Should render without drag errors
       await waitFor(() => {
@@ -230,7 +220,7 @@ describe('Browser Compatibility', () => {
   describe('Router Compatibility', () => {
     it('should handle browser history API', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -245,7 +235,7 @@ describe('Browser Compatibility', () => {
       });
 
       // Navigate to another page
-      const notesLink = screen.getByRole('link', { name: /necronomicon notes/i });
+      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
       await user.click(notesLink);
 
       await waitFor(() => {
@@ -258,7 +248,7 @@ describe('Browser Compatibility', () => {
 
     it('should handle route changes without page reload', async () => {
       const user = userEvent.setup();
-      render(<App />, { wrapper: AllProviders });
+      render(<App />);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();

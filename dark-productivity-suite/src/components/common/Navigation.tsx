@@ -19,10 +19,9 @@ const Navigation: React.FC = () => {
   const { settings } = useApp();
 
   const navItems = [
-    { path: '/terminal-tarot', label: 'Terminal Tarot', icon: '🔮', description: 'Divine your code' },
-    { path: '/ghost-writer', label: 'Ghost Writer', icon: '👻', description: 'Spectral suggestions' },
-    { path: '/necronomicon-notes', label: 'Necronomicon Notes', icon: '📖', description: 'Ancient wisdom' },
-    { path: '/graveyard-dashboard', label: 'Graveyard Dashboard', icon: '⚰️', description: 'Rest your tasks' },
+    { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods' },
+    { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest' },
+    { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance' },
   ];
 
   const handleNavClick = () => {
@@ -45,10 +44,17 @@ const Navigation: React.FC = () => {
 
   return (
     <nav className={styles.navigation}>
-      <div className={styles.navHeader}>
-        <h1 className={styles.title}>Dark Productivity</h1>
-        <p className={styles.subtitle}>Suite</p>
-      </div>
+      <Link 
+        to="/" 
+        className={styles.navHeader}
+        onClick={handleNavClick}
+        onMouseEnter={handleNavHover}
+        title="Return to the forest entrance"
+      >
+        <div className={styles.forestIcon}>🌲</div>
+        <h1 className={styles.title}>The Dark Forest</h1>
+        <p className={styles.subtitle}>Choose Your Path</p>
+      </Link>
       
       <ul className={styles.navList}>
         {navItems.map((item) => (
@@ -77,12 +83,12 @@ const Navigation: React.FC = () => {
           className={styles.exportButton}
           onClick={handleExport}
           onMouseEnter={handleNavHover}
-          title="Export all data"
+          title="Preserve your journey"
         >
-          <span className={styles.exportIcon}>💾</span>
-          <span className={styles.exportLabel}>Export Data</span>
+          <span className={styles.exportIcon}>📜</span>
+          <span className={styles.exportLabel}>Save Journey</span>
         </button>
-        <div className={styles.ornament}>✦</div>
+        <div className={styles.ornament}>🍂</div>
       </div>
     </nav>
   );

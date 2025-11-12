@@ -1,4 +1,4 @@
-import { expect, afterEach, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 // Mock Web Audio API
-global.AudioContext = vi.fn().mockImplementation(() => ({
+(globalThis as any).AudioContext = vi.fn().mockImplementation(() => ({
   createGain: vi.fn().mockReturnValue({
     connect: vi.fn(),
     gain: { value: 1 },
