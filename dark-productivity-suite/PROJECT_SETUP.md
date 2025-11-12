@@ -13,6 +13,7 @@
   - react-dom: ^19.2.0
   - react-router-dom: ^7.9.5
   - isomorphic-git: ^1.35.0
+  - firebase: ^12.5.0 (for authentication and cloud sync)
 
 - **Dev Dependencies:**
   - TypeScript: ~5.9.3

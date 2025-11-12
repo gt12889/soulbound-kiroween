@@ -1,0 +1,22 @@
+{
+  "enabled": true,
+  "name": "Source to Docs Sync",
+  "description": "Monitors all source files (JavaScript, TypeScript, YAML configs, and manifests) and automatically updates documentation in README.md or docs/ folder when changes are detected",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.js",
+      "src/**/*.yaml",
+      "src/**/*.csv",
+      "tools/**/*.js",
+      "*.yaml",
+      "*.json",
+      "package.json"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source files have been modified. Please review the changes and update the relevant documentation. If there's a docs/ folder, update the appropriate documentation files there. Otherwise, update the README.md file. Focus on keeping documentation accurate and in sync with code changes, including any new features, configuration changes, or structural updates."
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "enabled": true,
+  "name": "Auto-Translate Localization Files",
+  "description": "Monitors changes to user-facing text content in localization files (JSON, YAML, etc.) and automatically generates translations for all configured target languages while maintaining context and locale-specific conventions.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*locales/**/*.json",
+      "**/*i18n/**/*.json",
+      "**/*translations/**/*.json",
+      "**/*lang/**/*.json",
+      "**/*locales/**/*.yaml",
+      "**/*i18n/**/*.yaml",
+      "**/*translations/**/*.yaml",
+      "**/*lang/**/*.yaml",
+      "**/en.json",
+      "**/en.yaml",
+      "**/en-US.json",
+      "**/en-US.yaml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Localization files have been modified. Please analyze the changes and:\n\n1. Identify all new or modified text entries in the primary language files\n2. Determine which target languages need translations based on the project's localization configuration\n3. For each target language, generate accurate translations that:\n   - Maintain the original meaning and context\n   - Follow locale-specific conventions (date formats, number formats, cultural nuances)\n   - Preserve any placeholders, variables, or formatting tokens (e.g., {variable}, %s, {{key}})\n   - Match the tone and style of existing translations\n4. Update the corresponding translation files with the new content\n5. Flag any entries that may require human review due to:\n   - Cultural sensitivity\n   - Technical terminology\n   - Ambiguous context\n   - Brand-specific language\n\nProvide a summary of translations generated and any items requiring human review."
+  }
+}

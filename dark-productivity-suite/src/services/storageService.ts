@@ -1,6 +1,7 @@
 /**
  * Storage service for managing LocalStorage operations
  * Handles data persistence with error handling for quota exceeded scenarios
+ * Supports encryption for sensitive data
  */
 
 export class StorageError extends Error {
@@ -15,6 +16,7 @@ export class StorageError extends Error {
 
 class StorageService {
   private readonly prefix = 'darkprod_';
+  private encryptionEnabled = false;
 
   /**
    * Get data from LocalStorage
@@ -146,6 +148,91 @@ class StorageService {
       );
     }
     return false;
+  }
+
+  /**
+   * Enable encryption for cloud storage
+   * Note: This is a basic implementation. For production, use a proper encryption library
+   */
+  enableEncryption(enabled: boolean): void {
+    this.encryptionEnabled = enabled;
+  }
+
+  /**
+   * Encrypt data (basic implementation)
+   * In production, use a proper encryption library like crypto-js
+   */
+  private encrypt(data: string): string {
+    if (!this.encryptionEnabled) {
+      return data;
+    }
+    // Basic Base64 encoding (NOT secure, just for demonstration)
+    // In production, use proper encryption with a key
+    return btoa(data);
+  }
+
+  /**
+   * Decrypt data (basic implementation)
+   */
+  private decrypt(data: string): string {
+    if (!this.encryptionEnabled) {
+      return data;
+    }
+    // Basic Base64 decoding
+    try {
+      return atob(data);
+    } catch {
+      return data; // Return as-is if decryption fails
+    }
+  }
+
+  /**
+   * Get encrypted data from storage
+   */
+  getEncrypted<T>(key: string): T | null {
+    try {
+      const fullKey = this.prefix + key;
+      const item = localStorage.getItem(fullKey);
+      
+      if (item === null) {
+        return null;
+      }
+
+      const decrypted = this.decrypt(item);
+      return this.deserialize<T>(decrypted);
+    } catch (error) {
+      console.error(`Error reading encrypted data from storage (${key}):`, error);
+      throw new StorageError(
+        `Failed to read encrypted data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'PARSE_ERROR'
+      );
+    }
+  }
+
+  /**
+   * Set encrypted data in storage
+   */
+  setEncrypted<T>(key: string, value: T): void {
+    try {
+      const fullKey = this.prefix + key;
+      const serialized = this.serialize(value);
+      const encrypted = this.encrypt(serialized);
+      localStorage.setItem(fullKey, encrypted);
+    } catch (error) {
+      if (this.isQuotaExceededError(error)) {
+        console.error('LocalStorage quota exceeded');
+        throw new StorageError(
+          'Storage quota exceeded. Please export your data and clear old entries.',
+          'QUOTA_EXCEEDED'
+        );
+      }
+      
+      console.error(`Error writing encrypted data to storage (${key}):`, error);
+      throw new StorageError(
+        `Failed to write encrypted data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'UNKNOWN'
+      );
+    }
   }
 }
 

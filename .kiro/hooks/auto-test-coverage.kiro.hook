@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "name": "Auto Test Coverage Generator",
+  "description": "Automatically updates or creates test files to cover new functions with multiple test cases for different code paths, following existing test patterns and libraries",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.js",
+      "tools/**/*.js",
+      "src/**/*.ts",
+      "tools/**/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "New or modified functions have been detected in the source code. Please:\n\n1. First, read the package.json file to understand how unit tests are initiated and what testing libraries are used\n2. Examine existing test files in the test/ directory to understand the testing format, patterns, and conventions used\n3. Identify all new or modified functions in the changed files\n4. For each new/modified function, create or update corresponding test files that:\n   - Follow the same format and structure as existing tests\n   - Use the same testing libraries (Jest, etc.) that are already in use\n   - Include multiple test cases for each function covering:\n     * Happy path scenarios\n     * Edge cases\n     * Error conditions\n     * Different code paths and branches\n     * Boundary conditions\n5. Ensure test file naming conventions match existing patterns\n6. Make sure all tests are properly organized and documented\n\nFocus on comprehensive coverage while maintaining consistency with the existing test suite."
+  }
+}

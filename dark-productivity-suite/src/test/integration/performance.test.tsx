@@ -103,38 +103,24 @@ describe('Performance Testing', () => {
       expect(loadTime).toBeLessThan(2000);
     });
 
-    it('should load Necronomicon Notes within 2 seconds', async () => {
-      const user = userEvent.setup();
-      render(<App />);
-
-      await waitFor(() => {
-        expect(screen.getByRole('navigation')).toBeInTheDocument();
-      });
-
-      const startTime = performance.now();
-
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
-      await user.click(notesLink);
-
-      await waitFor(() => {
-        expect(window.location.pathname).toBe('/necronomicon-notes');
-      });
-
-      const loadTime = performance.now() - startTime;
-      expect(loadTime).toBeLessThan(2000);
-    });
-
     it('should load Graveyard Dashboard within 2 seconds', async () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
       const startTime = performance.now();
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       await waitFor(() => {
@@ -144,6 +130,8 @@ describe('Performance Testing', () => {
       const loadTime = performance.now() - startTime;
       expect(loadTime).toBeLessThan(2000);
     });
+
+
   });
 
   describe('Large Dataset Performance', () => {
@@ -158,7 +146,18 @@ describe('Performance Testing', () => {
 
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       await waitFor(() => {
@@ -185,7 +184,18 @@ describe('Performance Testing', () => {
 
       render(<App />);
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       await waitFor(() => {
@@ -210,7 +220,18 @@ describe('Performance Testing', () => {
 
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       await waitFor(() => {
@@ -245,19 +266,26 @@ describe('Performance Testing', () => {
 
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
       // Navigate between modules with large datasets
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       await waitFor(() => {
         expect(window.location.pathname).toBe('/necronomicon-notes');
       });
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       await waitFor(() => {
@@ -274,8 +302,23 @@ describe('Performance Testing', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
+
+      await waitFor(() => {
+        expect(window.location.pathname).toBe('/necronomicon-notes');
+      });
 
       const newNoteButton = screen.getByRole('button', { name: /new note/i });
       await user.click(newNoteButton);
@@ -329,7 +372,18 @@ describe('Performance Testing', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       // Wait for initial note

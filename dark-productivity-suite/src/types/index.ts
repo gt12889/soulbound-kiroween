@@ -2,8 +2,19 @@
  * Core data models for Dark Productivity Suite
  */
 
+export interface User {
+  id: string;
+  email: string;
+  displayName?: string;
+  photoURL?: string;
+  provider: 'email' | 'google' | 'github';
+  createdAt: Date;
+  lastLogin: Date;
+}
+
 export interface Task {
   id: string;
+  userId?: string;
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high';
@@ -14,6 +25,7 @@ export interface Task {
 
 export interface Note {
   id: string;
+  userId?: string;
   title: string;
   content: string;
   createdAt: Date;
@@ -37,6 +49,7 @@ export interface CommitStats {
 
 export interface TarotReading {
   id: string;
+  userId?: string;
   date: Date;
   cards: TarotCard[];
   interpretation: string;
@@ -56,4 +69,28 @@ export interface AppSettings {
   lastModule: string;
 }
 
+export interface SyncStatus {
+  lastSync: Date | null;
+  syncing: boolean;
+  error?: string;
+  pendingChanges: number;
+}
+
+export interface SyncQueueItem {
+  id: string;
+  type: 'note' | 'task' | 'tarot';
+  action: 'create' | 'update' | 'delete';
+  data: any;
+  timestamp: Date;
+}
+
 export type ModuleName = 'terminal-tarot' | 'ghost-writer' | 'necronomicon-notes' | 'graveyard-dashboard';
+
+export interface KeyboardShortcut {
+  id: string;
+  action: string;
+  keys: string[];
+  description: string;
+  category: 'navigation' | 'actions' | 'search' | 'help';
+  customizable: boolean;
+}

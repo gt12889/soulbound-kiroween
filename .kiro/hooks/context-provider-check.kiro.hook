@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "name": "Context Provider Check",
+  "description": "Verifies proper TypeScript types and default values when context files are saved for type-safe contexts",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/context/**/*.tsx",
+      "**/contexts/**/*.tsx",
+      "**/*Context.tsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A context file has been saved. Verify it has: properly typed context interface, typed default values, typed provider props, proper error handling for missing provider, and exported custom hook for consuming the context. Report any type safety issues."
+  }
+}

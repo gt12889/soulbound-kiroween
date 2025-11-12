@@ -131,6 +131,7 @@ The Dark Productivity Suite embraces a **gothic, mystical aesthetic** that trans
 - **Custom CSS** - Ambient animations and effects
 
 ### Data & Services
+- **Firebase** - Authentication and cloud sync (optional)
 - **isomorphic-git** - Git operations in the browser
 - **LocalStorage API** - Client-side data persistence
 - **Context API** - State management
@@ -203,6 +204,12 @@ npm run test:ui
 
 ---
 
+## 🔥 Firebase Integration (Optional)
+
+Firebase support is included for cloud sync and authentication. The app works fully offline with LocalStorage - Firebase is only needed for syncing across devices.
+
+See [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for complete setup instructions.
+
 ## 🚢 Deployment
 
 The Dark Productivity Suite can be deployed to multiple platforms. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
@@ -240,7 +247,9 @@ All deployment configurations are included in the repository.
 - [x] Ambient audio system
 - [x] Data export functionality
 - [x] Production build optimization
-- [ ] Cloud sync (optional)
+- [x] Firebase integration (ready for cloud sync)
+- [ ] Cloud sync implementation
+- [ ] User authentication
 - [ ] Mobile app version
 - [ ] Additional tarot spreads
 - [ ] Custom themes

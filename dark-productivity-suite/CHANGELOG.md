@@ -5,6 +5,15 @@ All notable changes to the Dark Productivity Suite will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Firebase Integration**: Added Firebase SDK for future cloud sync and authentication features
+  - Firebase 12.5.0 dependency installed
+  - Documentation for Firebase setup and configuration
+  - Environment variable configuration guide
+  - Optional cloud sync architecture prepared
+
 ## [1.0.0] - 2024-11-12
 
 ### Added

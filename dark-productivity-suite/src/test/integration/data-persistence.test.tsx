@@ -26,8 +26,19 @@ describe('Data Persistence', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
       // Navigate to Notes
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       // Wait for initial note
@@ -56,8 +67,19 @@ describe('Data Persistence', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
       // Navigate to Graveyard
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       const startTime = Date.now();
@@ -86,8 +108,19 @@ describe('Data Persistence', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
       // Navigate to Notes
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       // Wait for initial note
@@ -117,8 +150,19 @@ describe('Data Persistence', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
       // Navigate to Graveyard
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       // Create task
@@ -160,7 +204,18 @@ describe('Data Persistence', () => {
       // First render - create note
       const { unmount } = render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      let enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       // Wait for initial note
@@ -183,7 +238,17 @@ describe('Data Persistence', () => {
       // Second render - verify restoration
       render(<App />);
 
-      await user.click(screen.getByRole('link', { name: /necronomicon/i }));
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('link', { name: /ancient library/i }));
 
       await waitFor(() => {
         expect(screen.getByDisplayValue('Persistent Note')).toBeInTheDocument();
@@ -196,7 +261,18 @@ describe('Data Persistence', () => {
       // First render - create task
       const { unmount } = render(<App />);
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      let enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       const newTaskButton = screen.getByRole('button', { name: /raise new task/i });
@@ -219,7 +295,17 @@ describe('Data Persistence', () => {
       // Second render - verify restoration
       render(<App />);
 
-      await user.click(screen.getByRole('link', { name: /graveyard/i }));
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('link', { name: /forgotten graveyard/i }));
 
       await waitFor(() => {
         expect(screen.getByText('Persistent Task')).toBeInTheDocument();
@@ -231,6 +317,13 @@ describe('Data Persistence', () => {
       
       // First render - change settings
       const { unmount } = render(<App />);
+
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      let enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
 
       // Wait for app to load
       await waitFor(() => {
@@ -324,7 +417,18 @@ describe('Data Persistence', () => {
 
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       // Wait for initial load

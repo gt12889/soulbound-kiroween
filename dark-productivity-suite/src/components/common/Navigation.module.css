@@ -258,8 +258,9 @@
   background: linear-gradient(90deg, transparent, var(--accent-purple-light), transparent);
 }
 
-/* Export Button */
-.exportButton {
+/* Export and Logout Buttons */
+.exportButton,
+.logoutButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,7 +279,8 @@
   overflow: hidden;
 }
 
-.exportButton::before {
+.exportButton::before,
+.logoutButton::before {
   content: '';
   position: absolute;
   top: 0;
@@ -289,11 +291,13 @@
   transition: left var(--timing-normal) var(--ease-in-out);
 }
 
-.exportButton:hover::before {
+.exportButton:hover::before,
+.logoutButton:hover::before {
   left: 100%;
 }
 
-.exportButton:hover {
+.exportButton:hover,
+.logoutButton:hover {
   background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
   border-color: var(--accent-purple-light);
   color: var(--text-primary);
@@ -301,23 +305,27 @@
   transform: translateY(-2px);
 }
 
-.exportButton:active {
+.exportButton:active,
+.logoutButton:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px var(--shadow-medium);
 }
 
-.exportIcon {
+.exportIcon,
+.logoutIcon {
   font-size: 1.25rem;
   filter: drop-shadow(0 0 5px var(--shadow-light));
   transition: transform var(--timing-hover) var(--ease-in-out);
 }
 
-.exportButton:hover .exportIcon {
+.exportButton:hover .exportIcon,
+.logoutButton:hover .logoutIcon {
   transform: scale(1.1);
   animation: pulseGlow 1s ease-in-out infinite;
 }
 
-.exportLabel {
+.exportLabel,
+.logoutLabel {
   font-weight: 600;
 }
 

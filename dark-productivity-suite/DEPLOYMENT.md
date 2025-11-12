@@ -147,7 +147,34 @@ Check that `base: './'` is set in `vite.config.ts` for relative paths.
 
 ## Environment Variables
 
+### Basic Deployment (LocalStorage Only)
+
 This project doesn't require environment variables for basic functionality. All data is stored locally in the browser.
+
+### Firebase Integration (Optional)
+
+If you want to enable cloud sync and authentication, you'll need to configure Firebase:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+
+2. Enable Authentication and Firestore in your Firebase project
+
+3. Create a `.env` file in the project root:
+   ```env
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+4. Configure environment variables in your hosting platform:
+   - **Vercel**: Project Settings → Environment Variables
+   - **Netlify**: Site Settings → Environment Variables
+   - **GitHub Pages**: Repository Settings → Secrets and Variables → Actions
+
+**Note**: The app works fully offline with LocalStorage. Firebase is only needed for cloud sync across devices.
 
 ## Custom Domain
 

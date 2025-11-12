@@ -79,6 +79,13 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
@@ -112,7 +119,15 @@ describe('Browser Compatibility', () => {
 
   describe('CSS and Rendering Compatibility', () => {
     it('should render all main components', async () => {
+      const user = userEvent.setup();
       render(<App />);
+
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -123,7 +138,15 @@ describe('Browser Compatibility', () => {
     });
 
     it('should handle CSS modules correctly', async () => {
+      const user = userEvent.setup();
       render(<App />);
+
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -138,17 +161,24 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
       // Navigate to trigger loading animation
-      const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-      await user.click(ghostWriterLink);
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
+      await user.click(notesLink);
 
       // Should not crash with animations
       await waitFor(() => {
-        expect(window.location.pathname).toBe('/ghost-writer');
+        expect(window.location.pathname).toBe('/necronomicon-notes');
       });
     });
   });
@@ -158,20 +188,38 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
-      const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       
-      expect(() => user.click(ghostWriterLink)).not.toThrow();
+      expect(() => user.click(notesLink)).not.toThrow();
     });
 
     it('should handle keyboard events', async () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       await waitFor(() => {
@@ -193,7 +241,18 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
-      const graveyardLink = screen.getByRole('link', { name: /graveyard/i });
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('navigation')).toBeInTheDocument();
+      });
+
+      const graveyardLink = screen.getByRole('link', { name: /forgotten graveyard/i });
       await user.click(graveyardLink);
 
       await waitFor(() => {
@@ -222,20 +281,27 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
 
       // Navigate forward
-      const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-      await user.click(ghostWriterLink);
+      const tarotLink = screen.getByRole('link', { name: /mystic clearing/i });
+      await user.click(tarotLink);
 
       await waitFor(() => {
-        expect(window.location.pathname).toBe('/ghost-writer');
+        expect(window.location.pathname).toBe('/terminal-tarot');
       });
 
       // Navigate to another page
-      const notesLink = screen.getByRole('link', { name: /necronomicon/i });
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
       await user.click(notesLink);
 
       await waitFor(() => {
@@ -250,6 +316,13 @@ describe('Browser Compatibility', () => {
       const user = userEvent.setup();
       render(<App />);
 
+      // Enter from landing page
+      await waitFor(() => {
+        expect(screen.getByText(/begin your journey/i)).toBeInTheDocument();
+      });
+      const enterButton = screen.getByRole('button', { name: /begin your journey/i });
+      await user.click(enterButton);
+
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
       });
@@ -257,11 +330,11 @@ describe('Browser Compatibility', () => {
       const initialNav = screen.getByRole('navigation');
 
       // Navigate
-      const ghostWriterLink = screen.getByRole('link', { name: /ghost writer/i });
-      await user.click(ghostWriterLink);
+      const notesLink = screen.getByRole('link', { name: /ancient library/i });
+      await user.click(notesLink);
 
       await waitFor(() => {
-        expect(window.location.pathname).toBe('/ghost-writer');
+        expect(window.location.pathname).toBe('/necronomicon-notes');
       });
 
       // Navigation element should still be the same (no page reload)

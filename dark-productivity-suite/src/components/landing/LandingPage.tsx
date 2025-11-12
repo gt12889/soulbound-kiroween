@@ -12,7 +12,7 @@ const LandingPage: React.FC = () => {
 
   const handleGetStarted = () => {
     playUIClick();
-    navigate('/necronomicon-notes');
+    navigate('/login');
   };
 
   const features = [

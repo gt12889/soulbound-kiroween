@@ -1,0 +1,161 @@
+/**
+ * Sync Status Indicator Styles
+ */
+
+.syncIndicator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Status Dot */
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.statusDot.online {
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.statusDot.offline {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Status Text */
+.statusText {
+  font-size: 0.875rem;
+  font-family: 'Lora', serif;
+  flex: 1;
+  min-width: 0;
+}
+
+.syncing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #8b5cf6;
+}
+
+.error {
+  color: #ef4444;
+  cursor: help;
+}
+
+.pending {
+  color: #f59e0b;
+}
+
+.synced {
+  color: #10b981;
+}
+
+/* Sync Spinner */
+.syncSpinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-top-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sync Button */
+.syncButton {
+  background: transparent;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 6px;
+  padding: 0.375rem;
+  cursor: pointer;
+  color: #8b5cf6;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.syncButton:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+  border-color: #8b5cf6;
+  transform: scale(1.05);
+}
+
+.syncButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.syncButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.syncIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.syncIcon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+/* Error Message */
+.errorMessage {
+  font-size: 0.75rem;
+  color: #ef4444;
+  padding: 0.25rem 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-family: 'Lora', serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .syncIndicator {
+    padding: 0.375rem 0.75rem;
+  }
+
+  .statusText {
+    font-size: 0.8125rem;
+  }
+
+  .syncButton {
+    padding: 0.25rem;
+  }
+
+  .syncIcon {
+    width: 14px;
+    height: 14px;
+  }
+}
