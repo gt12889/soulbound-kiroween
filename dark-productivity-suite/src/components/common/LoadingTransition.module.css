@@ -1,0 +1,258 @@
+.loadingTransition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-loading);
+  animation: fadeIn 0.5s ease-in-out;
+  overflow: hidden;
+}
+
+.loadingTransition.fadeOut {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+/* Fog Layers - Multiple layers for depth */
+.fogLayer1,
+.fogLayer2,
+.fogLayer3 {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+}
+
+.fogLayer1 {
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    var(--shadow-light) 0%,
+    transparent 50%
+  );
+  animation: fogDrift1 8s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.fogLayer2 {
+  background: radial-gradient(
+    ellipse at 70% 60%,
+    var(--shadow-medium) 0%,
+    transparent 50%
+  );
+  animation: fogDrift2 10s ease-in-out infinite;
+  opacity: 0.3;
+  animation-delay: -2s;
+}
+
+.fogLayer3 {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    var(--glow-purple) 0%,
+    transparent 60%
+  );
+  animation: fogDrift3 12s ease-in-out infinite;
+  opacity: 0.2;
+  animation-delay: -4s;
+}
+
+/* Shadow Effect */
+.shadowEffect {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle at center,
+    transparent 30%,
+    var(--shadow-heavy) 100%
+  );
+  animation: shadowPulse 3s ease-in-out infinite;
+}
+
+/* Loading Content */
+.loadingContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Spinner */
+.loadingSpinner {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.spinnerRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: var(--accent-purple-light);
+  border-radius: 50%;
+  animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.spinnerRing:nth-child(1) {
+  border-top-color: var(--accent-purple-light);
+  animation-duration: 1.5s;
+}
+
+.spinnerRing:nth-child(2) {
+  border-top-color: var(--highlight-blue);
+  animation-duration: 2s;
+  animation-delay: -0.5s;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+}
+
+.spinnerRing:nth-child(3) {
+  border-top-color: var(--accent-purple);
+  animation-duration: 2.5s;
+  animation-delay: -1s;
+  width: 60%;
+  height: 60%;
+  top: 20%;
+  left: 20%;
+}
+
+/* Loading Text */
+.loadingText {
+  font-family: var(--font-header);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px var(--glow-purple);
+}
+
+.loadingDots {
+  display: inline-block;
+}
+
+.dot {
+  animation: dotPulse 1.5s ease-in-out infinite;
+  opacity: 0;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fogDrift1 {
+  0%, 100% {
+    transform: translate(-10%, -10%) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(10%, 10%) scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes fogDrift2 {
+  0%, 100% {
+    transform: translate(10%, -5%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-10%, 5%) scale(1.15);
+    opacity: 0.5;
+  }
+}
+
+@keyframes fogDrift3 {
+  0%, 100% {
+    transform: translate(-5%, 10%) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(5%, -10%) scale(1.2);
+    opacity: 0.4;
+  }
+}
+
+@keyframes shadowPulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .loadingSpinner {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .loadingText {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loadingSpinner {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .loadingText {
+    font-size: 1rem;
+  }
+}

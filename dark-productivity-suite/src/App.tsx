@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Navigation from './components/common/Navigation';
+import LoadingTransition from './components/common/LoadingTransition';
+import TerminalTarot from './components/terminal-tarot/TerminalTarot';
+import GhostWriter from './components/ghost-writer/GhostWriter';
+import NecronomiconNotes from './components/necronomicon-notes/NecronomiconNotes';
+import GraveyardDashboard from './components/graveyard-dashboard/GraveyardDashboard';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const AppContent: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+
+  // Trigger loading transition on route change
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100); // Brief delay to trigger the transition
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="app">
+      <Navigation />
+      <main className="main-content">
+        <LoadingTransition isLoading={isLoading} minDisplayTime={500} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/terminal-tarot" replace />} />
+          <Route path="/terminal-tarot" element={<TerminalTarot />} />
+          <Route path="/ghost-writer" element={<GhostWriter />} />
+          <Route path="/necronomicon-notes" element={<NecronomiconNotes />} />
+          <Route path="/graveyard-dashboard" element={<GraveyardDashboard />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
 
-export default App
+const App: React.FC = () => {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+};
+
+export default App;
