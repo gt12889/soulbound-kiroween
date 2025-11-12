@@ -1,6 +1,9 @@
 /* Import Gothic fonts from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&display=swap');
 
+/* Import Ambient Animations */
+@import './styles/ambient-animations.css';
+
 :root {
   font-family: 'Lora', 'Merriweather', serif;
   line-height: 1.6;

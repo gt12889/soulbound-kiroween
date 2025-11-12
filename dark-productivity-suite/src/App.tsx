@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navigation from './components/common/Navigation';
 import LoadingTransition from './components/common/LoadingTransition';
+import AudioController from './components/common/AudioController';
 import TerminalTarot from './components/terminal-tarot/TerminalTarot';
 import GhostWriter from './components/ghost-writer/GhostWriter';
 import NecronomiconNotes from './components/necronomicon-notes/NecronomiconNotes';
-import GraveyardDashboard from './components/graveyard-dashboard/GraveyardDashboard';
+import { GraveyardDashboard } from './components/graveyard-dashboard/GraveyardDashboard';
 import './App.css';
 
 const AppContent: React.FC = () => {
@@ -35,6 +36,7 @@ const AppContent: React.FC = () => {
           <Route path="/graveyard-dashboard" element={<GraveyardDashboard />} />
         </Routes>
       </main>
+      <AudioController />
     </div>
   );
 };

@@ -1,0 +1,130 @@
+.ghostSuggestion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(77, 45, 110, 0.15);
+  border: 1px solid rgba(77, 45, 110, 0.3);
+  border-radius: 6px;
+  color: rgba(224, 224, 224, 0.3);
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 1rem;
+  font-style: italic;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: 
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out,
+    color 0.1s ease-in-out,
+    background 0.1s ease-in-out,
+    border-color 0.1s ease-in-out;
+  pointer-events: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(77, 45, 110, 0.2);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fade-in animation (0.5-1.0s) - Requirement 2.2 */
+.ghostSuggestion.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  animation: fadeIn 0.7s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Hover state - opacity from 30% to 80% */
+.ghostSuggestion.hovered {
+  color: rgba(224, 224, 224, 0.8);
+  background: rgba(77, 45, 110, 0.25);
+  border-color: rgba(77, 45, 110, 0.5);
+  box-shadow: 
+    0 6px 20px rgba(77, 45, 110, 0.4),
+    0 0 30px rgba(77, 45, 110, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Fade-out animation */
+.ghostSuggestion.fadingOut {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  transition: 
+    opacity 0.3s ease-in,
+    transform 0.3s ease-in;
+}
+
+.suggestionText {
+  flex: 1;
+  min-width: 0;
+}
+
+.ghostIcon {
+  font-size: 1.2rem;
+  opacity: 0.6;
+  transition: opacity 0.1s ease-in-out;
+  flex-shrink: 0;
+}
+
+.ghostSuggestion.hovered .ghostIcon {
+  opacity: 1;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Spectral glow effect on hover */
+.ghostSuggestion.hovered::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    45deg,
+    rgba(77, 45, 110, 0.3),
+    rgba(61, 90, 128, 0.3),
+    rgba(77, 45, 110, 0.3)
+  );
+  border-radius: 6px;
+  z-index: -1;
+  opacity: 0;
+  animation: spectralGlow 2s ease-in-out infinite;
+}
+
+@keyframes spectralGlow {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ghostSuggestion {
+    max-width: 250px;
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+}

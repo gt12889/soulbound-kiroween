@@ -1,0 +1,274 @@
+.tombstone {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out;
+  animation-fill-mode: both;
+}
+
+.tombstone:hover {
+  transform: scale(1.05);
+}
+
+.tombstone.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+/* Rise animation on creation (1.0-1.5s) - Requirement 4.2 */
+@keyframes rise {
+  0% {
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.tombstone.rising {
+  animation: rise 1.2s ease-in-out;
+}
+
+/* Sink animation on completion - Requirement 4.3 */
+@keyframes sink {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.tombstone.sinking {
+  animation: sink 1.2s ease-in-out;
+}
+
+/* Stone structure */
+.stone {
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border: 2px solid #4a4a4a;
+  border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+  padding: 1.5rem 1rem;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Size based on priority - Requirement 4.4 */
+.priorityLow .stone {
+  min-height: 100px;
+  width: 100px;
+  font-size: 0.8rem;
+}
+
+.priorityMedium .stone {
+  min-height: 120px;
+  width: 120px;
+  font-size: 0.9rem;
+}
+
+.priorityHigh .stone {
+  min-height: 150px;
+  width: 150px;
+  font-size: 1rem;
+  border-width: 3px;
+}
+
+/* Weathered texture for completed tombstones - Requirement 4.3 */
+.completed .stone {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border-color: #2a2a2a;
+  opacity: 0.7;
+  filter: grayscale(0.5);
+}
+
+.completed .stone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(0, 0, 0, 0.1) 10px,
+      rgba(0, 0, 0, 0.1) 11px
+    );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Cross at top */
+.cross {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 0.5rem;
+}
+
+.crossVertical {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 30px;
+  background: #6a6a6a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.crossHorizontal {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 4px;
+  background: #6a6a6a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Engraved title - Requirement 4.1 */
+.title {
+  font-family: 'Cinzel', serif;
+  color: #8a8a8a;
+  text-align: center;
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 1px rgba(255, 255, 255, 0.1);
+  word-wrap: break-word;
+  max-width: 90%;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.rip {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7em;
+  color: #6a6a6a;
+  margin-top: 0.5rem;
+  letter-spacing: 2px;
+}
+
+/* Ghostly tooltip - Requirement 4.5 */
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 1rem;
+  z-index: 1000;
+  pointer-events: none;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltipContent {
+  background: rgba(20, 10, 30, 0.95);
+  border: 2px solid #4a2d6e;
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 200px;
+  max-width: 300px;
+  box-shadow: 
+    0 0 20px rgba(74, 45, 110, 0.5),
+    0 0 40px rgba(74, 45, 110, 0.3),
+    inset 0 0 20px rgba(74, 45, 110, 0.2);
+  pointer-events: auto;
+  animation: ghostlyGlow 2s ease-in-out infinite;
+}
+
+@keyframes ghostlyGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(74, 45, 110, 0.5),
+      0 0 40px rgba(74, 45, 110, 0.3),
+      inset 0 0 20px rgba(74, 45, 110, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(74, 45, 110, 0.7),
+      0 0 60px rgba(74, 45, 110, 0.5),
+      inset 0 0 30px rgba(74, 45, 110, 0.3);
+  }
+}
+
+.tooltipContent h4 {
+  margin: 0 0 0.5rem 0;
+  color: #e0e0e0;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+}
+
+.tooltipContent p {
+  margin: 0 0 0.75rem 0;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.tooltipMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: #8a8a8a;
+  margin-bottom: 0.75rem;
+}
+
+.deleteButton {
+  width: 100%;
+  padding: 0.5rem;
+  background: rgba(110, 45, 45, 0.8);
+  border: 1px solid #6e2d2d;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+
+.deleteButton:hover {
+  background: rgba(110, 45, 45, 1);
+  box-shadow: 0 0 10px rgba(110, 45, 45, 0.5);
+}
+
+/* Arrow pointing to tombstone */
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #4a2d6e;
+}

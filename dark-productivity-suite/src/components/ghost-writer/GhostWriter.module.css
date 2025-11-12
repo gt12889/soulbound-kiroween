@@ -1,0 +1,103 @@
+.ghostWriter {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fog layers - Requirement 3.4 */
+.fogLayer {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fogLayer:nth-child(1) {
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    rgba(77, 45, 110, 0.15) 0%,
+    transparent 60%
+  );
+}
+
+.fogLayer:nth-child(2) {
+  background: radial-gradient(
+    ellipse at 70% 60%,
+    rgba(61, 90, 128, 0.12) 0%,
+    transparent 55%
+  );
+}
+
+.fogLayer:nth-child(3) {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(45, 27, 78, 0.1) 0%,
+    transparent 65%
+  );
+}
+
+.header {
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  font-family: 'Cinzel', 'Crimson Text', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin: 0 0 0.5rem;
+  text-shadow: 
+    0 0 10px rgba(77, 45, 110, 0.5),
+    0 0 20px rgba(77, 45, 110, 0.3);
+  letter-spacing: 0.1em;
+}
+
+.subtitle {
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(176, 176, 176, 0.7);
+  margin: 0;
+}
+
+.editorWrapper {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    padding: 1.5rem 1rem 0.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+  }
+}

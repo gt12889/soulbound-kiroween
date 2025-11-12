@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { TarotReading } from '../../types';
 import { getRecentCommits, analyzeCommits, isGitRepository, generateDemoCommits } from '../../services/gitService';
 import { generateTarotReading } from '../../services/tarotService';
+import { useAudio } from '../../hooks/useAudio';
 import TarotCard from './TarotCard';
 import styles from './TarotReader.module.css';
 
@@ -10,6 +11,7 @@ const TarotReader: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const { playUIClick, playUIHover } = useAudio();
 
   const generateReading = async (useDemoData: boolean = false) => {
     setLoading(true);
@@ -63,10 +65,12 @@ const TarotReader: React.FC = () => {
   };
 
   const handleGenerateReading = () => {
+    playUIClick();
     generateReading(false);
   };
 
   const handleDemoReading = () => {
+    playUIClick();
     generateReading(true);
   };
 
@@ -84,6 +88,7 @@ const TarotReader: React.FC = () => {
           <button 
             className={styles.generateButton}
             onClick={handleGenerateReading}
+            onMouseEnter={playUIHover}
           >
             <span className={styles.buttonIcon}>🔮</span>
             Generate Reading
@@ -93,6 +98,7 @@ const TarotReader: React.FC = () => {
             <button 
               className={styles.demoButton}
               onClick={handleDemoReading}
+              onMouseEnter={playUIHover}
             >
               <span className={styles.buttonIcon}>✨</span>
               Try Demo Reading

@@ -48,12 +48,17 @@
   --font-body: 'Lora', 'Merriweather', serif;
   --font-mono: 'Fira Code', 'Source Code Pro', monospace;
   
-  /* Timing Variables */
-  --timing-fast: 100ms;
-  --timing-normal: 200ms;
-  --timing-slow: 300ms;
-  --timing-page-turn: 1000ms;
-  --timing-transition: 800ms;
+  /* Timing Variables - Requirement 6.5 */
+  --timing-hover: 100ms;        /* Hover effects respond within 100ms */
+  --timing-micro: 250ms;        /* Micro-interactions (200-300ms) */
+  --timing-normal: 300ms;       /* Standard transitions */
+  --timing-page-turn: 1000ms;   /* Page transitions (800-1200ms) */
+  --timing-transition: 900ms;   /* Module transitions (800-1200ms) */
+  
+  /* Easing Functions */
+  --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-in-out: ease-in-out;
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
   
   /* Z-Index Layers */
   --z-base: 1;
@@ -91,7 +96,7 @@ body {
   flex: 1;
   padding: 2rem;
   min-height: 100vh;
-  transition: opacity var(--timing-transition) ease-in-out;
+  transition: opacity var(--timing-transition) var(--ease-in-out);
 }
 
 /* ===================================
@@ -146,7 +151,7 @@ code, pre {
 ::-webkit-scrollbar-thumb {
   background: var(--accent-purple);
   border-radius: 4px;
-  transition: background var(--timing-normal) ease;
+  transition: background var(--timing-micro) var(--ease-in-out);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -385,9 +390,9 @@ code, pre {
   animation: glowPulse 2s ease-in-out infinite;
 }
 
-/* Hover States */
+/* Hover States - Requirement 6.5 */
 .hover-lift {
-  transition: transform var(--timing-normal) ease;
+  transition: transform var(--timing-hover) var(--ease-in-out);
 }
 
 .hover-lift:hover {
@@ -395,7 +400,7 @@ code, pre {
 }
 
 .hover-glow {
-  transition: box-shadow var(--timing-normal) ease;
+  transition: box-shadow var(--timing-hover) var(--ease-in-out);
 }
 
 .hover-glow:hover {
@@ -403,8 +408,10 @@ code, pre {
 }
 
 /* ===================================
-   Responsive Design
+   Responsive Design - Requirement 6.4
    =================================== */
+
+/* Tablet (1024px and below) */
 @media (max-width: 1024px) {
   .main-content {
     margin-left: 200px;
@@ -418,12 +425,19 @@ code, pre {
   h2 {
     font-size: 1.75rem;
   }
+  
+  /* Simplify animations on tablets */
+  .ambient-fog-layer {
+    animation-duration: 40s !important;
+  }
 }
 
+/* Mobile (768px and below) */
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
     padding: 1rem;
+    padding-top: 0;
   }
   
   h1 {
@@ -433,8 +447,24 @@ code, pre {
   h2 {
     font-size: 1.5rem;
   }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  /* Simplify animations on mobile */
+  .ambient-fog-layer {
+    opacity: 0.5 !important;
+    animation-duration: 50s !important;
+  }
+  
+  /* Reduce animation complexity */
+  .ambient-shadow-drift {
+    animation: none;
+  }
 }
 
+/* Small mobile (480px and below) */
 @media (max-width: 480px) {
   .main-content {
     padding: 0.75rem;
@@ -446,5 +476,44 @@ code, pre {
   
   h2 {
     font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.1rem;
+  }
+  
+  p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+}
+
+/* Minimum width support - Requirement 6.4 */
+@media (max-width: 320px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  
+  h1 {
+    font-size: 1.25rem;
+  }
+  
+  h2 {
+    font-size: 1.1rem;
+  }
+  
+  h3 {
+    font-size: 1rem;
+  }
+  
+  p {
+    font-size: 0.9rem;
+  }
+  
+  /* Disable complex animations on very small screens */
+  .ambient-fog-layer,
+  .ambient-shadow-drift,
+  .ambient-glow-pulse {
+    display: none;
   }
 }

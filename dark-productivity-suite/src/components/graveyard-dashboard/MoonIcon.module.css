@@ -1,0 +1,316 @@
+.moonContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.moonContainer:hover {
+  background: rgba(74, 45, 110, 0.2);
+  transform: scale(1.05);
+}
+
+/* Event indicator - Requirement 5.6 */
+.eventIndicator {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 10;
+}
+
+.eventDot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: #6e2d2d;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(110, 45, 45, 0.8);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+/* Moon icon - Requirements 5.1, 5.2 */
+.moonIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Glow effect on selection - Requirement 5.2 */
+.moonIcon.selected {
+  box-shadow: 
+    0 0 20px rgba(224, 224, 224, 0.6),
+    0 0 40px rgba(224, 224, 224, 0.4),
+    0 0 60px rgba(224, 224, 224, 0.2);
+  transform: scale(1.1);
+}
+
+.moonSurface {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 50%, #a0a0a0 100%);
+  box-shadow: 
+    inset -4px -4px 8px rgba(0, 0, 0, 0.3),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add subtle crater texture */
+.moonSurface::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 30% 30%, rgba(0, 0, 0, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 70% 50%, rgba(0, 0, 0, 0.08) 3px, transparent 3px),
+    radial-gradient(circle at 50% 80%, rgba(0, 0, 0, 0.06) 2px, transparent 2px);
+  background-size: 100% 100%;
+  border-radius: 50%;
+}
+
+/* Moon shadow overlay for phase representation */
+.moonShadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  border-radius: 50%;
+  transition: clip-path 0.3s ease;
+}
+
+/* Phase-specific styling */
+.moonIcon.new .moonSurface {
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+}
+
+.moonIcon.full .moonSurface {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+  box-shadow: 
+    0 0 20px rgba(224, 224, 224, 0.4),
+    inset -4px -4px 8px rgba(0, 0, 0, 0.2),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.3);
+}
+
+/* Day number */
+.dayNumber {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: #b0b0b0;
+  font-weight: 600;
+}
+
+/* Tooltip - Requirement 5.4 */
+.tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.5rem;
+  z-index: 1000;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltipContent {
+  background: rgba(20, 10, 30, 0.95);
+  border: 2px solid #4a2d6e;
+  border-radius: 8px;
+  padding: 0.75rem;
+  min-width: 180px;
+  box-shadow: 
+    0 0 20px rgba(74, 45, 110, 0.5),
+    0 0 40px rgba(74, 45, 110, 0.3);
+  white-space: nowrap;
+}
+
+.tooltipDate {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.tooltipPhase {
+  font-family: 'Lora', serif;
+  font-size: 0.85rem;
+  color: #b0b0b0;
+  margin-bottom: 0.25rem;
+}
+
+.tooltipIllumination {
+  font-family: 'Lora', serif;
+  font-size: 0.8rem;
+  color: #8a8a8a;
+  margin-bottom: 0.5rem;
+}
+
+.tooltipEvents {
+  border-top: 1px solid #4a2d6e;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tooltipEventsTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: #b0b0b0;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.tooltipEvent {
+  font-family: 'Lora', serif;
+  font-size: 0.75rem;
+  color: #8a8a8a;
+  margin-bottom: 0.15rem;
+  white-space: normal;
+  max-width: 200px;
+}
+
+/* Arrow pointing to moon */
+.tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #4a2d6e;
+}
+
+/* Responsive adjustments - Requirement 6.4 */
+@media (max-width: 1024px) {
+  .moonIcon {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .moonContainer {
+    padding: 0.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .moonIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .dayNumber {
+    font-size: 0.8rem;
+  }
+
+  .tooltipContent {
+    min-width: 150px;
+    padding: 0.6rem;
+  }
+  
+  .tooltipDate {
+    font-size: 0.85rem;
+  }
+  
+  .tooltipPhase {
+    font-size: 0.8rem;
+  }
+  
+  .eventDot {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .moonIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dayNumber {
+    font-size: 0.7rem;
+  }
+  
+  .moonContainer {
+    padding: 0.3rem;
+    gap: 0.3rem;
+  }
+  
+  .tooltipContent {
+    min-width: 120px;
+    padding: 0.5rem;
+  }
+  
+  .tooltipDate {
+    font-size: 0.8rem;
+  }
+  
+  .tooltipPhase,
+  .tooltipIllumination {
+    font-size: 0.75rem;
+  }
+  
+  .tooltipEvent {
+    font-size: 0.7rem;
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 320px) {
+  .moonIcon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dayNumber {
+    font-size: 0.65rem;
+  }
+  
+  .moonContainer {
+    padding: 0.2rem;
+  }
+  
+  /* Simplify tooltip on very small screens */
+  .tooltipContent {
+    min-width: 100px;
+    padding: 0.4rem;
+  }
+  
+  .tooltipEvents {
+    display: none;
+  }
+}

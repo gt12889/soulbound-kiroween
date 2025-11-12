@@ -1,0 +1,246 @@
+.moonCalendar {
+  background: rgba(26, 26, 26, 0.6);
+  border: 2px solid #4a2d6e;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 0 30px rgba(74, 45, 110, 0.3);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.monthTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  color: #e0e0e0;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.navButton {
+  background: rgba(74, 45, 110, 0.3);
+  border: 2px solid #4a2d6e;
+  border-radius: 8px;
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navButton:hover:not(:disabled) {
+  background: rgba(74, 45, 110, 0.5);
+  box-shadow: 0 0 15px rgba(74, 45, 110, 0.5);
+  transform: scale(1.05);
+}
+
+.navButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Weekday headers */
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.weekday {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: #8a8a8a;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Calendar grid - Requirements 5.1, 5.2 */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Waxing/waning animation on month navigation - Requirement 5.5 */
+.calendar.animating {
+  animation: moonTransition 0.9s ease-in-out;
+}
+
+@keyframes moonTransition {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.emptyCell {
+  /* Empty cells for alignment */
+}
+
+/* Selected date info panel */
+.selectedDateInfo {
+  background: rgba(20, 10, 30, 0.8);
+  border: 2px solid #4a2d6e;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  animation: slideIn 0.25s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selectedDateTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: #e0e0e0;
+  margin: 0 0 0.5rem 0;
+}
+
+.selectedDatePhase {
+  font-family: 'Lora', serif;
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin-bottom: 1rem;
+  text-transform: capitalize;
+}
+
+.selectedDateTasks {
+  margin-top: 1rem;
+}
+
+.selectedDateTasks h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin: 0 0 0.75rem 0;
+}
+
+.selectedDateTasks ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.selectedDateTasks li {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: #8a8a8a;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: rgba(74, 45, 110, 0.2);
+  border-radius: 4px;
+  border-left: 3px solid #4a2d6e;
+}
+
+.selectedDateTasks li.completedTask {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.noTasks {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: #6a6a6a;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .moonCalendar {
+    padding: 1.5rem;
+  }
+
+  .monthTitle {
+    font-size: 1.4rem;
+  }
+
+  .navButton {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .weekday {
+    font-size: 0.8rem;
+  }
+
+  .calendar {
+    gap: 0.25rem;
+  }
+
+  .selectedDateInfo {
+    padding: 1rem;
+  }
+
+  .selectedDateTitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .moonCalendar {
+    padding: 1rem;
+  }
+
+  .monthTitle {
+    font-size: 1.2rem;
+  }
+
+  .navButton {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+
+  .weekday {
+    font-size: 0.7rem;
+  }
+
+  .selectedDateInfo {
+    padding: 0.75rem;
+  }
+
+  .selectedDateTitle {
+    font-size: 0.9rem;
+  }
+
+  .selectedDatePhase {
+    font-size: 0.85rem;
+  }
+
+  .selectedDateTasks li {
+    font-size: 0.85rem;
+    padding: 0.4rem;
+  }
+}
