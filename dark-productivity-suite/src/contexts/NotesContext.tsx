@@ -21,6 +21,13 @@ interface NotesContextType {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   filteredNotes: Note[];
+  
+  // Tag filtering
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+  tagFilterMode: 'AND' | 'OR';
+  setTagFilterMode: (mode: 'AND' | 'OR') => void;
+  allTags: string[];
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
@@ -43,6 +50,10 @@ export function NotesProvider({ children }: NotesProviderProps) {
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Tag filtering state
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagFilterMode, setTagFilterMode] = useState<'AND' | 'OR'>('OR');
 
   /**
    * Create a new note
@@ -53,6 +64,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
       id: crypto.randomUUID(),
       title,
       content,
+      tags: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -101,20 +113,49 @@ export function NotesProvider({ children }: NotesProviderProps) {
   }, [notes]);
 
   /**
-   * Filter notes based on search query
-   * Requirements: 3.6
+   * Get all unique tags from all notes
+   */
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    notes.forEach(note => {
+      note.tags?.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [notes]);
+
+  /**
+   * Filter notes based on search query and tags
+   * Requirements: 3.6, 14.4, 14.6
    */
   const filteredNotes = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return notes;
+    let result = notes;
+    
+    // Apply tag filtering
+    if (selectedTags.length > 0) {
+      result = result.filter(note => {
+        const noteTags = note.tags || [];
+        if (tagFilterMode === 'AND') {
+          // Note must have ALL selected tags
+          return selectedTags.every(tag => noteTags.includes(tag));
+        } else {
+          // Note must have ANY selected tag
+          return selectedTags.some(tag => noteTags.includes(tag));
+        }
+      });
     }
     
-    const query = searchQuery.toLowerCase();
-    return notes.filter(note => 
-      note.title.toLowerCase().includes(query) ||
-      note.content.toLowerCase().includes(query)
-    );
-  }, [notes, searchQuery]);
+    // Apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(note => 
+        note.title.toLowerCase().includes(query) ||
+        note.content.toLowerCase().includes(query) ||
+        (note.tags || []).some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+    
+    return result;
+  }, [notes, searchQuery, selectedTags, tagFilterMode]);
 
   const value: NotesContextType = {
     notes,
@@ -127,6 +168,11 @@ export function NotesProvider({ children }: NotesProviderProps) {
     searchQuery,
     setSearchQuery,
     filteredNotes,
+    selectedTags,
+    setSelectedTags,
+    tagFilterMode,
+    setTagFilterMode,
+    allTags,
   };
 
   return <NotesContext.Provider value={value}>{children}</NotesContext.Provider>;

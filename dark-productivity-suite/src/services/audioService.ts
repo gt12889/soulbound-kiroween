@@ -12,7 +12,8 @@ export type SoundEffect =
   | 'tombstone-rise'
   | 'tombstone-sink'
   | 'ui-click'
-  | 'ui-hover';
+  | 'ui-hover'
+  | 'pomodoro-complete';
 
 interface AudioState {
   context: AudioContext | null;
@@ -221,6 +222,13 @@ class AudioService {
       case 'ui-hover':
         // Subtle hover sound
         this.generateTone(600, 0.08, 'sine', 0.15);
+        break;
+
+      case 'pomodoro-complete':
+        // Mystical chime - three ascending tones
+        this.generateTone(523, 0.3, 'sine', 0.35); // C5
+        setTimeout(() => this.generateTone(659, 0.3, 'sine', 0.35), 200); // E5
+        setTimeout(() => this.generateTone(784, 0.4, 'sine', 0.4), 400); // G5
         break;
 
       default:

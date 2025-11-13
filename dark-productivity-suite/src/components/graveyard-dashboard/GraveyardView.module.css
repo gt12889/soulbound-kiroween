@@ -245,3 +245,28 @@
     gap: 1rem;
   }
 }
+
+/* Tag cloud toggle button */
+.tagCloudToggle {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: 'Cinzel', serif;
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tagCloudToggle:hover {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 8px var(--glow-purple);
+}
+
+.filterSection {
+  margin-bottom: 1.5rem;
+}

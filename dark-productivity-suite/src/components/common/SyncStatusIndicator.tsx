@@ -1,15 +1,15 @@
 /**
  * Sync Status Indicator Component
  * Displays sync status, last sync time, and provides manual sync button
+ * Requirements: 17.3
  */
 
-import { useContext } from 'react';
-import { AuthContext } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { useCloudSync } from '../../hooks/useCloudSync';
 import styles from './SyncStatusIndicator.module.css';
 
 export const SyncStatusIndicator = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const { syncStatus, syncNow, isOnline } = useCloudSync({
     userId: user?.id || null,
     autoSync: true,

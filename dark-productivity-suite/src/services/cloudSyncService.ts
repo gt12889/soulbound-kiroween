@@ -7,11 +7,8 @@ import {
   collection,
   doc,
   setDoc,
-  getDoc,
   getDocs,
   deleteDoc,
-  query,
-  where,
   onSnapshot,
   serverTimestamp,
   Timestamp,
@@ -19,10 +16,13 @@ import {
 import type { Unsubscribe } from 'firebase/firestore';
 import { db } from './firebaseService';
 import { storageService } from './storageService';
-import type { Task, Note, TarotReading, SyncQueueItem, SyncStatus } from '../types';
+import type { Task, Note, TarotReading, SyncQueueItem } from '../types';
 
 const SYNC_QUEUE_KEY = 'sync_queue';
 const LAST_SYNC_KEY = 'last_sync';
+const RETRY_DELAY_MS = 5000;
+const MAX_RETRY_ATTEMPTS = 3;
+const BATCH_SIZE = 10;
 
 export class CloudSyncError extends Error {
   public readonly code: 'NETWORK_ERROR' | 'AUTH_ERROR' | 'CONFLICT' | 'UNKNOWN';
@@ -36,7 +36,8 @@ export class CloudSyncError extends Error {
 
 class CloudSyncService {
   private syncListeners: Map<string, Unsubscribe> = new Map();
-  private retryTimeouts: Map<string, NodeJS.Timeout> = new Map();
+  private retryTimeouts: Map<string, number> = new Map();
+  private retryAttempts: Map<string, number> = new Map();
   private isOnline: boolean = navigator.onLine;
   private syncInProgress: boolean = false;
 
@@ -59,6 +60,8 @@ class CloudSyncService {
         updatedAt: Timestamp.fromDate(note.updatedAt),
         syncedAt: serverTimestamp(),
       });
+      // Clear retry state on success
+      this.clearRetryState('note', note.id);
     } catch (error) {
       this.handleSyncError(error, 'note', note.id);
       throw error;
@@ -78,6 +81,8 @@ class CloudSyncService {
         completedAt: task.completedAt ? Timestamp.fromDate(task.completedAt) : null,
         syncedAt: serverTimestamp(),
       });
+      // Clear retry state on success
+      this.clearRetryState('task', task.id);
     } catch (error) {
       this.handleSyncError(error, 'task', task.id);
       throw error;
@@ -96,6 +101,8 @@ class CloudSyncService {
         date: Timestamp.fromDate(reading.date),
         syncedAt: serverTimestamp(),
       });
+      // Clear retry state on success
+      this.clearRetryState('tarot', reading.id);
     } catch (error) {
       this.handleSyncError(error, 'tarot', reading.id);
       throw error;
@@ -129,150 +136,175 @@ class CloudSyncService {
   }
 
   /**
+   * Generic fetch method to reduce duplication
+   */
+  private async fetchCollection<T>(
+    userId: string,
+    collectionName: string,
+    mapper: (docId: string, data: any) => T,
+    errorMessage: string
+  ): Promise<T[]> {
+    try {
+      const collectionRef = collection(db, 'users', userId, collectionName);
+      const snapshot = await getDocs(collectionRef);
+      
+      return snapshot.docs.map(doc => mapper(doc.id, doc.data()));
+    } catch (error) {
+      throw new CloudSyncError(errorMessage, this.getErrorCode(error));
+    }
+  }
+
+  /**
    * Fetch all notes for a user
    */
   async fetchNotes(userId: string): Promise<Note[]> {
-    try {
-      const notesRef = collection(db, 'users', userId, 'notes');
-      const snapshot = await getDocs(notesRef);
-      
-      return snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          userId,
-          title: data.title,
-          content: data.content,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-        };
-      });
-    } catch (error) {
-      throw new CloudSyncError(
-        'Failed to fetch notes from cloud',
-        this.getErrorCode(error)
-      );
-    }
+    return this.fetchCollection<Note>(
+      userId,
+      'notes',
+      (docId, data) => ({
+        id: docId,
+        userId,
+        title: data.title || '',
+        content: data.content || '',
+        tags: data.tags || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      }),
+      'Failed to fetch notes from cloud'
+    );
   }
 
   /**
    * Fetch all tasks for a user
    */
   async fetchTasks(userId: string): Promise<Task[]> {
-    try {
-      const tasksRef = collection(db, 'users', userId, 'tasks');
-      const snapshot = await getDocs(tasksRef);
-      
-      return snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          userId,
-          title: data.title,
-          description: data.description,
-          priority: data.priority,
-          completed: data.completed,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          completedAt: data.completedAt?.toDate(),
-        };
-      });
-    } catch (error) {
-      throw new CloudSyncError(
-        'Failed to fetch tasks from cloud',
-        this.getErrorCode(error)
-      );
-    }
+    return this.fetchCollection<Task>(
+      userId,
+      'tasks',
+      (docId, data) => ({
+        id: docId,
+        userId,
+        title: data.title || '',
+        description: data.description || '',
+        priority: data.priority || 'medium',
+        completed: data.completed || false,
+        archived: data.archived || false,
+        tags: data.tags || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+        completedAt: data.completedAt?.toDate(),
+        archivedAt: data.archivedAt?.toDate(),
+      }),
+      'Failed to fetch tasks from cloud'
+    );
   }
 
   /**
    * Fetch all tarot readings for a user
    */
   async fetchTarotReadings(userId: string): Promise<TarotReading[]> {
-    try {
-      const readingsRef = collection(db, 'users', userId, 'tarot_readings');
-      const snapshot = await getDocs(readingsRef);
-      
-      return snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          userId,
-          date: data.date?.toDate() || new Date(),
-          cards: data.cards,
-          interpretation: data.interpretation,
-          commitStats: data.commitStats,
-        };
-      });
-    } catch (error) {
-      throw new CloudSyncError(
-        'Failed to fetch tarot readings from cloud',
-        this.getErrorCode(error)
-      );
-    }
+    return this.fetchCollection<TarotReading>(
+      userId,
+      'tarot_readings',
+      (docId, data) => ({
+        id: docId,
+        userId,
+        date: data.date?.toDate() || new Date(),
+        cards: data.cards || [],
+        interpretation: data.interpretation || '',
+        commitStats: data.commitStats || {
+          totalCommits: 0,
+          averageCommitsPerDay: 0,
+          mostActiveHour: 12,
+          sentimentScore: 0,
+          topKeywords: [],
+        },
+      }),
+      'Failed to fetch tarot readings from cloud'
+    );
+  }
+
+  /**
+   * Generic subscription method to reduce duplication
+   */
+  private subscribe<T>(
+    userId: string,
+    collectionName: string,
+    mapper: (docId: string, data: any) => T,
+    callback: (items: T[]) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    const collectionRef = collection(db, 'users', userId, collectionName);
+    
+    const unsubscribe = onSnapshot(
+      collectionRef,
+      (snapshot) => {
+        const items = snapshot.docs.map(doc => mapper(doc.id, doc.data()));
+        callback(items);
+      },
+      (error) => {
+        console.error(`Error in ${collectionName} subscription:`, error);
+        if (onError) {
+          onError(error);
+        }
+      }
+    );
+
+    this.syncListeners.set(`${collectionName}_${userId}`, unsubscribe);
+    return unsubscribe;
   }
 
   /**
    * Subscribe to real-time note updates
    */
-  subscribeToNotes(userId: string, callback: (notes: Note[]) => void): Unsubscribe {
-    const notesRef = collection(db, 'users', userId, 'notes');
-    
-    const unsubscribe = onSnapshot(
-      notesRef,
-      (snapshot) => {
-        const notes = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            userId,
-            title: data.title,
-            content: data.content,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date(),
-          };
-        });
-        callback(notes);
-      },
-      (error) => {
-        console.error('Error in notes subscription:', error);
-      }
+  subscribeToNotes(
+    userId: string,
+    callback: (notes: Note[]) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    return this.subscribe<Note>(
+      userId,
+      'notes',
+      (docId, data) => ({
+        id: docId,
+        userId,
+        title: data.title || '',
+        content: data.content || '',
+        tags: data.tags || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      }),
+      callback,
+      onError
     );
-
-    this.syncListeners.set(`notes_${userId}`, unsubscribe);
-    return unsubscribe;
   }
 
   /**
    * Subscribe to real-time task updates
    */
-  subscribeToTasks(userId: string, callback: (tasks: Task[]) => void): Unsubscribe {
-    const tasksRef = collection(db, 'users', userId, 'tasks');
-    
-    const unsubscribe = onSnapshot(
-      tasksRef,
-      (snapshot) => {
-        const tasks = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            userId,
-            title: data.title,
-            description: data.description,
-            priority: data.priority,
-            completed: data.completed,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            completedAt: data.completedAt?.toDate(),
-          };
-        });
-        callback(tasks);
-      },
-      (error) => {
-        console.error('Error in tasks subscription:', error);
-      }
+  subscribeToTasks(
+    userId: string,
+    callback: (tasks: Task[]) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    return this.subscribe<Task>(
+      userId,
+      'tasks',
+      (docId, data) => ({
+        id: docId,
+        userId,
+        title: data.title || '',
+        description: data.description || '',
+        priority: data.priority || 'medium',
+        completed: data.completed || false,
+        archived: data.archived || false,
+        tags: data.tags || [],
+        createdAt: data.createdAt?.toDate() || new Date(),
+        completedAt: data.completedAt?.toDate(),
+        archivedAt: data.archivedAt?.toDate(),
+      }),
+      callback,
+      onError
     );
-
-    this.syncListeners.set(`tasks_${userId}`, unsubscribe);
-    return unsubscribe;
   }
 
   /**
@@ -307,7 +339,37 @@ class CloudSyncService {
   }
 
   /**
-   * Process offline sync queue
+   * Process a single sync queue item
+   */
+  private async processSyncItem(userId: string, item: SyncQueueItem): Promise<void> {
+    switch (item.type) {
+      case 'note':
+        if (item.action === 'delete') {
+          await this.deleteNote(userId, item.data.id);
+        } else {
+          await this.syncNote(userId, item.data);
+        }
+        break;
+      
+      case 'task':
+        if (item.action === 'delete') {
+          await this.deleteTask(userId, item.data.id);
+        } else {
+          await this.syncTask(userId, item.data);
+        }
+        break;
+      
+      case 'tarot':
+        await this.syncTarotReading(userId, item.data);
+        break;
+      
+      default:
+        console.warn(`Unknown sync item type: ${(item as any).type}`);
+    }
+  }
+
+  /**
+   * Process offline sync queue with batching
    */
   async processSyncQueue(userId: string): Promise<void> {
     if (this.syncInProgress || !this.isOnline) {
@@ -316,33 +378,35 @@ class CloudSyncService {
 
     this.syncInProgress = true;
     const queue = this.getSyncQueue();
+    const failedItems: SyncQueueItem[] = [];
 
     try {
-      for (const item of queue) {
-        try {
-          if (item.type === 'note') {
-            if (item.action === 'delete') {
-              await this.deleteNote(userId, item.data.id);
-            } else {
-              await this.syncNote(userId, item.data);
-            }
-          } else if (item.type === 'task') {
-            if (item.action === 'delete') {
-              await this.deleteTask(userId, item.data.id);
-            } else {
-              await this.syncTask(userId, item.data);
-            }
-          } else if (item.type === 'tarot') {
-            await this.syncTarotReading(userId, item.data);
+      // Process in batches to avoid overwhelming the server
+      for (let i = 0; i < queue.length; i += BATCH_SIZE) {
+        const batch = queue.slice(i, i + BATCH_SIZE);
+        
+        // Process batch items in parallel
+        const results = await Promise.allSettled(
+          batch.map(item => this.processSyncItem(userId, item))
+        );
+
+        // Collect failed items for retry
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            console.error('Error processing queue item:', result.reason);
+            failedItems.push(batch[index]);
           }
-        } catch (error) {
-          console.error('Error processing queue item:', error);
-          // Continue with next item
-        }
+        });
       }
 
-      // Clear queue after successful processing
-      this.clearSyncQueue();
+      // Update queue with only failed items
+      if (failedItems.length > 0) {
+        console.warn(`${failedItems.length} items failed to sync, will retry later`);
+        storageService.set(SYNC_QUEUE_KEY, failedItems);
+      } else {
+        this.clearSyncQueue();
+      }
+      
       this.updateLastSyncTime();
     } finally {
       this.syncInProgress = false;
@@ -427,26 +491,62 @@ class CloudSyncService {
   }
 
   /**
-   * Handle sync errors with retry logic
+   * Handle sync errors with exponential backoff retry logic
    */
   private handleSyncError(error: any, type: string, id: string): void {
     console.error(`Sync error for ${type} ${id}:`, error);
 
-    // Implement exponential backoff retry
     const retryKey = `${type}_${id}`;
+    const currentAttempts = this.retryAttempts.get(retryKey) || 0;
+
+    // Check if max retries exceeded
+    if (currentAttempts >= MAX_RETRY_ATTEMPTS) {
+      console.error(`Max retry attempts (${MAX_RETRY_ATTEMPTS}) exceeded for ${type} ${id}`);
+      this.retryAttempts.delete(retryKey);
+      this.retryTimeouts.delete(retryKey);
+      return;
+    }
+
+    // Clear existing timeout if any
     const existingTimeout = this.retryTimeouts.get(retryKey);
-    
     if (existingTimeout) {
       clearTimeout(existingTimeout);
     }
 
-    // Retry after 5 seconds (can be made exponential)
+    // Calculate exponential backoff delay: 5s, 10s, 20s
+    const delay = RETRY_DELAY_MS * Math.pow(2, currentAttempts);
+    
     const timeout = setTimeout(() => {
-      console.log(`Retrying sync for ${type} ${id}...`);
+      console.log(`Retry attempt ${currentAttempts + 1} for ${type} ${id}...`);
+      this.retryAttempts.set(retryKey, currentAttempts + 1);
       this.retryTimeouts.delete(retryKey);
-    }, 5000);
+      // Note: Actual retry logic should be implemented by the caller
+    }, delay);
 
     this.retryTimeouts.set(retryKey, timeout);
+  }
+
+  /**
+   * Clear retry state for a specific item
+   */
+  private clearRetryState(type: string, id: string): void {
+    const retryKey = `${type}_${id}`;
+    const timeout = this.retryTimeouts.get(retryKey);
+    if (timeout) {
+      clearTimeout(timeout);
+      this.retryTimeouts.delete(retryKey);
+    }
+    this.retryAttempts.delete(retryKey);
+  }
+
+  /**
+   * Cleanup all retry timeouts (call on service destruction)
+   */
+  cleanup(): void {
+    this.retryTimeouts.forEach(timeout => clearTimeout(timeout));
+    this.retryTimeouts.clear();
+    this.retryAttempts.clear();
+    this.unsubscribeAll();
   }
 
   /**

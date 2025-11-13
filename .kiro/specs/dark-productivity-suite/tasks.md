@@ -558,7 +558,10 @@
     - Add manual sync button
     - _Requirements: 17.7_
 
-  - [-] 15.5 Implement offline support
+  - [x] 15.5 Implement offline support
+
+
+
 
     - Queue changes when offline
     - Sync queued changes when connection restored
@@ -628,22 +631,46 @@
     - Add help shortcut (Ctrl+?) to open shortcuts panel
     - _Requirements: 9.1, 9.2, 9.3_
 
-- [ ] 17. Implement theme system
+- [x] 17. Implement theme system
 
-  - [ ] 17.1 Create theme definitions
+
+
+
+
+  - [x] 17.1 Create theme definitions
+
+
+
+
+
+
+
+
+
+
+
     - Build theme files: defaultDark.ts, bloodMoon.ts, midnightForest.ts
     - Define color palettes for each theme
     - Create theme interface with all required colors
     - _Requirements: 10.1_
 
-  - [ ] 17.2 Create ThemeContext
+
+  - [x] 17.2 Create ThemeContext
+
+
+
+
+
+
     - Implement context for current theme state
     - Add theme switching function
     - Implement CSS variable injection for theme colors
     - Persist theme selection to storage and cloud
     - _Requirements: 10.3, 10.4_
 
-  - [ ] 17.3 Build ThemeSelector component
+  - [x] 17.3 Build ThemeSelector component
+
+
     - Create theme selector UI with visual previews
     - Show color swatches for each theme
     - Implement smooth theme transition animations
@@ -651,15 +678,33 @@
     - Style with gothic aesthetic
     - _Requirements: 10.1, 10.2, 10.5_
 
-  - [ ] 17.4 Apply themes across all components
+  - [x] 17.4 Apply themes across all components
+
+
     - Update all components to use theme CSS variables
     - Ensure consistent theming across modules
     - Test theme transitions for smoothness
     - _Requirements: 10.2_
 
-- [ ] 18. Implement quick capture system
+- [x] 18. Implement quick capture system
 
-  - [ ] 18.1 Build QuickCapture component
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  - [x] 18.1 Build QuickCapture component
+
+
     - Create floating modal with minimal input form
     - Add type selector (note vs task)
     - Implement auto-focus on input field
@@ -667,55 +712,119 @@
     - Style with gothic aesthetic and mystical animations
     - _Requirements: 13.2, 13.3, 13.6_
 
-  - [ ] 18.2 Integrate quick capture with keyboard shortcuts
+
+
+
+  - [x] 18.2 Integrate quick capture with keyboard shortcuts
+
+
     - Register Ctrl+K global shortcut
     - Open quick capture modal on shortcut press
     - Handle modal visibility state
     - _Requirements: 13.1_
 
-  - [ ] 18.3 Implement quick capture submission
+
+  - [x] 18.3 Implement quick capture submission
+
+
+
+
+
     - Save captured item (note or task) to storage
     - Display brief confirmation animation
     - Close modal automatically after submission
     - _Requirements: 13.4, 13.5_
 
-- [ ] 19. Implement tag management system
+- [x] 19. Implement tag management system
 
-  - [ ] 19.1 Update data models for tags
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  - [x] 19.1 Update data models for tags
+
+
+
+
     - Add tags array to Task and Note interfaces
     - Update storage service to handle tags
     - Implement tag persistence
     - _Requirements: 14.1_
 
-  - [ ] 19.2 Build TagManager component
+
+  - [x] 19.2 Build TagManager component
+
+
     - Create tag input with autocomplete suggestions
     - Implement tag addition and removal
     - Style tags with mystical symbols and gothic labels
     - Add tag editing functionality
     - _Requirements: 14.1, 14.2, 14.3_
 
-  - [ ] 19.3 Implement tag filtering
+
+  - [x] 19.3 Implement tag filtering
+
+
     - Add tag filter UI to notes and tasks views
     - Implement multi-tag filtering with AND/OR logic
     - Update search to include tag-based filtering
+
     - _Requirements: 14.4, 14.6_
 
-  - [ ] 19.4 Build tag cloud visualization
+  - [x] 19.4 Build tag cloud visualization
+
+
     - Create tag cloud component showing all tags
     - Display usage counts for each tag
     - Make tags clickable to filter by tag
     - Style with gothic aesthetic
     - _Requirements: 14.5, 14.6_
 
-- [ ] 20. Implement archive system
+- [x] 20. Implement archive system
 
-  - [ ] 20.1 Update Task model for archiving
+
+
+
+
+  - [x] 20.1 Update Task model for archiving
+
+
+
+
+
+
+
     - Add archived and archivedAt fields to Task interface
     - Update TasksContext to handle archived tasks
     - Implement archive/unarchive functions
     - _Requirements: 15.1, 15.3_
 
-  - [ ] 20.2 Build ArchiveView component
+
+  - [x] 20.2 Build ArchiveView component
+
+
+
+
+
     - Create separate view for archived tasks
     - Style archived tombstones as weathered and moss-covered
     - Implement filter and search within archive
@@ -723,21 +832,29 @@
     - Add permanent deletion option
     - _Requirements: 15.4, 15.5_
 
-  - [ ] 20.3 Implement archive animations
+  - [x] 20.3 Implement archive animations
+
+
     - Create deeper sink animation for archiving (1.5-2.0s)
     - Implement rise animation for restoring
     - Add weathering effects to archived tombstones
     - _Requirements: 15.2_
 
-  - [ ] 20.4 Add auto-archive suggestions
+  - [x] 20.4 Add auto-archive suggestions
+
+
     - Implement logic to detect tasks completed >30 days
     - Display archive suggestions to user
     - Add option to auto-archive or dismiss
     - _Requirements: 15.6_
 
-- [ ] 21. Implement pomodoro timer
+- [-] 21. Implement pomodoro timer
 
-  - [ ] 21.1 Create pomodoro service and hook
+
+
+  - [x] 21.1 Create pomodoro service and hook
+
+
     - Build usePomodoro hook with timer logic
     - Implement configurable work/break durations
     - Add start, pause, resume, reset functions
@@ -745,7 +862,9 @@
     - Persist timer state across refreshes
     - _Requirements: 12.2, 12.3, 12.7_
 
-  - [ ] 21.2 Build PomodoroTimer component
+  - [x] 21.2 Build PomodoroTimer component
+
+
     - Create hourglass visualization
     - Implement flowing souls/sand animation during work intervals
     - Add duration configuration controls
@@ -753,13 +872,16 @@
     - Style with gothic aesthetic
     - _Requirements: 12.1, 12.5_
 
-  - [ ] 21.3 Implement pomodoro notifications
+  - [x] 21.3 Implement pomodoro notifications
+
+
     - Play mystical chime sound on interval completion
     - Display notification when timer completes
     - Add visual indicator for timer state
     - _Requirements: 12.4_
 
-  - [ ] 21.4 Add pomodoro statistics
+  - [-] 21.4 Add pomodoro statistics
+
     - Track and display completed sessions
     - Show session history
     - Display productivity statistics
@@ -767,11 +889,15 @@
 
 - [ ] 22. Implement markdown support
 
+
+
   - [ ] 22.1 Install markdown dependencies
+
     - Add react-markdown or marked.js library
     - Install syntax highlighting library for code blocks
     - Configure markdown parser options
     - _Requirements: 16.1_
+
 
   - [ ] 22.2 Build MarkdownEditor component
     - Create split-view editor (raw + preview)
@@ -780,12 +906,14 @@
     - Add keyboard shortcuts for common formatting
     - _Requirements: 16.2, 16.4, 16.5_
 
+
   - [ ] 22.3 Build MarkdownPreview component
     - Implement real-time markdown rendering
     - Apply gothic-styled CSS to rendered markdown
     - Support headers, lists, links, code blocks, images
     - Implement smooth scroll sync with editor
     - _Requirements: 16.1, 16.3_
+
 
   - [ ] 22.4 Integrate markdown into notes
     - Add markdown toggle to NotePage component
@@ -795,6 +923,8 @@
     - _Requirements: 16.1, 16.6_
 
 - [ ] 23. Implement import system
+
+
 
   - [ ] 23.1 Build import service
     - Create importService.ts with JSON parsing

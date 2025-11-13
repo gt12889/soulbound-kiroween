@@ -19,8 +19,11 @@ export interface Task {
   description: string;
   priority: 'low' | 'medium' | 'high';
   completed: boolean;
+  archived: boolean;
+  tags: string[];
   createdAt: Date;
   completedAt?: Date;
+  archivedAt?: Date;
 }
 
 export interface Note {
@@ -28,6 +31,7 @@ export interface Note {
   userId?: string;
   title: string;
   content: string;
+  tags: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -93,4 +97,56 @@ export interface KeyboardShortcut {
   description: string;
   category: 'navigation' | 'actions' | 'search' | 'help';
   customizable: boolean;
+}
+
+export interface Theme {
+  id: string;
+  name: string;
+  colors: {
+    bgPrimary: string;
+    bgSecondary: string;
+    bgTertiary: string;
+    accentPurple: string;
+    accentPurpleLight: string;
+    accentPurpleDark: string;
+    textPrimary: string;
+    textSecondary: string;
+    textTertiary: string;
+    textMuted: string;
+    highlightBlue: string;
+    highlightBlueLight: string;
+    highlightGreen: string;
+    highlightGreenLight: string;
+    warningRed: string;
+    warningRedLight: string;
+    warningRedDark: string;
+    borderPrimary: string;
+    borderSecondary: string;
+    shadowLight: string;
+    shadowMedium: string;
+    shadowHeavy: string;
+    glowPurple: string;
+    glowBlue: string;
+    glowRed: string;
+  };
+}
+
+export interface PomodoroSession {
+  id: string;
+  userId?: string;
+  startTime: Date;
+  endTime?: Date;
+  duration: number;
+  type: 'work' | 'break';
+  completed: boolean;
+}
+
+export interface PomodoroState {
+  isRunning: boolean;
+  isPaused: boolean;
+  currentType: 'work' | 'break';
+  timeRemaining: number;
+  workDuration: number;
+  breakDuration: number;
+  currentSessionId: string | null;
 }

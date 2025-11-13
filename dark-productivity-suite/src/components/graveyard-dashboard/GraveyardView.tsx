@@ -2,6 +2,10 @@ import { useState, useRef } from 'react';
 import { useTasks } from '../../contexts/TasksContext';
 import { useAudio } from '../../hooks/useAudio';
 import { Tombstone } from './Tombstone';
+import { TagFilter } from '../common/TagFilter';
+import { TagManager } from '../common/TagManager';
+import { TagCloud } from '../common/TagCloud';
+import { ArchiveSuggestions } from './ArchiveSuggestions';
 import type { Task } from '../../types';
 import styles from './GraveyardView.module.css';
 
@@ -10,18 +14,34 @@ import styles from './GraveyardView.module.css';
  * Requirements: 4.1, 4.6, 8.4
  */
 export function GraveyardView() {
-  const { tasks, createTask, toggleTaskCompletion, deleteTask, reorderTasks } = useTasks();
+  const { 
+    filteredTasks,
+    tasks,
+    createTask, 
+    toggleTaskCompletion, 
+    deleteTask, 
+    reorderTasks,
+    archiveTask,
+    allTags,
+    selectedTags,
+    setSelectedTags,
+    tagFilterMode,
+    setTagFilterMode,
+    updateTask
+  } = useTasks();
   const { playUIClick, playUIHover } = useAudio();
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<Task['priority']>('medium');
+  const [newTaskTags, setNewTaskTags] = useState<string[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showTagCloud, setShowTagCloud] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const dragCounter = useRef(0);
 
   // Sort tasks by priority (high -> medium -> low) and completion status
-  const sortedTasks = [...tasks].sort((a, b) => {
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
     // Completed tasks go to the end
     if (a.completed !== b.completed) {
       return a.completed ? 1 : -1;
@@ -37,10 +57,14 @@ export function GraveyardView() {
     
     if (newTaskTitle.trim()) {
       playUIClick();
-      createTask(newTaskTitle.trim(), newTaskDescription.trim(), newTaskPriority);
+      const task = createTask(newTaskTitle.trim(), newTaskDescription.trim(), newTaskPriority);
+      if (newTaskTags.length > 0) {
+        updateTask(task.id, { tags: newTaskTags });
+      }
       setNewTaskTitle('');
       setNewTaskDescription('');
       setNewTaskPriority('medium');
+      setNewTaskTags([]);
       setShowCreateForm(false);
     }
   };
@@ -48,6 +72,14 @@ export function GraveyardView() {
   const handleToggleForm = () => {
     playUIClick();
     setShowCreateForm(!showCreateForm);
+  };
+
+  const handleTagClick = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
   };
 
   // Drag and drop handlers - Requirement 4.6
@@ -95,6 +127,9 @@ export function GraveyardView() {
 
   return (
     <div className={styles.graveyard}>
+      {/* Archive Suggestions Modal */}
+      <ArchiveSuggestions />
+
       <div className={styles.header}>
         <h1 className={styles.title}>Graveyard Dashboard</h1>
         <p className={styles.subtitle}>Where tasks come to rest</p>
@@ -147,6 +182,16 @@ export function GraveyardView() {
             </select>
           </div>
           
+          <div className={styles.formGroup}>
+            <label>Tags</label>
+            <TagManager
+              tags={newTaskTags}
+              allTags={allTags}
+              onTagsChange={setNewTaskTags}
+              placeholder="Add tags..."
+            />
+          </div>
+          
           <button 
             type="submit" 
             className={styles.submitButton}
@@ -156,6 +201,36 @@ export function GraveyardView() {
           </button>
         </form>
       )}
+
+      {/* Tag Cloud Toggle */}
+      <button
+        className={styles.tagCloudToggle}
+        onClick={() => setShowTagCloud(!showTagCloud)}
+        onMouseEnter={playUIHover}
+      >
+        {showTagCloud ? '▼' : '▶'} Tag Cloud
+      </button>
+
+      {/* Tag Cloud */}
+      {showTagCloud && (
+        <TagCloud
+          tags={allTags}
+          items={tasks}
+          onTagClick={handleTagClick}
+          selectedTags={selectedTags}
+        />
+      )}
+
+      {/* Tag Filter */}
+      <div className={styles.filterSection}>
+        <TagFilter
+          availableTags={allTags}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
+          filterMode={tagFilterMode}
+          onFilterModeChange={setTagFilterMode}
+        />
+      </div>
 
       {/* Grid layout for tombstones - Requirement 4.1 */}
       <div className={styles.tombstoneGrid}>
@@ -181,6 +256,7 @@ export function GraveyardView() {
                 task={task}
                 onToggleComplete={toggleTaskCompletion}
                 onDelete={deleteTask}
+                onArchive={archiveTask}
                 isDragging={draggedIndex === index}
               />
             </div>

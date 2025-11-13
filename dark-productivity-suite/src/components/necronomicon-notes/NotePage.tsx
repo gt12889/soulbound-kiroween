@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useMemo, useState } from 'react';
 import { useNotes } from '../../contexts/NotesContext';
 import { aiService } from '../../services/aiService';
 import { useAudio } from '../../hooks/useAudio';
+import { TagManager } from '../common/TagManager';
 import type { GhostSuggestion as GhostSuggestionType } from '../../types';
 import styles from './NotePage.module.css';
 
@@ -14,7 +15,7 @@ interface NotePageProps {
  * Requirements: 3.1, 3.3, 3.4, 3.6
  */
 const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
-  const { getNote, updateNote, searchQuery } = useNotes();
+  const { getNote, updateNote, searchQuery, allTags } = useNotes();
   const note = getNote(noteId);
   const contentRef = useRef<HTMLDivElement>(null);
   const [aiEnabled, setAiEnabled] = useState(false);
@@ -368,6 +369,16 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
         >
           {note.title}
         </h2>
+
+        {/* Tags */}
+        <div className={styles.tagsSection}>
+          <TagManager
+            tags={note.tags || []}
+            allTags={allTags}
+            onTagsChange={(tags) => updateNote(noteId, { tags })}
+            placeholder="Add tags..."
+          />
+        </div>
 
         {/* Note content */}
         <div

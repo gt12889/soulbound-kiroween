@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { GraveyardView } from './GraveyardView';
 import { MoonPhaseCalendar } from './MoonPhaseCalendar';
+import { ArchiveView } from './ArchiveView';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { DEFAULT_SHORTCUTS } from '../../utils/keyboardShortcuts';
 import { useTasks } from '../../contexts/TasksContext';
 import styles from './GraveyardDashboard.module.css';
 
-type ViewMode = 'graveyard' | 'calendar';
+type ViewMode = 'graveyard' | 'calendar' | 'archive';
 
 /**
  * GraveyardDashboard - Main component combining task management and moon phase calendar
@@ -41,10 +42,18 @@ export function GraveyardDashboard() {
         >
           🌙 Moon Calendar
         </button>
+        <button
+          className={`${styles.toggleButton} ${viewMode === 'archive' ? styles.active : ''}`}
+          onClick={() => setViewMode('archive')}
+        >
+          📦 Archive
+        </button>
       </div>
 
       <div className={styles.content}>
-        {viewMode === 'graveyard' ? <GraveyardView /> : <MoonPhaseCalendar />}
+        {viewMode === 'graveyard' && <GraveyardView />}
+        {viewMode === 'calendar' && <MoonPhaseCalendar />}
+        {viewMode === 'archive' && <ArchiveView />}
       </div>
     </div>
   );

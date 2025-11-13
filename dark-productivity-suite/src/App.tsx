@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { KeyboardProvider } from './contexts/KeyboardContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { NotesProvider } from './contexts/NotesContext';
+import { TasksProvider } from './contexts/TasksContext';
 import Navigation from './components/common/Navigation';
 import LoadingTransition from './components/common/LoadingTransition';
 import AudioController from './components/common/AudioController';
 import { KeyboardShortcutsPanel } from './components/common/KeyboardShortcutsPanel';
+import QuickCapture from './components/common/QuickCapture';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import LandingPage from './components/landing/LandingPage';
 import LoginPage from './components/auth/LoginPage';
@@ -21,6 +25,7 @@ import './App.css';
 
 const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showQuickCapture, setShowQuickCapture] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isLandingPage = location.pathname === '/';
@@ -46,6 +51,17 @@ const AppContent: React.FC = () => {
     'navigate-necronomicon-notes': () => navigate('/necronomicon-notes'),
     'navigate-graveyard-dashboard': () => navigate('/graveyard-dashboard'),
   });
+
+  // Register quick capture keyboard shortcut (Ctrl+K)
+  // Requirement: 13.1
+  const quickCaptureShortcut = DEFAULT_SHORTCUTS.find(s => s.action === 'quick-capture');
+  
+  useKeyboardShortcuts(
+    quickCaptureShortcut ? [quickCaptureShortcut] : [],
+    {
+      'quick-capture': () => setShowQuickCapture(true),
+    }
+  );
 
   const showNavigation = !isLandingPage && !isAuthPage;
   const contentClass = isLandingPage || isAuthPage ? 'landing-content' : 'main-content';
@@ -96,6 +112,7 @@ const AppContent: React.FC = () => {
       </main>
       {showNavigation && <AudioController />}
       <KeyboardShortcutsPanel />
+      <QuickCapture isOpen={showQuickCapture} onClose={() => setShowQuickCapture(false)} />
     </div>
   );
 };
@@ -104,9 +121,15 @@ const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
-        <KeyboardProvider>
-          <AppContent />
-        </KeyboardProvider>
+        <ThemeProvider>
+          <KeyboardProvider>
+            <NotesProvider>
+              <TasksProvider>
+                <AppContent />
+              </TasksProvider>
+            </NotesProvider>
+          </KeyboardProvider>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );

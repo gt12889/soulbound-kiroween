@@ -1,5 +1,7 @@
 /* ===================================
    CSS Variables - Gothic Color Palette
+   These variables are dynamically updated by ThemeContext
+   when users switch themes (Requirement 10.2)
    =================================== */
 :root {
   /* Background Colors */

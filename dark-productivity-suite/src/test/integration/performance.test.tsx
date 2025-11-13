@@ -23,6 +23,7 @@ function generateNotes(count: number): Note[] {
     id: `note-${i}`,
     title: `Test Note ${i}`,
     content: `This is the content of test note ${i}. `.repeat(10),
+    tags: [],
     createdAt: new Date(Date.now() - i * 1000),
     updatedAt: new Date(Date.now() - i * 500),
   }));
@@ -35,6 +36,8 @@ function generateTasks(count: number): Task[] {
     description: `Description for task ${i}`,
     priority: ['low', 'medium', 'high'][i % 3] as 'low' | 'medium' | 'high',
     completed: i % 5 === 0,
+    archived: false,
+    tags: [],
     createdAt: new Date(Date.now() - i * 1000),
     completedAt: i % 5 === 0 ? new Date(Date.now() - i * 500) : undefined,
   }));

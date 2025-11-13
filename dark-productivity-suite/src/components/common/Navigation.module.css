@@ -258,7 +258,8 @@
   background: linear-gradient(90deg, transparent, var(--accent-purple-light), transparent);
 }
 
-/* Export and Logout Buttons */
+/* Settings, Export and Logout Buttons */
+.settingsButton,
 .exportButton,
 .logoutButton {
   display: flex;
@@ -279,6 +280,7 @@
   overflow: hidden;
 }
 
+.settingsButton::before,
 .exportButton::before,
 .logoutButton::before {
   content: '';
@@ -291,11 +293,13 @@
   transition: left var(--timing-normal) var(--ease-in-out);
 }
 
+.settingsButton:hover::before,
 .exportButton:hover::before,
 .logoutButton:hover::before {
   left: 100%;
 }
 
+.settingsButton:hover,
 .exportButton:hover,
 .logoutButton:hover {
   background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
@@ -305,12 +309,14 @@
   transform: translateY(-2px);
 }
 
+.settingsButton:active,
 .exportButton:active,
 .logoutButton:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px var(--shadow-medium);
 }
 
+.settingsIcon,
 .exportIcon,
 .logoutIcon {
   font-size: 1.25rem;
@@ -318,12 +324,14 @@
   transition: transform var(--timing-hover) var(--ease-in-out);
 }
 
+.settingsButton:hover .settingsIcon,
 .exportButton:hover .exportIcon,
 .logoutButton:hover .logoutIcon {
   transform: scale(1.1);
   animation: pulseGlow 1s ease-in-out infinite;
 }
 
+.settingsLabel,
 .exportLabel,
 .logoutLabel {
   font-weight: 600;

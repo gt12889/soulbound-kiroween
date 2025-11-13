@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAudio } from '../../hooks/useAudio';
@@ -7,11 +7,13 @@ import { useTasks } from '../../contexts/TasksContext';
 import { useApp } from '../../contexts/AppContext';
 import { useKeyboard } from '../../contexts/KeyboardContext';
 import { exportService } from '../../services/exportService';
+import { SyncStatusIndicator } from './SyncStatusIndicator';
+import SettingsModal from './SettingsModal';
 import styles from './Navigation.module.css';
 
 /**
  * Navigation component with UI interaction sounds, data export, logout, and keyboard shortcuts
- * Requirements: 6.1, 6.3, 7.5, 8.4, 9.1, 18.6
+ * Requirements: 6.1, 6.3, 7.5, 8.4, 9.1, 10.5, 18.6
  */
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -22,6 +24,7 @@ const Navigation: React.FC = () => {
   const { tasks } = useTasks();
   const { settings } = useApp();
   const { registerShortcut, unregisterShortcut } = useKeyboard();
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const navItems = [
     { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods', shortcutId: 'nav-necronomicon-notes' },
@@ -85,6 +88,16 @@ const Navigation: React.FC = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    playUIClick();
+    setIsSettingsOpen(true);
+  };
+
+  const handleSettingsClose = () => {
+    playUIClick();
+    setIsSettingsOpen(false);
+  };
+
   return (
     <nav className={styles.navigation}>
       <Link 
@@ -122,6 +135,19 @@ const Navigation: React.FC = () => {
       </ul>
       
       <div className={styles.navFooter}>
+        {/* Sync Status Indicator - Requirements: 17.3 */}
+        <SyncStatusIndicator />
+        
+        <button 
+          className={styles.settingsButton}
+          onClick={handleSettingsClick}
+          onMouseEnter={handleNavHover}
+          title="Realm settings"
+        >
+          <span className={styles.settingsIcon}>⚙️</span>
+          <span className={styles.settingsLabel}>Settings</span>
+        </button>
+        
         <button 
           className={styles.exportButton}
           onClick={handleExport}
@@ -146,6 +172,8 @@ const Navigation: React.FC = () => {
         
         <div className={styles.ornament}>🍂</div>
       </div>
+      
+      <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
     </nav>
   );
 };

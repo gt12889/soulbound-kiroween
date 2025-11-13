@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback } from 'react';
+import { createContext, useContext, useCallback, useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Task } from '../types';
@@ -6,6 +6,9 @@ import type { Task } from '../types';
 interface TasksContextType {
   // Tasks data
   tasks: Task[];
+  filteredTasks: Task[];
+  activeTasks: Task[];
+  archivedTasks: Task[];
   
   // CRUD operations
   createTask: (title: string, description: string, priority?: Task['priority']) => Task;
@@ -18,9 +21,21 @@ interface TasksContextType {
   completeTask: (id: string) => void;
   uncompleteTask: (id: string) => void;
   
+  // Archive operations
+  archiveTask: (id: string) => void;
+  unarchiveTask: (id: string) => void;
+  getArchiveSuggestions: () => Task[];
+  
   // Task reordering
   reorderTasks: (startIndex: number, endIndex: number) => void;
   moveTask: (taskId: string, newIndex: number) => void;
+  
+  // Tag filtering
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+  tagFilterMode: 'AND' | 'OR';
+  setTagFilterMode: (mode: 'AND' | 'OR') => void;
+  allTags: string[];
 }
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
@@ -37,6 +52,10 @@ interface TasksProviderProps {
 export function TasksProvider({ children }: TasksProviderProps) {
   // Persist tasks to LocalStorage
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
+  
+  // Tag filtering state
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tagFilterMode, setTagFilterMode] = useState<'AND' | 'OR'>('OR');
 
   /**
    * Create a new task
@@ -53,6 +72,8 @@ export function TasksProvider({ children }: TasksProviderProps) {
       description,
       priority,
       completed: false,
+      archived: false,
+      tags: [],
       createdAt: new Date(),
     };
     
@@ -145,6 +166,59 @@ export function TasksProvider({ children }: TasksProviderProps) {
   }, [setTasks]);
 
   /**
+   * Archive a task
+   * Requirements: 15.1, 15.3
+   */
+  const archiveTask = useCallback((id: string) => {
+    setTasks(prev => prev.map(task => {
+      if (task.id === id && !task.archived) {
+        return {
+          ...task,
+          archived: true,
+          archivedAt: new Date(),
+        };
+      }
+      return task;
+    }));
+  }, [setTasks]);
+
+  /**
+   * Unarchive a task (restore from archive)
+   * Requirements: 15.1, 15.3
+   */
+  const unarchiveTask = useCallback((id: string) => {
+    setTasks(prev => prev.map(task => {
+      if (task.id === id && task.archived) {
+        return {
+          ...task,
+          archived: false,
+          archivedAt: undefined,
+        };
+      }
+      return task;
+    }));
+  }, [setTasks]);
+
+  /**
+   * Get tasks that should be suggested for archiving
+   * (completed for more than 30 days)
+   * Requirements: 15.6
+   */
+  const getArchiveSuggestions = useCallback((): Task[] => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    return tasks.filter(task => {
+      if (!task.completed || task.archived || !task.completedAt) {
+        return false;
+      }
+      
+      const completedDate = new Date(task.completedAt);
+      return completedDate < thirtyDaysAgo;
+    });
+  }, [tasks]);
+
+  /**
    * Reorder tasks by moving from startIndex to endIndex
    * Requirements: 4.6, 7.3
    */
@@ -173,8 +247,62 @@ export function TasksProvider({ children }: TasksProviderProps) {
     });
   }, [setTasks]);
 
+  /**
+   * Get active (non-archived) tasks
+   * Requirements: 15.1
+   */
+  const activeTasks = useMemo(() => {
+    return tasks.filter(task => !task.archived);
+  }, [tasks]);
+
+  /**
+   * Get archived tasks
+   * Requirements: 15.1, 15.4
+   */
+  const archivedTasks = useMemo(() => {
+    return tasks.filter(task => task.archived);
+  }, [tasks]);
+
+  /**
+   * Get all unique tags from all tasks
+   */
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    tasks.forEach(task => {
+      task.tags?.forEach(tag => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [tasks]);
+
+  /**
+   * Filter tasks based on selected tags
+   * Requirements: 14.4, 14.6
+   */
+  const filteredTasks = useMemo(() => {
+    // Only filter active tasks by default
+    const tasksToFilter = activeTasks;
+    
+    if (selectedTags.length === 0) {
+      return tasksToFilter;
+    }
+    
+    return tasksToFilter.filter(task => {
+      const taskTags = task.tags || [];
+      if (tagFilterMode === 'AND') {
+        // Task must have ALL selected tags
+        return selectedTags.every(tag => taskTags.includes(tag));
+      } else {
+        // Task must have ANY selected tag
+        return selectedTags.some(tag => taskTags.includes(tag));
+      }
+    });
+  }, [activeTasks, selectedTags, tagFilterMode]);
+
   const value: TasksContextType = {
     tasks,
+    filteredTasks,
+    activeTasks,
+    archivedTasks,
     createTask,
     updateTask,
     deleteTask,
@@ -182,8 +310,16 @@ export function TasksProvider({ children }: TasksProviderProps) {
     toggleTaskCompletion,
     completeTask,
     uncompleteTask,
+    archiveTask,
+    unarchiveTask,
+    getArchiveSuggestions,
     reorderTasks,
     moveTask,
+    selectedTags,
+    setSelectedTags,
+    tagFilterMode,
+    setTagFilterMode,
+    allTags,
   };
 
   return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;

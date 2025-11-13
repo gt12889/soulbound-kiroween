@@ -34,7 +34,7 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
   });
 
   const [isOnline, setIsOnline] = useState(cloudSyncService.isConnected());
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const syncIntervalRef = useRef<number | null>(null);
   const isMountedRef = useRef(true);
 
   /**
