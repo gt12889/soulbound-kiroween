@@ -32,16 +32,9 @@ const NotesBook: React.FC = () => {
 
   return (
     <div className={styles.notesBook}>
-      <div className={`${styles.bookContainer} ${isTransitioning ? styles.turning : ''}`}>
-        {/* Left page (for visual effect) */}
-        <div className={styles.leftPage}>
-          <div className={styles.pageContent}>
-            {displayedNoteId && <NotePage noteId={displayedNoteId} />}
-          </div>
-        </div>
-
-        {/* Right page (turning page) */}
-        <div className={styles.rightPage}>
+      <div className={styles.bookContainer}>
+        {/* Single page - no 3D transforms */}
+        <div className={styles.singlePage}>
           <div className={styles.pageContent}>
             {currentNoteId && <NotePage noteId={currentNoteId} />}
           </div>

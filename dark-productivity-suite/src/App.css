@@ -83,6 +83,21 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
+  direction: ltr !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+}
+
+/* Force all text elements to display correctly - no mirroring */
+* {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+}
+
+/* Prevent any transforms from flipping text */
+*:not(svg):not(path):not(circle):not(rect):not(line):not(polyline):not(polygon) {
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
 }
 
 /* ===================================

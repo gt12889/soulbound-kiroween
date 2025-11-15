@@ -13,12 +13,16 @@ interface NotePageProps {
 
 /**
  * NotePage component - Renders a single note with parchment styling
- * Requirements: 3.1, 3.3, 3.4, 3.6
+ * Completely rebuilt to prevent text mirroring issues
+ * Features: Markdown support, AI suggestions, text formatting, tags, search highlighting
  */
 const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
   const { getNote, updateNote, searchQuery, allTags } = useNotes();
   const note = getNote(noteId);
   const contentRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  
+  // State management
   const [aiEnabled, setAiEnabled] = useState(false);
   const [suggestions, setSuggestions] = useState<GhostSuggestionType[]>([]);
   const [fontSize, setFontSize] = useState(18);
@@ -31,14 +35,15 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
 
   // Focus on content when note changes
   useEffect(() => {
-    if (contentRef.current) {
+    if (contentRef.current && !note?.markdown) {
       contentRef.current.focus();
     }
-  }, [noteId]);
+  }, [noteId, note?.markdown]);
 
+  // Empty state
   if (!note) {
     return (
-      <div className={styles.notePage}>
+      <div className={styles.notePage} dir="ltr">
         <div className={styles.parchment}>
           <p className={styles.emptyMessage}>No note selected</p>
         </div>
@@ -46,6 +51,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
     );
   }
 
+  // Event handlers
   const handleTitleChange = (e: React.FormEvent<HTMLHeadingElement>) => {
     const newTitle = e.currentTarget.textContent || '';
     updateNote(noteId, { title: newTitle });
@@ -80,13 +86,10 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
   };
 
   const handleAcceptSuggestion = (suggestion: GhostSuggestionType) => {
-    if (!note) return;
-    
     playSuggestionAccept();
     const newContent = note.content + ' ' + suggestion.text;
     updateNote(noteId, { content: newContent });
     
-    // Update the contentEditable div
     if (contentRef.current) {
       contentRef.current.textContent = newContent;
     }
@@ -96,7 +99,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
 
   const handleDismissSuggestion = (suggestionId: string) => {
     playGhostDisappear();
-    setSuggestions(prev => prev.filter(s => s.id !== suggestionId));
+    setSuggestions((prev) => prev.filter((s) => s.id !== suggestionId));
   };
 
   const handleFormatCommand = (command: string, value?: string) => {
@@ -115,9 +118,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
     playUIClick();
   };
 
-
-
-  // Highlight search matches in content
+  // Highlight search matches
   const highlightedContent = useMemo(() => {
     if (!searchQuery.trim() || !note?.content) {
       return note?.content || '';
@@ -136,8 +137,31 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
       .join('');
   }, [note?.content, searchQuery]);
 
+  // Color palette for text formatting
+  const colorPalette = [
+    { color: '#1a1a1a', name: 'Black' },
+    { color: '#4a4a4a', name: 'Dark Gray (Default)' },
+    { color: '#6B7280', name: 'Gray' },
+    { color: '#9CA3AF', name: 'Light Gray' },
+    { color: '#D1D5DB', name: 'Very Light Gray', border: true },
+    { color: '#F3F4F6', name: 'Off White', border: true },
+    { color: '#FFFFFF', name: 'White', border: true },
+    { color: '#8B4513', name: 'Saddle Brown' },
+    { color: '#D97706', name: 'Amber' },
+    { color: '#EA580C', name: 'Orange' },
+    { color: '#C53030', name: 'Red' },
+    { color: '#DC2626', name: 'Bright Red' },
+    { color: '#DB2777', name: 'Pink' },
+    { color: '#6B46C1', name: 'Purple' },
+    { color: '#7C3AED', name: 'Bright Purple' },
+    { color: '#2C5282', name: 'Blue' },
+    { color: '#0284C7', name: 'Sky Blue' },
+    { color: '#2F855A', name: 'Forest Green' },
+    { color: '#059669', name: 'Emerald' },
+  ];
+
   return (
-    <div className={styles.notePage}>
+    <div className={styles.notePage} dir="ltr">
       {/* Toolbar */}
       <div className={styles.toolbar}>
         {/* Markdown Toggle */}
@@ -153,11 +177,14 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
           <span className={styles.buttonLabel}>Markdown</span>
         </button>
 
-        {/* AI Toggle - only show in non-markdown mode */}
+        {/* AI Toggle - only in non-markdown mode */}
         {!note.markdown && (
           <button
             className={`${styles.toolbarButton} ${aiEnabled ? styles.aiEnabled : ''}`}
-            onClick={() => setAiEnabled(!aiEnabled)}
+            onClick={() => {
+              playUIClick();
+              setAiEnabled(!aiEnabled);
+            }}
             title={aiEnabled ? 'Disable AI suggestions' : 'Enable AI suggestions'}
           >
             <span className={styles.aiIcon}>👻</span>
@@ -165,11 +192,14 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
           </button>
         )}
 
-        {/* Formatting Toggle - only show in non-markdown mode */}
+        {/* Formatting Toggle - only in non-markdown mode */}
         {!note.markdown && (
           <button
             className={`${styles.toolbarButton} ${showFormatting ? styles.active : ''}`}
-            onClick={() => setShowFormatting(!showFormatting)}
+            onClick={() => {
+              playUIClick();
+              setShowFormatting(!showFormatting);
+            }}
             title="Text formatting"
           >
             <span>🎨</span>
@@ -177,8 +207,8 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
           </button>
         )}
 
-        {/* Formatting Options */}
-        {showFormatting && (
+        {/* Formatting Panel */}
+        {showFormatting && !note.markdown && (
           <div className={styles.formattingPanel}>
             {/* Font Size */}
             <div className={styles.formattingGroup}>
@@ -206,120 +236,18 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
             <div className={styles.formattingGroup}>
               <label className={styles.formattingLabel}>Color</label>
               <div className={styles.colorButtons}>
-                <button
-                  className={`${styles.colorButton} ${textColor === '#1a1a1a' ? styles.activeColor : ''}`}
-                  style={{ background: '#1a1a1a' }}
-                  onClick={() => handleColorChange('#1a1a1a')}
-                  title="Black"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#4a4a4a' ? styles.activeColor : ''}`}
-                  style={{ background: '#4a4a4a' }}
-                  onClick={() => handleColorChange('#4a4a4a')}
-                  title="Dark Gray (Default)"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#6B7280' ? styles.activeColor : ''}`}
-                  style={{ background: '#6B7280' }}
-                  onClick={() => handleColorChange('#6B7280')}
-                  title="Gray"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#9CA3AF' ? styles.activeColor : ''}`}
-                  style={{ background: '#9CA3AF' }}
-                  onClick={() => handleColorChange('#9CA3AF')}
-                  title="Light Gray"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#D1D5DB' ? styles.activeColor : ''}`}
-                  style={{ background: '#D1D5DB', border: '1px solid #9CA3AF' }}
-                  onClick={() => handleColorChange('#D1D5DB')}
-                  title="Very Light Gray"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#F3F4F6' ? styles.activeColor : ''}`}
-                  style={{ background: '#F3F4F6', border: '1px solid #9CA3AF' }}
-                  onClick={() => handleColorChange('#F3F4F6')}
-                  title="Off White"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#FFFFFF' ? styles.activeColor : ''}`}
-                  style={{ background: '#FFFFFF', border: '1px solid #9CA3AF' }}
-                  onClick={() => handleColorChange('#FFFFFF')}
-                  title="White"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#8B4513' ? styles.activeColor : ''}`}
-                  style={{ background: '#8B4513' }}
-                  onClick={() => handleColorChange('#8B4513')}
-                  title="Saddle Brown"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#D97706' ? styles.activeColor : ''}`}
-                  style={{ background: '#D97706' }}
-                  onClick={() => handleColorChange('#D97706')}
-                  title="Amber"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#EA580C' ? styles.activeColor : ''}`}
-                  style={{ background: '#EA580C' }}
-                  onClick={() => handleColorChange('#EA580C')}
-                  title="Orange"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#C53030' ? styles.activeColor : ''}`}
-                  style={{ background: '#C53030' }}
-                  onClick={() => handleColorChange('#C53030')}
-                  title="Red"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#DC2626' ? styles.activeColor : ''}`}
-                  style={{ background: '#DC2626' }}
-                  onClick={() => handleColorChange('#DC2626')}
-                  title="Bright Red"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#DB2777' ? styles.activeColor : ''}`}
-                  style={{ background: '#DB2777' }}
-                  onClick={() => handleColorChange('#DB2777')}
-                  title="Pink"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#6B46C1' ? styles.activeColor : ''}`}
-                  style={{ background: '#6B46C1' }}
-                  onClick={() => handleColorChange('#6B46C1')}
-                  title="Purple"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#7C3AED' ? styles.activeColor : ''}`}
-                  style={{ background: '#7C3AED' }}
-                  onClick={() => handleColorChange('#7C3AED')}
-                  title="Bright Purple"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#2C5282' ? styles.activeColor : ''}`}
-                  style={{ background: '#2C5282' }}
-                  onClick={() => handleColorChange('#2C5282')}
-                  title="Blue"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#0284C7' ? styles.activeColor : ''}`}
-                  style={{ background: '#0284C7' }}
-                  onClick={() => handleColorChange('#0284C7')}
-                  title="Sky Blue"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#2F855A' ? styles.activeColor : ''}`}
-                  style={{ background: '#2F855A' }}
-                  onClick={() => handleColorChange('#2F855A')}
-                  title="Forest Green"
-                />
-                <button
-                  className={`${styles.colorButton} ${textColor === '#059669' ? styles.activeColor : ''}`}
-                  style={{ background: '#059669' }}
-                  onClick={() => handleColorChange('#059669')}
-                  title="Emerald"
-                />
+                {colorPalette.map(({ color, name, border }) => (
+                  <button
+                    key={color}
+                    className={`${styles.colorButton} ${textColor === color ? styles.activeColor : ''}`}
+                    style={{
+                      background: color,
+                      ...(border && { border: '1px solid #9CA3AF' }),
+                    }}
+                    onClick={() => handleColorChange(color)}
+                    title={name}
+                  />
+                ))}
               </div>
             </div>
 
@@ -327,32 +255,16 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
             <div className={styles.formattingGroup}>
               <label className={styles.formattingLabel}>Style</label>
               <div className={styles.styleButtons}>
-                <button
-                  className={styles.styleButton}
-                  onClick={() => handleFormatCommand('bold')}
-                  title="Bold"
-                >
+                <button className={styles.styleButton} onClick={() => handleFormatCommand('bold')} title="Bold">
                   <strong>B</strong>
                 </button>
-                <button
-                  className={styles.styleButton}
-                  onClick={() => handleFormatCommand('italic')}
-                  title="Italic"
-                >
+                <button className={styles.styleButton} onClick={() => handleFormatCommand('italic')} title="Italic">
                   <em>I</em>
                 </button>
-                <button
-                  className={styles.styleButton}
-                  onClick={() => handleFormatCommand('underline')}
-                  title="Underline"
-                >
+                <button className={styles.styleButton} onClick={() => handleFormatCommand('underline')} title="Underline">
                   <u>U</u>
                 </button>
-                <button
-                  className={styles.styleButton}
-                  onClick={() => handleFormatCommand('strikeThrough')}
-                  title="Strikethrough"
-                >
+                <button className={styles.styleButton} onClick={() => handleFormatCommand('strikeThrough')} title="Strikethrough">
                   <s>S</s>
                 </button>
               </div>
@@ -361,7 +273,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
         )}
       </div>
 
-      {/* Render markdown editor or regular editor based on markdown flag */}
+      {/* Main Content Area */}
       {note.markdown ? (
         <div className={styles.markdownContainer}>
           <MarkdownEditor
@@ -372,20 +284,17 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
           />
         </div>
       ) : (
-        <div className={styles.parchment}>
-          {/* Dripping ink border animation - Requirement 3.4 */}
+        <div className={styles.parchment} dir="ltr">
+          {/* Dripping ink border animation */}
           <div className={styles.inkBorder}>
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
-            <div className={styles.inkDrip} />
+            {[...Array(7)].map((_, i) => (
+              <div key={i} className={styles.inkDrip} />
+            ))}
           </div>
 
-          {/* Note title */}
+          {/* Note Title */}
           <h2
+            ref={titleRef}
             className={styles.noteTitle}
             contentEditable
             suppressContentEditableWarning
@@ -396,11 +305,12 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
                 contentRef.current?.focus();
               }
             }}
+            dir="ltr"
           >
             {note.title}
           </h2>
 
-          {/* Tags */}
+          {/* Tags Section */}
           <div className={styles.tagsSection}>
             <TagManager
               tags={note.tags || []}
@@ -410,20 +320,28 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
             />
           </div>
 
-          {/* Note content */}
+          {/* Note Content */}
           <div
             ref={contentRef}
             className={styles.noteContent}
             contentEditable
             suppressContentEditableWarning
+            dir="ltr"
             onInput={handleContentChange}
             data-placeholder="Begin your inscription..."
-            style={{ fontSize: `${fontSize}px`, color: textColor }}
+            style={{
+              fontSize: `${fontSize}px`,
+              color: textColor,
+              transform: 'scaleX(1)',
+              WebkitTransform: 'scaleX(1)',
+              direction: 'ltr',
+              unicodeBidi: 'normal',
+              textAlign: 'left',
+            }}
             dangerouslySetInnerHTML={searchQuery ? { __html: highlightedContent } : undefined}
           >
             {!searchQuery && note.content}
           </div>
-
           {/* AI Suggestions */}
           {aiEnabled && suggestions.length > 0 && (
             <div className={styles.suggestionsContainer}>
@@ -434,6 +352,12 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
                   onClick={() => handleAcceptSuggestion(suggestion)}
                   role="button"
                   tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleAcceptSuggestion(suggestion);
+                    }
+                  }}
                 >
                   <span className={styles.suggestionIcon}>👻</span>
                   <span className={styles.suggestionText}>{suggestion.text}</span>
@@ -452,7 +376,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
             </div>
           )}
 
-          {/* Torn edges effect */}
+          {/* Torn Edges Effect */}
           <div className={styles.tornEdgeTop} />
           <div className={styles.tornEdgeBottom} />
         </div>

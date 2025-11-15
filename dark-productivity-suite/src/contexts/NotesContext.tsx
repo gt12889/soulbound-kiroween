@@ -193,7 +193,12 @@ export function NotesProvider({ children }: NotesProviderProps) {
       );
     }
     
-    return result;
+    // Sort by creation date (newest first)
+    return result.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    });
   }, [notes, searchQuery, selectedTags, tagFilterMode]);
 
   const value: NotesContextType = {
