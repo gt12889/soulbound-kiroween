@@ -320,15 +320,14 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
             />
           </div>
 
-          {/* Note Content */}
-          <div
-            ref={contentRef}
+          {/* Note Content - Using textarea as fallback */}
+          <textarea
+            ref={contentRef as any}
             className={styles.noteContent}
-            contentEditable
-            suppressContentEditableWarning
             dir="ltr"
-            onInput={handleContentChange}
-            data-placeholder="Begin your inscription..."
+            value={note.content}
+            onChange={(e) => updateNote(noteId, { content: e.target.value })}
+            placeholder="Begin your inscription..."
             style={{
               fontSize: `${fontSize}px`,
               color: textColor,
@@ -337,11 +336,14 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
               direction: 'ltr',
               unicodeBidi: 'normal',
               textAlign: 'left',
+              resize: 'none',
+              border: 'none',
+              background: 'transparent',
+              outline: 'none',
+              width: '100%',
+              fontFamily: 'inherit',
             }}
-            dangerouslySetInnerHTML={searchQuery ? { __html: highlightedContent } : undefined}
-          >
-            {!searchQuery && note.content}
-          </div>
+          />
           {/* AI Suggestions */}
           {aiEnabled && suggestions.length > 0 && (
             <div className={styles.suggestionsContainer}>

@@ -1,12 +1,14 @@
 .notesList {
-  width: 280px;
+  width: 100%;
+  min-width: 280px;
   height: 100%;
-  background: linear-gradient(to bottom, #1a1a1a, #0a0a0a);
-  border-right: 2px solid #2d1b4e;
+  background: linear-gradient(to bottom, var(--bg-secondary), var(--bg-primary));
+  border-right: 2px solid var(--border-primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 4px 0 20px var(--shadow-heavy);
+  transition: background 0.3s ease;
 }
 
 .header {
@@ -14,38 +16,39 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 1rem;
-  border-bottom: 1px solid #2d1b4e;
-  background: rgba(45, 27, 78, 0.2);
+  border-bottom: 1px solid var(--border-primary);
+  background: var(--bg-tertiary);
+  transition: background 0.3s ease;
 }
 
 .title {
-  font-family: 'Cinzel', 'Crimson Text', serif;
+  font-family: var(--font-header);
   font-size: 1.3rem;
   font-weight: 700;
-  color: #e0e0e0;
+  color: var(--text-primary);
   margin: 0;
-  text-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
+  text-shadow: 0 0 10px var(--glow-purple);
 }
 
 .createButton {
   width: 36px;
   height: 36px;
-  background: linear-gradient(135deg, #2d1b4e, #4a2d6e);
-  border: 1px solid #6e4a9e;
+  background: linear-gradient(135deg, var(--accent-purple-dark), var(--accent-purple));
+  border: 1px solid var(--accent-purple-light);
   border-radius: 50%;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-size: 1.5rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.1s ease-in-out;
-  box-shadow: 0 2px 8px rgba(110, 74, 158, 0.3);
+  box-shadow: 0 2px 8px var(--shadow-medium);
 }
 
 .createButton:hover {
-  background: linear-gradient(135deg, #4a2d6e, #6e4a9e);
-  box-shadow: 0 0 15px rgba(157, 78, 221, 0.5);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
+  box-shadow: 0 0 15px var(--glow-purple);
   transform: scale(1.05);
 }
 
@@ -70,16 +73,16 @@
 }
 
 .notesContainer::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--bg-primary);
 }
 
 .notesContainer::-webkit-scrollbar-thumb {
-  background: #2d1b4e;
+  background: var(--accent-purple);
   border-radius: 4px;
 }
 
 .notesContainer::-webkit-scrollbar-thumb:hover {
-  background: #4a2d6e;
+  background: var(--accent-purple-light);
 }
 
 .noteItems {
@@ -93,7 +96,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid rgba(45, 27, 78, 0.3);
+  border-bottom: 1px solid var(--border-secondary);
   cursor: pointer;
   transition: all 0.1s ease-in-out;
   position: relative;
@@ -101,16 +104,16 @@
 }
 
 .noteItem:hover {
-  background: rgba(45, 27, 78, 0.2);
-  border-left: 3px solid #6e4a9e;
+  background: var(--bg-tertiary);
+  border-left: 3px solid var(--accent-purple);
   padding-left: calc(1rem - 3px);
 }
 
 .noteItem.selected {
-  background: rgba(45, 27, 78, 0.4);
-  border-left: 3px solid #9d4edd;
+  background: var(--accent-purple-dark);
+  border-left: 3px solid var(--accent-purple-light);
   padding-left: calc(1rem - 3px);
-  box-shadow: inset 0 0 20px rgba(157, 78, 221, 0.2);
+  box-shadow: inset 0 0 20px var(--shadow-medium);
 }
 
 .noteItemContent {
@@ -120,10 +123,10 @@
 }
 
 .noteItemTitle {
-  font-family: 'Lora', 'Merriweather', serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 600;
-  color: #e0e0e0;
+  color: var(--text-primary);
   margin: 0 0 0.25rem 0;
   white-space: nowrap;
   overflow: hidden;
@@ -133,14 +136,14 @@
 
 .noteItem:hover .noteItemTitle,
 .noteItem.selected .noteItemTitle {
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(157, 78, 221, 0.4);
+  color: var(--text-primary);
+  text-shadow: 0 0 8px var(--glow-purple);
 }
 
 .noteItemDate {
-  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   margin: 0;
   opacity: 0.7;
 }
@@ -151,7 +154,7 @@
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
@@ -168,9 +171,9 @@
 }
 
 .deleteButton:hover {
-  background: rgba(110, 26, 26, 0.3);
-  border-color: #6e1a1a;
-  color: #ff6b6b;
+  background: var(--warning-red);
+  border-color: var(--warning-red-light);
+  color: var(--warning-red-light);
   transform: scale(1.1);
 }
 
@@ -181,12 +184,12 @@
 .emptyState {
   padding: 2rem 1rem;
   text-align: center;
-  color: #b0b0b0;
+  color: var(--text-secondary);
 }
 
 .emptyState p {
   margin: 0.5rem 0;
-  font-family: 'Lora', 'Merriweather', serif;
+  font-family: var(--font-body);
 }
 
 .emptyHint {

@@ -1,32 +1,36 @@
 .tarotReader {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-  color: #e0e0e0;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
   padding: 2rem;
   font-family: 'Lora', 'Georgia', serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .header {
   text-align: center;
   margin-bottom: 3rem;
   padding: 2rem 0;
-  border-bottom: 2px solid #2d1b4e;
+  border-bottom: 2px solid var(--border-primary);
+  transition: border-color 0.3s ease;
 }
 
 .title {
   font-family: 'Cinzel', 'Georgia', serif;
   font-size: 3rem;
-  color: #e0e0e0;
+  color: var(--text-primary);
   margin: 0;
-  text-shadow: 0 0 20px rgba(77, 45, 110, 0.8);
+  text-shadow: 0 0 20px var(--glow-purple);
   letter-spacing: 4px;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .subtitle {
   font-size: 1.2rem;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   margin: 1rem 0 0 0;
   font-style: italic;
+  transition: color 0.3s ease;
 }
 
 .controls {
@@ -43,11 +47,12 @@
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-family: 'Cinzel', 'Georgia', serif;
-  background: linear-gradient(135deg, #2d1b4e 0%, #4a2d6e 100%);
-  color: #e0e0e0;
-  border: 2px solid #4a2d6e;
+  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
+  color: var(--text-primary);
+  border: 2px solid var(--accent-purple-light);
   border-radius: 8px;
   cursor: pointer;
+  transition: all 0.3s ease;
   transition: all 0.25s ease-in-out;
   display: flex;
   align-items: center;

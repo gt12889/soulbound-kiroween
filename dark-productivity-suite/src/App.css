@@ -113,7 +113,9 @@ body {
   flex: 1;
   padding: 2rem;
   min-height: 100vh;
-  transition: opacity var(--timing-transition) var(--ease-in-out);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: opacity var(--timing-transition) var(--ease-in-out), background-color 0.3s ease;
 }
 
 .landing-content {
