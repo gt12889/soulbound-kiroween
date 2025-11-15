@@ -66,7 +66,23 @@ service cloud.firestore {
 }
 ```
 
-## Step 5: Configure Environment Variables
+## Step 5: Firebase Configuration Files
+
+The project includes pre-configured Firebase files:
+
+- **`firebase.json`** - Main Firebase configuration
+  - Hosting setup (serves from `dist/` folder)
+  - SPA routing configuration
+  - Optimized caching headers
+  - Firestore and Storage rules references
+
+- **`firestore.rules`** - Database security rules
+- **`firestore.indexes.json`** - Database indexes for query optimization
+- **`storage.rules`** - Cloud Storage security rules
+
+These files are ready to use. When you run `firebase init`, select "use existing file" for these configurations.
+
+## Step 6: Configure Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -81,7 +97,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 **Important**: Add `.env` to `.gitignore` to keep credentials secure.
 
-## Step 6: Create Firebase Service
+## Step 7: Create Firebase Service
 
 Create `src/services/firebaseService.ts`:
 
@@ -107,7 +123,41 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 ```
 
-## Step 7: Deploy Configuration
+## Step 8: Deploy Firebase Configuration
+
+Deploy your Firestore rules, indexes, and storage rules:
+
+```bash
+# Login to Firebase
+firebase login
+
+# Initialize Firebase (if not already done)
+firebase init
+
+# Deploy rules and indexes
+firebase deploy --only firestore:rules,firestore:indexes,storage
+```
+
+The `firebase.json` configuration will automatically:
+- Reference the correct rules files
+- Set up hosting configuration
+- Configure caching headers for optimal performance
+
+## Step 9: Deploy to Hosting (Optional)
+
+If you want to host on Firebase Hosting:
+
+```bash
+# Build the project
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+```
+
+Your app will be available at `https://your-project-id.web.app`
+
+## Step 10: Configure Environment Variables for Deployment
 
 ### Vercel
 

@@ -3,6 +3,7 @@ import { useNotes } from '../../contexts/NotesContext';
 import { aiService } from '../../services/aiService';
 import { useAudio } from '../../hooks/useAudio';
 import { TagManager } from '../common/TagManager';
+import MarkdownEditor from './MarkdownEditor';
 import type { GhostSuggestion as GhostSuggestionType } from '../../types';
 import styles from './NotePage.module.css';
 
@@ -23,6 +24,7 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
   const [fontSize, setFontSize] = useState(18);
   const [textColor, setTextColor] = useState('#4a4a4a');
   const [showFormatting, setShowFormatting] = useState(false);
+  const [markdownViewMode, setMarkdownViewMode] = useState<'edit' | 'preview' | 'split'>('split');
 
   const suggestionTimerRef = useRef<number | null>(null);
   const { playGhostAppear, playGhostDisappear, playSuggestionAccept, playUIClick } = useAudio();
@@ -138,25 +140,42 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
     <div className={styles.notePage}>
       {/* Toolbar */}
       <div className={styles.toolbar}>
-        {/* AI Toggle */}
+        {/* Markdown Toggle */}
         <button
-          className={`${styles.toolbarButton} ${aiEnabled ? styles.aiEnabled : ''}`}
-          onClick={() => setAiEnabled(!aiEnabled)}
-          title={aiEnabled ? 'Disable AI suggestions' : 'Enable AI suggestions'}
+          className={`${styles.toolbarButton} ${note.markdown ? styles.active : ''}`}
+          onClick={() => {
+            playUIClick();
+            updateNote(noteId, { markdown: !note.markdown });
+          }}
+          title={note.markdown ? 'Disable markdown' : 'Enable markdown'}
         >
-          <span className={styles.aiIcon}>👻</span>
-          <span className={styles.buttonLabel}>AI</span>
+          <span>📝</span>
+          <span className={styles.buttonLabel}>Markdown</span>
         </button>
 
-        {/* Formatting Toggle */}
-        <button
-          className={`${styles.toolbarButton} ${showFormatting ? styles.active : ''}`}
-          onClick={() => setShowFormatting(!showFormatting)}
-          title="Text formatting"
-        >
-          <span>🎨</span>
-          <span className={styles.buttonLabel}>Format</span>
-        </button>
+        {/* AI Toggle - only show in non-markdown mode */}
+        {!note.markdown && (
+          <button
+            className={`${styles.toolbarButton} ${aiEnabled ? styles.aiEnabled : ''}`}
+            onClick={() => setAiEnabled(!aiEnabled)}
+            title={aiEnabled ? 'Disable AI suggestions' : 'Enable AI suggestions'}
+          >
+            <span className={styles.aiIcon}>👻</span>
+            <span className={styles.buttonLabel}>AI</span>
+          </button>
+        )}
+
+        {/* Formatting Toggle - only show in non-markdown mode */}
+        {!note.markdown && (
+          <button
+            className={`${styles.toolbarButton} ${showFormatting ? styles.active : ''}`}
+            onClick={() => setShowFormatting(!showFormatting)}
+            title="Text formatting"
+          >
+            <span>🎨</span>
+            <span className={styles.buttonLabel}>Format</span>
+          </button>
+        )}
 
         {/* Formatting Options */}
         {showFormatting && (
@@ -342,90 +361,102 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
         )}
       </div>
 
-      <div className={styles.parchment}>
-        {/* Dripping ink border animation - Requirement 3.4 */}
-        <div className={styles.inkBorder}>
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-          <div className={styles.inkDrip} />
-        </div>
-
-        {/* Note title */}
-        <h2
-          className={styles.noteTitle}
-          contentEditable
-          suppressContentEditableWarning
-          onBlur={handleTitleChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              contentRef.current?.focus();
-            }
-          }}
-        >
-          {note.title}
-        </h2>
-
-        {/* Tags */}
-        <div className={styles.tagsSection}>
-          <TagManager
-            tags={note.tags || []}
-            allTags={allTags}
-            onTagsChange={(tags) => updateNote(noteId, { tags })}
-            placeholder="Add tags..."
+      {/* Render markdown editor or regular editor based on markdown flag */}
+      {note.markdown ? (
+        <div className={styles.markdownContainer}>
+          <MarkdownEditor
+            content={note.content}
+            onChange={(content) => updateNote(noteId, { content })}
+            viewMode={markdownViewMode}
+            onViewModeChange={setMarkdownViewMode}
           />
         </div>
-
-        {/* Note content */}
-        <div
-          ref={contentRef}
-          className={styles.noteContent}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={handleContentChange}
-          data-placeholder="Begin your inscription..."
-          style={{ fontSize: `${fontSize}px`, color: textColor }}
-          dangerouslySetInnerHTML={searchQuery ? { __html: highlightedContent } : undefined}
-        >
-          {!searchQuery && note.content}
-        </div>
-
-        {/* AI Suggestions */}
-        {aiEnabled && suggestions.length > 0 && (
-          <div className={styles.suggestionsContainer}>
-            {suggestions.map((suggestion) => (
-              <div
-                key={suggestion.id}
-                className={styles.suggestion}
-                onClick={() => handleAcceptSuggestion(suggestion)}
-                role="button"
-                tabIndex={0}
-              >
-                <span className={styles.suggestionIcon}>👻</span>
-                <span className={styles.suggestionText}>{suggestion.text}</span>
-                <button
-                  className={styles.dismissButton}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDismissSuggestion(suggestion.id);
-                  }}
-                  aria-label="Dismiss suggestion"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
+      ) : (
+        <div className={styles.parchment}>
+          {/* Dripping ink border animation - Requirement 3.4 */}
+          <div className={styles.inkBorder}>
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
+            <div className={styles.inkDrip} />
           </div>
-        )}
 
-        {/* Torn edges effect */}
-        <div className={styles.tornEdgeTop} />
-        <div className={styles.tornEdgeBottom} />
-      </div>
+          {/* Note title */}
+          <h2
+            className={styles.noteTitle}
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={handleTitleChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                contentRef.current?.focus();
+              }
+            }}
+          >
+            {note.title}
+          </h2>
+
+          {/* Tags */}
+          <div className={styles.tagsSection}>
+            <TagManager
+              tags={note.tags || []}
+              allTags={allTags}
+              onTagsChange={(tags) => updateNote(noteId, { tags })}
+              placeholder="Add tags..."
+            />
+          </div>
+
+          {/* Note content */}
+          <div
+            ref={contentRef}
+            className={styles.noteContent}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleContentChange}
+            data-placeholder="Begin your inscription..."
+            style={{ fontSize: `${fontSize}px`, color: textColor }}
+            dangerouslySetInnerHTML={searchQuery ? { __html: highlightedContent } : undefined}
+          >
+            {!searchQuery && note.content}
+          </div>
+
+          {/* AI Suggestions */}
+          {aiEnabled && suggestions.length > 0 && (
+            <div className={styles.suggestionsContainer}>
+              {suggestions.map((suggestion) => (
+                <div
+                  key={suggestion.id}
+                  className={styles.suggestion}
+                  onClick={() => handleAcceptSuggestion(suggestion)}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <span className={styles.suggestionIcon}>👻</span>
+                  <span className={styles.suggestionText}>{suggestion.text}</span>
+                  <button
+                    className={styles.dismissButton}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDismissSuggestion(suggestion.id);
+                    }}
+                    aria-label="Dismiss suggestion"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Torn edges effect */}
+          <div className={styles.tornEdgeTop} />
+          <div className={styles.tornEdgeBottom} />
+        </div>
+      )}
     </div>
   );
 };

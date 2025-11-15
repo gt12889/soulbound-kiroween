@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { AppProvider } from './contexts/AppContext';
 import { KeyboardProvider } from './contexts/KeyboardContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { NotesProvider } from './contexts/NotesContext';
 import { TasksProvider } from './contexts/TasksContext';
 import Navigation from './components/common/Navigation';
-import LoadingTransition from './components/common/LoadingTransition';
+// import LoadingTransition from './components/common/LoadingTransition';
 import AudioController from './components/common/AudioController';
 import { KeyboardShortcutsPanel } from './components/common/KeyboardShortcutsPanel';
 import QuickCapture from './components/common/QuickCapture';
@@ -20,26 +21,35 @@ import GhostWriter from './components/ghost-writer/GhostWriter';
 import NecronomiconNotes from './components/necronomicon-notes/NecronomiconNotes';
 import { GraveyardDashboard } from './components/graveyard-dashboard/GraveyardDashboard';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useSettingsInitialization, useSettingsPersistence } from './hooks/useSettingsInitialization';
 import { DEFAULT_SHORTCUTS } from './utils/keyboardShortcuts';
 import './App.css';
 
 const AppContent: React.FC = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [showQuickCapture, setShowQuickCapture] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isLandingPage = location.pathname === '/';
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/password-reset';
 
-  // Trigger loading transition on route change
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100); // Brief delay to trigger the transition
+  // Initialize settings on app startup (Requirements: 10.3, 17.3)
+  // Run in background without blocking the UI
+  useSettingsInitialization();
+  
+  // Ensure settings persistence across sessions (Requirements: 10.3, 17.3)
+  useSettingsPersistence();
 
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
+  // Trigger loading transition on route change
+  // DISABLED: This was causing black screen issues
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 100); // Brief delay to trigger the transition
+
+  //   return () => clearTimeout(timer);
+  // }, [location.pathname]);
 
   // Register global keyboard shortcuts for navigation
   // Requirements: 9.1, 9.2, 9.3
@@ -66,11 +76,13 @@ const AppContent: React.FC = () => {
   const showNavigation = !isLandingPage && !isAuthPage;
   const contentClass = isLandingPage || isAuthPage ? 'landing-content' : 'main-content';
 
+  // Settings load in the background - don't block the UI
+
   return (
     <div className="app">
       {showNavigation && <Navigation />}
       <main className={contentClass}>
-        <LoadingTransition isLoading={isLoading} minDisplayTime={500} />
+        {/* <LoadingTransition isLoading={isLoading} minDisplayTime={500} /> */}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -121,15 +133,17 @@ const App: React.FC = () => {
   return (
     <Router>
       <AuthProvider>
-        <ThemeProvider>
-          <KeyboardProvider>
-            <NotesProvider>
-              <TasksProvider>
-                <AppContent />
-              </TasksProvider>
-            </NotesProvider>
-          </KeyboardProvider>
-        </ThemeProvider>
+        <AppProvider>
+          <ThemeProvider>
+            <KeyboardProvider>
+              <NotesProvider>
+                <TasksProvider>
+                  <AppContent />
+                </TasksProvider>
+              </NotesProvider>
+            </KeyboardProvider>
+          </ThemeProvider>
+        </AppProvider>
       </AuthProvider>
     </Router>
   );

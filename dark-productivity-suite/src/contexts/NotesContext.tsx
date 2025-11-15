@@ -28,6 +28,9 @@ interface NotesContextType {
   tagFilterMode: 'AND' | 'OR';
   setTagFilterMode: (mode: 'AND' | 'OR') => void;
   allTags: string[];
+  
+  // Import functionality
+  importNotes: (importedNotes: Note[], strategy: 'replace' | 'merge') => void;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
@@ -64,6 +67,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
       id: crypto.randomUUID(),
       title,
       content,
+      markdown: false,
       tags: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -124,6 +128,41 @@ export function NotesProvider({ children }: NotesProviderProps) {
   }, [notes]);
 
   /**
+   * Import notes with merge or replace strategy
+   * Requirements: 11.3
+   */
+  const importNotes = useCallback((importedNotes: Note[], strategy: 'replace' | 'merge') => {
+    if (strategy === 'replace') {
+      // Replace all existing notes
+      setNotes(importedNotes);
+      setCurrentNoteId(null);
+    } else {
+      // Merge: add only unique notes (skip duplicates)
+      setNotes(prev => {
+        const merged = [...prev];
+        
+        importedNotes.forEach(importedNote => {
+          // Check if note already exists (by title and content)
+          const isDuplicate = prev.some(existing => 
+            existing.title.trim().toLowerCase() === importedNote.title.trim().toLowerCase() &&
+            existing.content.trim().toLowerCase() === importedNote.content.trim().toLowerCase()
+          );
+          
+          if (!isDuplicate) {
+            // Generate new ID to avoid conflicts
+            merged.push({
+              ...importedNote,
+              id: crypto.randomUUID(),
+            });
+          }
+        });
+        
+        return merged;
+      });
+    }
+  }, [setNotes]);
+
+  /**
    * Filter notes based on search query and tags
    * Requirements: 3.6, 14.4, 14.6
    */
@@ -173,6 +212,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
     tagFilterMode,
     setTagFilterMode,
     allTags,
+    importNotes,
   };
 
   return <NotesContext.Provider value={value}>{children}</NotesContext.Provider>;

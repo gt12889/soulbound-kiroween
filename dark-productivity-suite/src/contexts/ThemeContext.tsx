@@ -56,6 +56,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const data = settingsDoc.data();
           if (data.theme && themes[data.theme as ThemeId]) {
             setThemeId(data.theme as ThemeId);
+            console.log('Theme loaded from cloud:', data.theme);
           }
         }
         
@@ -124,12 +125,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           theme: themeId,
           updatedAt: new Date(),
         }, { merge: true });
+        console.log('Theme synced to cloud:', themeId);
       } catch (error) {
         console.error('Failed to sync theme to cloud:', error);
       }
     };
 
-    syncThemeToCloud();
+    // Debounce sync to avoid excessive writes
+    const timeoutId = setTimeout(syncThemeToCloud, 500);
+    return () => clearTimeout(timeoutId);
   }, [themeId, cloudSyncEnabled, isAuthenticated, user]);
 
   // Switch theme function

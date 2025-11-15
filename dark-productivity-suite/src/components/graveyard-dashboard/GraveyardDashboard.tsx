@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { GraveyardView } from './GraveyardView';
 import { MoonPhaseCalendar } from './MoonPhaseCalendar';
 import { ArchiveView } from './ArchiveView';
+import { PomodoroTimer } from './PomodoroTimer';
+import { PomodoroStatistics } from './PomodoroStatistics';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { DEFAULT_SHORTCUTS } from '../../utils/keyboardShortcuts';
 import { useTasks } from '../../contexts/TasksContext';
 import styles from './GraveyardDashboard.module.css';
 
-type ViewMode = 'graveyard' | 'calendar' | 'archive';
+type ViewMode = 'graveyard' | 'calendar' | 'archive' | 'pomodoro';
 
 /**
  * GraveyardDashboard - Main component combining task management and moon phase calendar
@@ -15,12 +17,11 @@ type ViewMode = 'graveyard' | 'calendar' | 'archive';
  */
 export function GraveyardDashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>('graveyard');
+  
+  // Register keyboard shortcuts for task creation
   const { createTask } = useTasks();
-
-  // Register keyboard shortcuts for tasks using the hook
-  // Requirements: 9.2
   const taskShortcuts = DEFAULT_SHORTCUTS.filter(s => s.action === 'create-task');
-
+  
   useKeyboardShortcuts(taskShortcuts, {
     'create-task': () => {
       createTask('New Task', '', 'medium');
@@ -43,6 +44,12 @@ export function GraveyardDashboard() {
           🌙 Moon Calendar
         </button>
         <button
+          className={`${styles.toggleButton} ${viewMode === 'pomodoro' ? styles.active : ''}`}
+          onClick={() => setViewMode('pomodoro')}
+        >
+          ⏳ Pomodoro
+        </button>
+        <button
           className={`${styles.toggleButton} ${viewMode === 'archive' ? styles.active : ''}`}
           onClick={() => setViewMode('archive')}
         >
@@ -53,6 +60,12 @@ export function GraveyardDashboard() {
       <div className={styles.content}>
         {viewMode === 'graveyard' && <GraveyardView />}
         {viewMode === 'calendar' && <MoonPhaseCalendar />}
+        {viewMode === 'pomodoro' && (
+          <div className={styles.pomodoroView}>
+            <PomodoroTimer />
+            <PomodoroStatistics />
+          </div>
+        )}
         {viewMode === 'archive' && <ArchiveView />}
       </div>
     </div>

@@ -73,7 +73,83 @@ The `netlify.toml` file is already configured with:
 4. Netlify will auto-detect the configuration
 5. Click "Deploy site"
 
-## Option 3: GitHub Pages
+## Option 3: Firebase Hosting
+
+### Prerequisites
+
+1. Install Firebase CLI:
+   ```bash
+   npm install -g firebase-tools
+   ```
+
+2. Login to Firebase:
+   ```bash
+   firebase login
+   ```
+
+### Initial Setup
+
+1. Initialize Firebase in your project (if not already done):
+   ```bash
+   cd dark-productivity-suite
+   firebase init
+   ```
+
+2. Select the following features:
+   - Firestore (if using cloud sync)
+   - Hosting
+   - Storage (if using cloud sync)
+
+3. Use existing configuration files:
+   - Firestore rules: `firestore.rules`
+   - Firestore indexes: `firestore.indexes.json`
+   - Storage rules: `storage.rules`
+   - Hosting config: Already configured in `firebase.json`
+
+### Deploy
+
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+
+2. Deploy to Firebase:
+   ```bash
+   firebase deploy
+   ```
+
+   Or deploy specific services:
+   ```bash
+   # Deploy hosting only
+   firebase deploy --only hosting
+
+   # Deploy Firestore rules and indexes
+   firebase deploy --only firestore
+
+   # Deploy storage rules
+   firebase deploy --only storage
+   ```
+
+### Configuration
+
+The `firebase.json` file is already configured with:
+- **Hosting**:
+  - Public directory: `dist` (Vite build output)
+  - SPA routing (all routes redirect to `/index.html`)
+  - Optimized caching headers:
+    - Static assets (JS, CSS, fonts, images): 1 year cache
+    - HTML files: No cache (always fresh)
+- **Firestore**: Rules and indexes configured
+- **Storage**: Security rules configured
+
+### Custom Domain
+
+1. In Firebase Console, go to Hosting
+2. Click "Add custom domain"
+3. Follow the DNS configuration instructions
+4. Firebase will automatically provision SSL certificate
+
+## Option 4: GitHub Pages
 
 ### Setup
 
@@ -151,30 +227,79 @@ Check that `base: './'` is set in `vite.config.ts` for relative paths.
 
 This project doesn't require environment variables for basic functionality. All data is stored locally in the browser.
 
-### Firebase Integration (Optional)
+### Firebase Integration (Required for Production)
 
-If you want to enable cloud sync and authentication, you'll need to configure Firebase:
+For production deployment with authentication and cloud sync, you must configure Firebase backend services and environment variables.
+
+**See detailed guides**:
+- **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Complete environment variables configuration guide
+- **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Initial Firebase project setup
+- **[OAUTH_SETUP.md](./OAUTH_SETUP.md)** - Google and GitHub OAuth configuration
+- **[FIREBASE_PRODUCTION.md](./FIREBASE_PRODUCTION.md)** - Production configuration guide
+- **[PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md)** - Complete deployment checklist
+
+#### Quick Setup
 
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 
-2. Enable Authentication and Firestore in your Firebase project
+2. Enable Authentication (Email/Password, Google, GitHub) and Firestore
 
-3. Create a `.env` file in the project root:
+3. Deploy security rules and indexes:
+   ```bash
+   firebase login
+   firebase init
+   firebase deploy --only firestore:rules,firestore:indexes,storage
+   ```
+
+4. Create a `.env` file in the project root (copy from `.env.example`):
+   ```bash
+   cp .env.example .env
+   ```
+
+5. Fill in your Firebase credentials and OAuth configuration:
    ```env
+   # Firebase Configuration
    VITE_FIREBASE_API_KEY=your_api_key
    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
    VITE_FIREBASE_PROJECT_ID=your_project_id
    VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    VITE_FIREBASE_APP_ID=your_app_id
+
+   # OAuth Configuration (optional)
+   VITE_GITHUB_OAUTH_CLIENT_ID=your_github_client_id
+
+   # Production URLs
+   VITE_APP_URL=https://your-domain.com
+   VITE_API_URL=https://your-domain.com/api
+
+   # Security (optional, recommended for production)
+   VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
    ```
 
-4. Configure environment variables in your hosting platform:
+6. Configure environment variables in your hosting platform:
    - **Vercel**: Project Settings → Environment Variables
    - **Netlify**: Site Settings → Environment Variables
    - **GitHub Pages**: Repository Settings → Secrets and Variables → Actions
 
-**Note**: The app works fully offline with LocalStorage. Firebase is only needed for cloud sync across devices.
+For detailed instructions on configuring each environment variable, see [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)
+
+#### Production Configuration Files
+
+The following files are included for Firebase production setup:
+
+- **`firebase.json`** - Firebase project configuration
+- **`firestore.rules`** - Firestore security rules (user data protection)
+- **`firestore.indexes.json`** - Optimized database indexes
+- **`storage.rules`** - Cloud Storage security rules
+
+These files ensure:
+- Users can only access their own data
+- Data validation on all writes
+- Optimized query performance
+- Secure file uploads
+
+**Note**: The app works fully offline with LocalStorage. Firebase is only needed for authentication and cloud sync across devices.
 
 ## Custom Domain
 
@@ -218,13 +343,45 @@ Consider adding:
 
 ## Continuous Deployment
 
-All three platforms support automatic deployments:
+All platforms support automatic deployments:
 - **Vercel/Netlify**: Auto-deploy on git push
+- **Firebase Hosting**: Use GitHub Actions or Firebase CLI
 - **GitHub Pages**: Auto-deploy via GitHub Actions
+
+### Firebase CI/CD with GitHub Actions
+
+Create `.github/workflows/firebase-deploy.yml`:
+
+```yaml
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: your-project-id
+```
 
 ## Support
 
 For platform-specific issues:
 - Vercel: [vercel.com/docs](https://vercel.com/docs)
 - Netlify: [docs.netlify.com](https://docs.netlify.com)
+- Firebase: [firebase.google.com/docs/hosting](https://firebase.google.com/docs/hosting)
 - GitHub Pages: [docs.github.com/pages](https://docs.github.com/pages)

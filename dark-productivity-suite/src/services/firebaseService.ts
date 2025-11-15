@@ -14,18 +14,30 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
+// Check if Firebase is configured
+const isFirebaseConfigured = firebaseConfig.apiKey && 
+  firebaseConfig.authDomain && 
+  firebaseConfig.projectId;
 
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-} catch (error) {
-  console.error('Firebase initialization error:', error);
-  throw error;
+// Initialize Firebase
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+
+if (isFirebaseConfigured) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    console.log('Firebase initialized successfully');
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    console.warn('App will run in offline mode without authentication');
+  }
+} else {
+  console.warn('Firebase not configured. Create a .env file with your Firebase credentials.');
+  console.warn('Copy .env.example to .env and fill in your Firebase project details.');
+  console.warn('App will run in offline mode without authentication.');
 }
 
-export { auth, db };
+export { auth, db, isFirebaseConfigured };

@@ -13,61 +13,142 @@
 
 ## ✨ Features
 
-### 📖 Necronomicon Notes (with AI Ghost Writer)
-Ancient wisdom meets modern note-taking with AI-powered writing assistance. Store your thoughts in a mystical tome with spectral suggestions.
+### 🔐 Authentication & Cloud Sync
+Secure your data and sync across devices with our mystical authentication system.
 
-- Rich text editing with improved readability
-- **AI-powered writing suggestions** - Toggle ghost writer assistance on/off
-- Context-aware AI suggestions that match your writing style
-- Full-text search across all notes
-- Tag-based organization
-- Ancient book aesthetic with parchment styling
-- Dripping ink animations
-- Enhanced typography for comfortable reading
+- **Email/Password & Social Auth** - Sign in with email, Google, or GitHub
+- **Cloud Synchronization** - Real-time sync across all your devices
+- **Offline Support** - Full functionality without internet connection
+- **End-to-end Encryption** - Your data stays private and secure
+- **Session Management** - Secure 30-day sessions with auto-renewal
+
+### 📖 Necronomicon Notes
+Ancient wisdom meets modern note-taking with AI-powered writing assistance and markdown support.
+
+- **AI Ghost Writer** - Context-aware writing suggestions with spectral effects
+- **Markdown Support** - Full markdown syntax with live preview
+- **Tag Organization** - Categorize notes with flexible tagging system
+- **Full-text Search** - Find notes instantly with highlighted results
+- **Ancient Book Aesthetic** - Parchment styling with dripping ink animations
+- **Split View Editor** - Edit and preview markdown simultaneously
 
 ### ⚰️ Graveyard Dashboard
-Task management with a dark twist. Watch your completed tasks rest in peace as tombstones.
+Task management with a dark twist. Watch your tasks rise and rest as tombstones.
 
-- Visual task tracking with tombstone markers
-- Moon phase calendar integration
-- Task prioritization and categorization
-- Completion animations
-- Data export functionality
+- **Visual Task Tracking** - Tombstone markers with rise/sink animations
+- **Pomodoro Timer** - Focus with mystical hourglass visualization
+- **Archive System** - Store completed tasks in deeper graveyard layers
+- **Tag-based Filtering** - Organize tasks by category
+- **Moon Phase Calendar** - Track time through lunar cycles
+- **Task Prioritization** - Size tombstones by importance
+- **Drag & Drop** - Reorder tasks intuitively
 
 ### 🔮 Terminal Tarot
-Divine insights from your git commit history. The Terminal Tarot reads your development journey and provides mystical guidance based on your coding patterns.
+Divine insights from your git commit history with mystical tarot readings.
 
-- Real-time git repository analysis
-- Tarot card readings based on commit history
-- Terminal-style interface with retro aesthetics
-- Personalized interpretations
+- **Git Repository Analysis** - Reads 30 days of commit history
+- **Three-Card Spreads** - Past, present, future interpretations
+- **ASCII Art Cards** - Terminal-styled tarot visualizations
+- **Commit Statistics** - Frequency, timing, and sentiment analysis
+- **Personalized Readings** - Interpretations based on your patterns
 
-### ⚰️ Graveyard Dashboard
-Task management with a dark twist. Watch your completed tasks rest in peace as tombstones.
+### ⚡ Quick Capture
+Capture thoughts instantly without breaking your flow.
 
-- Visual task tracking with tombstone markers
-- Moon phase calendar integration
-- Task prioritization and categorization
-- Completion animations
-- Data export functionality
+- **Global Shortcut** - Press `Ctrl+K` from anywhere
+- **Type Selection** - Create notes or tasks on the fly
+- **Minimal Interface** - No distractions, just capture
+- **Auto-save** - Saves and closes in under 500ms
+
+### ⌨️ Keyboard Shortcuts
+Navigate efficiently with comprehensive keyboard controls.
+
+- **Customizable Shortcuts** - Personalize all key combinations
+- **Module Navigation** - `Ctrl+1-4` to switch between features
+- **Quick Actions** - Create, search, and save with hotkeys
+- **Shortcuts Panel** - Press `Ctrl+?` for complete reference
+- **Conflict Detection** - Prevents duplicate shortcuts
+
+### 🎨 Theme System
+Customize your mystical atmosphere with multiple dark themes.
+
+- **Default Dark** - Original purple gothic aesthetic
+- **Blood Moon** - Crimson and blood red intensity
+- **Midnight Forest** - Dark greens and earth tones
+- **Smooth Transitions** - Instant theme switching with animations
+- **Cloud Sync** - Theme preferences sync across devices
+
+### 📦 Import/Export
+Migrate data, create backups, and share your productivity.
+
+- **Multiple Formats** - JSON, Markdown, and CSV export
+- **Selective Export** - Choose specific data types and date ranges
+- **Encryption Option** - Password-protect sensitive exports
+- **Smart Import** - Merge or replace with duplicate detection
+- **Data Preview** - Review before importing
 
 ### 🎵 Ambient Soundscapes
 Immersive audio to enhance your productivity ritual.
 
-- Multiple ambient sound options
-- Volume control
-- Persistent audio preferences
+- **Multiple Soundscapes** - Wind, thunder, whispers, and more
+- **UI Sound Effects** - Page turns, tombstone movements, ghost appearances
+- **Volume Control** - Adjust from 0-100%
+- **Toggle On/Off** - Mute all sounds instantly
+- **Persistent Preferences** - Audio settings saved to profile
+
+---
+
+## 📚 Documentation
+
+**[📖 Complete Documentation Index](./DOCUMENTATION_INDEX.md)** - Find all documentation organized by topic and user type
+
+### Getting Started
+- **[QUICK_START.md](./QUICK_START.md)** - 5-minute setup guide for new users
+- **[FEATURES.md](./FEATURES.md)** - Complete feature guide with detailed instructions
+- **[KEYBOARD_SHORTCUTS.md](./KEYBOARD_SHORTCUTS.md)** - Comprehensive keyboard shortcuts reference
+
+### User Guides
+- **[AUTHENTICATION_GUIDE.md](./AUTHENTICATION_GUIDE.md)** - Authentication and account management
+- **[THEME_GUIDE.md](./THEME_GUIDE.md)** - Theme system and visual customization
+- **[IMPORT_EXPORT_GUIDE.md](./IMPORT_EXPORT_GUIDE.md)** - Data import, export, and backup strategies
+- **[FAQ.md](./FAQ.md)** - Frequently asked questions and troubleshooting
+
+### Developer Documentation
+- **[PROJECT_SETUP.md](./PROJECT_SETUP.md)** - Development setup and configuration
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Contribution guidelines and code style
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Deployment instructions for multiple platforms
+
+### Firebase & Backend
+- **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Firebase configuration guide
+- **[OAUTH_SETUP.md](./OAUTH_SETUP.md)** - Social authentication setup (Google, GitHub)
+- **[FIREBASE_CONFIG_README.md](./FIREBASE_CONFIG_README.md)** - Configuration file details
+- **[FIREBASE_PRODUCTION.md](./FIREBASE_PRODUCTION.md)** - Production deployment guide
+- **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Environment variables configuration
+- **[BACKEND_SETUP_SUMMARY.md](./BACKEND_SETUP_SUMMARY.md)** - Backend setup overview
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### For Users
+
+**New to the Dark Productivity Suite?** Check out the **[Quick Start Guide](./QUICK_START.md)** to get up and running in 5 minutes!
+
+**Key Features to Try First:**
+1. Press `Ctrl+K` for quick capture
+2. Create your first note with `Ctrl+N`
+3. Add a task with `Ctrl+T`
+4. Switch themes in settings
+5. Enable cloud sync by signing in
+
+### For Developers
+
+#### Prerequisites
 
 - **Node.js**: 20.19+ or 22.12+
 - **npm**: 10+
 
-### Installation
+#### Installation
 
 ```bash
 # Clone the repository
@@ -83,7 +164,7 @@ npm run dev
 
 Visit `http://localhost:5173` to see the app in action.
 
-### Building for Production
+#### Building for Production
 
 ```bash
 # Create optimized production build
@@ -208,7 +289,21 @@ npm run test:ui
 
 Firebase support is included for cloud sync and authentication. The app works fully offline with LocalStorage - Firebase is only needed for syncing across devices.
 
-See [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for complete setup instructions.
+### Quick Start
+
+The project includes pre-configured Firebase files:
+- **`firebase.json`** - Hosting, Firestore, and Storage configuration
+- **`firestore.rules`** - Database security rules
+- **`firestore.indexes.json`** - Query optimization indexes
+- **`storage.rules`** - File storage security
+
+### Setup Guides
+
+- **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Environment variables configuration
+- **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Complete setup instructions
+- **[OAUTH_SETUP.md](./OAUTH_SETUP.md)** - Google and GitHub OAuth configuration
+- **[FIREBASE_CONFIG_README.md](./FIREBASE_CONFIG_README.md)** - Configuration file details
+- **[FIREBASE_PRODUCTION.md](./FIREBASE_PRODUCTION.md)** - Production deployment guide
 
 ## 🚢 Deployment
 
@@ -238,6 +333,8 @@ All deployment configurations are included in the repository.
 
 ## 🎯 Features Roadmap
 
+### ✅ Completed Features
+
 - [x] Core navigation and routing
 - [x] Graveyard Dashboard with task management
 - [x] Necronomicon Notes with search
@@ -245,14 +342,35 @@ All deployment configurations are included in the repository.
 - [x] Terminal Tarot with git integration
 - [x] Moon phase calendar
 - [x] Ambient audio system
-- [x] Data export functionality
+- [x] **User Authentication** (Email, Google, GitHub)
+- [x] **Cloud Sync** with real-time synchronization
+- [x] **Keyboard Shortcuts** with customization
+- [x] **Theme System** (3 themes: Default Dark, Blood Moon, Midnight Forest)
+- [x] **Quick Capture** for rapid note/task creation
+- [x] **Tag Management** with filtering and organization
+- [x] **Archive System** for completed tasks
+- [x] **Pomodoro Timer** with session tracking
+- [x] **Markdown Support** with live preview
+- [x] **Import/Export** (JSON, Markdown, CSV)
 - [x] Production build optimization
-- [x] Firebase integration (ready for cloud sync)
-- [ ] Cloud sync implementation
-- [ ] User authentication
-- [ ] Mobile app version
-- [ ] Additional tarot spreads
-- [ ] Custom themes
+- [x] Firebase integration
+
+### 🚀 Future Enhancements
+
+- [ ] Mobile native apps (iOS/Android)
+- [ ] Additional tarot spreads and reading types
+- [ ] User-created custom themes with theme editor
+- [ ] Collaborative features for shared notes
+- [ ] Voice input for Ghost Writer
+- [ ] Browser extension for quick capture
+- [ ] Advanced analytics and insights
+- [ ] Habit tracking integration
+- [ ] Team/workspace features
+- [ ] Two-factor authentication (2FA)
+- [ ] Note linking and backlinks
+- [ ] Version history for notes
+- [ ] Auto-theme switching by time of day
+- [ ] Community theme marketplace
 
 ---
 

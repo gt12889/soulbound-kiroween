@@ -115,6 +115,30 @@ test: add integration tests for notes
 
 5. Once approved, your PR will be merged
 
+## Feature Areas
+
+The Dark Productivity Suite is organized into several feature areas:
+
+### Core Features
+- **Authentication System** - Email/password and social auth (Google, GitHub)
+- **Cloud Sync** - Real-time synchronization with Firebase
+- **Keyboard Shortcuts** - Customizable keyboard controls
+- **Theme System** - Multiple dark themes with smooth transitions
+- **Quick Capture** - Rapid note/task creation with `Ctrl+K`
+
+### Modules
+- **Necronomicon Notes** - Note-taking with markdown and AI assistance
+- **Graveyard Dashboard** - Task management with visual tombstones
+- **Terminal Tarot** - Git-based tarot readings
+- **Ghost Writer** - AI-powered writing suggestions
+
+### Supporting Features
+- **Tag Management** - Organize notes and tasks with tags
+- **Archive System** - Store completed tasks
+- **Pomodoro Timer** - Focus timer with session tracking
+- **Import/Export** - Data portability in multiple formats
+- **Markdown Support** - Full markdown editing with live preview
+
 ## Code Style Guidelines
 
 ### TypeScript
@@ -304,11 +328,60 @@ export function calculateMoonPhase(date: Date): MoonPhase {
 - Update installation steps if needed
 - Keep examples current
 
+## Feature-Specific Guidelines
+
+### Authentication & Security
+
+When working on authentication features:
+- Never log passwords or tokens
+- Use Firebase Auth SDK methods
+- Test with multiple auth providers
+- Handle session expiration gracefully
+- Follow security best practices
+
+### Cloud Sync
+
+When working on sync features:
+- Test offline functionality
+- Handle conflict resolution
+- Implement proper error handling
+- Use optimistic updates
+- Test with slow connections
+
+### Keyboard Shortcuts
+
+When adding shortcuts:
+- Check for conflicts with existing shortcuts
+- Use consistent modifier keys (Ctrl/Cmd)
+- Document in KEYBOARD_SHORTCUTS.md
+- Test on multiple platforms
+- Provide customization option
+
+### Themes
+
+When modifying themes:
+- Use CSS custom properties
+- Test all three themes
+- Ensure sufficient contrast
+- Maintain gothic aesthetic
+- Test in light and dark environments
+
+### Import/Export
+
+When working on data portability:
+- Validate data structure
+- Handle errors gracefully
+- Support multiple formats
+- Test with large datasets
+- Preserve data integrity
+
 ## Questions?
 
 - Open an issue for bugs or feature requests
 - Start a discussion for questions or ideas
 - Check existing issues before creating new ones
+- Review documentation before asking
+- Include reproduction steps for bugs
 
 ## Recognition
 

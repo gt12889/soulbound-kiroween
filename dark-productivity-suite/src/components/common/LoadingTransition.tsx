@@ -4,11 +4,13 @@ import styles from './LoadingTransition.module.css';
 interface LoadingTransitionProps {
   isLoading: boolean;
   minDisplayTime?: number; // Minimum time to display in ms (default 500ms)
+  message?: string; // Optional custom loading message
 }
 
 const LoadingTransition: React.FC<LoadingTransitionProps> = ({ 
   isLoading, 
-  minDisplayTime = 500 
+  minDisplayTime = 500,
+  message = 'Loading'
 }) => {
   const [shouldShow, setShouldShow] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -55,7 +57,7 @@ const LoadingTransition: React.FC<LoadingTransitionProps> = ({
         </div>
         <div className={styles.loadingText}>
           <span className={styles.loadingDots}>
-            Loading<span className={styles.dot}>.</span><span className={styles.dot}>.</span><span className={styles.dot}>.</span>
+            {message}<span className={styles.dot}>.</span><span className={styles.dot}>.</span><span className={styles.dot}>.</span>
           </span>
         </div>
       </div>

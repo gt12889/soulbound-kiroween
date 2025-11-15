@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { cloudSyncService } from '../services/cloudSyncService';
+import { storageService } from '../services/storageService';
 import type { SyncStatus, Note, Task, TarotReading } from '../types';
 
 interface UseCloudSyncOptions {
@@ -22,6 +23,7 @@ interface UseCloudSyncReturn {
   deleteNote: (noteId: string) => Promise<void>;
   deleteTask: (taskId: string) => Promise<void>;
   isOnline: boolean;
+  migrationCompleted: boolean;
 }
 
 export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn => {
@@ -34,8 +36,10 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
   });
 
   const [isOnline, setIsOnline] = useState(cloudSyncService.isConnected());
+  const [migrationCompleted, setMigrationCompleted] = useState(storageService.isMigrationCompleted());
   const syncIntervalRef = useRef<number | null>(null);
   const isMountedRef = useRef(true);
+  const migrationAttemptedRef = useRef(false);
 
   /**
    * Update sync status
@@ -238,10 +242,51 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
   }, [userId, autoSync, syncNow, updateSyncStatus]);
 
   /**
+   * Perform data migration when user first logs in
+   */
+  useEffect(() => {
+    const performMigration = async () => {
+      if (!userId || migrationAttemptedRef.current || migrationCompleted) {
+        return;
+      }
+
+      migrationAttemptedRef.current = true;
+
+      try {
+        console.log('Performing data migration for cloud sync...');
+        updateSyncStatus({ syncing: true });
+        
+        // Enable cloud sync mode
+        storageService.enableCloudSync(true);
+        
+        // Migrate existing data
+        const stats = await storageService.migrateDataForCloudSync(userId);
+        console.log('Migration completed:', stats);
+        
+        setMigrationCompleted(true);
+        updateSyncStatus({ syncing: false });
+        
+        // Trigger initial sync after migration
+        if (isOnline) {
+          await syncNow();
+        }
+      } catch (error) {
+        console.error('Error during data migration:', error);
+        updateSyncStatus({ 
+          syncing: false,
+          error: 'Failed to migrate data for cloud sync' 
+        });
+      }
+    };
+
+    performMigration();
+  }, [userId, migrationCompleted, isOnline, syncNow, updateSyncStatus]);
+
+  /**
    * Set up automatic sync interval
    */
   useEffect(() => {
-    if (!userId || !autoSync || !isOnline) {
+    if (!userId || !autoSync || !isOnline || !migrationCompleted) {
       return;
     }
 
@@ -258,7 +303,7 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
         clearInterval(syncIntervalRef.current);
       }
     };
-  }, [userId, autoSync, isOnline, syncInterval, syncNow]);
+  }, [userId, autoSync, isOnline, syncInterval, syncNow, migrationCompleted]);
 
   /**
    * Update pending changes count periodically
@@ -294,5 +339,6 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
     deleteNote,
     deleteTask,
     isOnline,
+    migrationCompleted,
   };
 };

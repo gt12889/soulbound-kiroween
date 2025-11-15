@@ -2,29 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAudio } from '../../hooks/useAudio';
+import { useKeyboard } from '../../contexts/KeyboardContext';
 import { useNotes } from '../../contexts/NotesContext';
 import { useTasks } from '../../contexts/TasksContext';
 import { useApp } from '../../contexts/AppContext';
-import { useKeyboard } from '../../contexts/KeyboardContext';
-import { exportService } from '../../services/exportService';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
 import SettingsModal from './SettingsModal';
+import { ExportDialog } from '../import-export/ExportDialog';
+import QuickCapture from './QuickCapture';
 import styles from './Navigation.module.css';
 
 /**
- * Navigation component with UI interaction sounds, data export, logout, and keyboard shortcuts
- * Requirements: 6.1, 6.3, 7.5, 8.4, 9.1, 10.5, 18.6
+ * Navigation component with UI interaction sounds, data export, logout, keyboard shortcuts, and quick capture
+ * Requirements: 6.1, 6.3, 7.5, 8.4, 9.1, 10.5, 13.1, 17.7, 18.6
  */
 const Navigation: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const { playUIClick, playUIHover } = useAudio();
+  const { registerShortcut, unregisterShortcut } = useKeyboard();
   const { notes } = useNotes();
   const { tasks } = useTasks();
   const { settings } = useApp();
-  const { registerShortcut, unregisterShortcut } = useKeyboard();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
 
   const navItems = [
     { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods', shortcutId: 'nav-necronomicon-notes' },
@@ -52,10 +55,28 @@ const Navigation: React.FC = () => {
       );
     });
 
+    // Register quick capture shortcut (Ctrl+K)
+    // Requirement: 13.1
+    registerShortcut(
+      {
+        id: 'quick-capture',
+        action: 'open-quick-capture',
+        keys: [], // Keys are defined in DEFAULT_SHORTCUTS
+        description: 'Open quick capture',
+        category: 'actions',
+        customizable: true,
+      },
+      () => {
+        setIsQuickCaptureOpen(true);
+        playUIClick();
+      }
+    );
+
     return () => {
       navItems.forEach((item) => {
         unregisterShortcut(item.shortcutId);
       });
+      unregisterShortcut('quick-capture');
     };
   }, [navigate, playUIClick, registerShortcut, unregisterShortcut]);
 
@@ -68,13 +89,8 @@ const Navigation: React.FC = () => {
   };
 
   const handleExport = () => {
-    try {
-      playUIClick();
-      exportService.exportAndDownload(notes, tasks, settings);
-    } catch (error) {
-      console.error('Export failed:', error);
-      alert('Failed to export data. Please try again.');
-    }
+    playUIClick();
+    setIsExportDialogOpen(true);
   };
 
   const handleLogout = async () => {
@@ -96,6 +112,15 @@ const Navigation: React.FC = () => {
   const handleSettingsClose = () => {
     playUIClick();
     setIsSettingsOpen(false);
+  };
+
+  const handleQuickCaptureClick = () => {
+    playUIClick();
+    setIsQuickCaptureOpen(true);
+  };
+
+  const handleQuickCaptureClose = () => {
+    setIsQuickCaptureOpen(false);
   };
 
   return (
@@ -135,8 +160,19 @@ const Navigation: React.FC = () => {
       </ul>
       
       <div className={styles.navFooter}>
-        {/* Sync Status Indicator - Requirements: 17.3 */}
+        {/* Sync Status Indicator - Requirements: 17.7 */}
         <SyncStatusIndicator />
+        
+        {/* Quick Capture Button - Requirements: 13.1 */}
+        <button 
+          className={styles.quickCaptureButton}
+          onClick={handleQuickCaptureClick}
+          onMouseEnter={handleNavHover}
+          title="Quick capture (Ctrl+K)"
+        >
+          <span className={styles.quickCaptureIcon}>⚡</span>
+          <span className={styles.quickCaptureLabel}>Quick Capture</span>
+        </button>
         
         <button 
           className={styles.settingsButton}
@@ -174,6 +210,14 @@ const Navigation: React.FC = () => {
       </div>
       
       <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
+      <ExportDialog 
+        isOpen={isExportDialogOpen} 
+        onClose={() => setIsExportDialogOpen(false)}
+        notes={notes}
+        tasks={tasks}
+        settings={settings}
+      />
+      <QuickCapture isOpen={isQuickCaptureOpen} onClose={handleQuickCaptureClose} />
     </nav>
   );
 };

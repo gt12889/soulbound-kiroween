@@ -1,6 +1,8 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAuth } from './AuthContext';
+import { cloudSyncService } from '../services/cloudSyncService';
 import type { AppSettings, ModuleName } from '../types';
 
 interface AppContextType {
@@ -37,6 +39,8 @@ interface AppProviderProps {
  * Requirements: 6.1, 6.2, 6.3
  */
 export function AppProvider({ children }: AppProviderProps) {
+  const { user, isAuthenticated } = useAuth();
+  
   // Persist settings to LocalStorage
   const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
   
@@ -48,6 +52,55 @@ export function AppProvider({ children }: AppProviderProps) {
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+
+  // Load settings from cloud when user logs in (Requirement 10.3, 17.3)
+  useEffect(() => {
+    const loadSettingsFromCloud = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const cloudSettings = await cloudSyncService.fetchSettings(user.id);
+        if (cloudSettings) {
+          // Merge cloud settings with local settings, preferring cloud data
+          setSettings(prev => ({
+            ...prev,
+            ...cloudSettings,
+            // Ensure we have valid values
+            audioEnabled: cloudSettings.audioEnabled ?? prev.audioEnabled,
+            audioVolume: cloudSettings.audioVolume ?? prev.audioVolume,
+            lastModule: cloudSettings.lastModule ?? prev.lastModule,
+          }));
+          console.log('Settings loaded from cloud successfully');
+        }
+      } catch (error) {
+        console.error('Failed to load settings from cloud:', error);
+      }
+    };
+
+    loadSettingsFromCloud();
+  }, [isAuthenticated, user, setSettings]);
+
+  // Sync settings to cloud when they change (Requirement 10.3, 17.3)
+  useEffect(() => {
+    const syncSettingsToCloud = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        await cloudSyncService.syncSettings(user.id, {
+          audioEnabled: settings.audioEnabled,
+          audioVolume: settings.audioVolume,
+          lastModule: settings.lastModule,
+        });
+        console.log('Settings synced to cloud successfully');
+      } catch (error) {
+        console.error('Failed to sync settings to cloud:', error);
+      }
+    };
+
+    // Debounce sync to avoid excessive writes
+    const timeoutId = setTimeout(syncSettingsToCloud, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [settings, isAuthenticated, user]);
 
   // Update current module and persist to settings
   const setCurrentModule = useCallback((module: ModuleName) => {

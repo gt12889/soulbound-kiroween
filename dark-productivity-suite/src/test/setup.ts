@@ -40,3 +40,29 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// Mock Firebase
+vi.mock('../services/firebaseService', () => ({
+  auth: {
+    currentUser: null,
+    onAuthStateChanged: vi.fn((callback) => {
+      callback(null);
+      return vi.fn(); // unsubscribe function
+    }),
+    signInWithEmailAndPassword: vi.fn(),
+    createUserWithEmailAndPassword: vi.fn(),
+    signOut: vi.fn(),
+    sendPasswordResetEmail: vi.fn(),
+    signInWithPopup: vi.fn(),
+  },
+  db: {
+    collection: vi.fn(),
+    doc: vi.fn(),
+    getDoc: vi.fn(),
+    setDoc: vi.fn(),
+    updateDoc: vi.fn(),
+    deleteDoc: vi.fn(),
+  },
+  googleProvider: {},
+  githubProvider: {},
+}));

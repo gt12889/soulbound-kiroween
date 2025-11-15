@@ -31,6 +31,7 @@ export interface Note {
   userId?: string;
   title: string;
   content: string;
+  markdown: boolean;
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -71,6 +72,8 @@ export interface AppSettings {
   audioEnabled: boolean;
   audioVolume: number;
   lastModule: string;
+  theme?: string;
+  keyboardShortcuts?: KeyboardShortcut[];
 }
 
 export interface SyncStatus {

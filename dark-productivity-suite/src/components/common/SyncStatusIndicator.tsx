@@ -22,8 +22,14 @@ export const SyncStatusIndicator = () => {
   const formatLastSync = (date: Date | null): string => {
     if (!date) return 'Never';
     
+    // Ensure date is a Date object
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    // Check if date is valid
+    if (isNaN(dateObj.getTime())) return 'Never';
+    
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
+    const diff = now.getTime() - dateObj.getTime();
     const seconds = Math.floor(diff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);

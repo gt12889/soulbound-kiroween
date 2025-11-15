@@ -166,6 +166,7 @@ class CloudSyncService {
         userId,
         title: data.title || '',
         content: data.content || '',
+        markdown: data.markdown || false,
         tags: data.tags || [],
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
@@ -269,6 +270,7 @@ class CloudSyncService {
         userId,
         title: data.title || '',
         content: data.content || '',
+        markdown: data.markdown || false,
         tags: data.tags || [],
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate() || new Date(),
@@ -537,6 +539,81 @@ class CloudSyncService {
       this.retryTimeouts.delete(retryKey);
     }
     this.retryAttempts.delete(retryKey);
+  }
+
+  /**
+   * Sync app settings to Firestore
+   * Requirements: 10.3, 17.3
+   */
+  async syncSettings(userId: string, settings: any): Promise<void> {
+    try {
+      const settingsRef = doc(db, 'users', userId, 'settings', 'preferences');
+      await setDoc(settingsRef, {
+        ...settings,
+        syncedAt: serverTimestamp(),
+      }, { merge: true });
+      this.clearRetryState('settings', 'preferences');
+    } catch (error) {
+      this.handleSyncError(error, 'settings', 'preferences');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch app settings from Firestore
+   * Requirements: 10.3, 17.3
+   */
+  async fetchSettings(userId: string): Promise<any | null> {
+    try {
+      const settingsDoc = await getDocs(collection(db, 'users', userId, 'settings'));
+      
+      if (settingsDoc.empty) {
+        return null;
+      }
+
+      const prefDoc = settingsDoc.docs.find(doc => doc.id === 'preferences');
+      if (!prefDoc) {
+        return null;
+      }
+
+      return prefDoc.data();
+    } catch (error) {
+      console.error('Failed to fetch settings from cloud:', error);
+      throw new CloudSyncError(
+        'Failed to fetch settings from cloud',
+        this.getErrorCode(error)
+      );
+    }
+  }
+
+  /**
+   * Subscribe to real-time settings updates
+   * Requirements: 17.3
+   */
+  subscribeToSettings(
+    userId: string,
+    callback: (settings: any) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    const settingsRef = doc(db, 'users', userId, 'settings', 'preferences');
+    
+    const unsubscribe = onSnapshot(
+      settingsRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          callback(snapshot.data());
+        }
+      },
+      (error) => {
+        console.error('Error in settings subscription:', error);
+        if (onError) {
+          onError(error);
+        }
+      }
+    );
+
+    this.syncListeners.set(`settings_${userId}`, unsubscribe);
+    return unsubscribe;
   }
 
   /**

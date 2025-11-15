@@ -23,6 +23,7 @@ function generateNotes(count: number): Note[] {
     id: `note-${i}`,
     title: `Test Note ${i}`,
     content: `This is the content of test note ${i}. `.repeat(10),
+    markdown: false,
     tags: [],
     createdAt: new Date(Date.now() - i * 1000),
     updatedAt: new Date(Date.now() - i * 500),

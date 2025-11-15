@@ -258,7 +258,8 @@
   background: linear-gradient(90deg, transparent, var(--accent-purple-light), transparent);
 }
 
-/* Settings, Export and Logout Buttons */
+/* Quick Capture, Settings, Export and Logout Buttons */
+.quickCaptureButton,
 .settingsButton,
 .exportButton,
 .logoutButton {
@@ -280,6 +281,15 @@
   overflow: hidden;
 }
 
+/* Quick Capture Button - Special styling for prominence */
+.quickCaptureButton {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.quickCaptureButton::before,
 .settingsButton::before,
 .exportButton::before,
 .logoutButton::before {
@@ -293,12 +303,14 @@
   transition: left var(--timing-normal) var(--ease-in-out);
 }
 
+.quickCaptureButton:hover::before,
 .settingsButton:hover::before,
 .exportButton:hover::before,
 .logoutButton:hover::before {
   left: 100%;
 }
 
+.quickCaptureButton:hover,
 .settingsButton:hover,
 .exportButton:hover,
 .logoutButton:hover {
@@ -309,6 +321,7 @@
   transform: translateY(-2px);
 }
 
+.quickCaptureButton:active,
 .settingsButton:active,
 .exportButton:active,
 .logoutButton:active {
@@ -316,6 +329,7 @@
   box-shadow: 0 2px 6px var(--shadow-medium);
 }
 
+.quickCaptureIcon,
 .settingsIcon,
 .exportIcon,
 .logoutIcon {
@@ -324,6 +338,7 @@
   transition: transform var(--timing-hover) var(--ease-in-out);
 }
 
+.quickCaptureButton:hover .quickCaptureIcon,
 .settingsButton:hover .settingsIcon,
 .exportButton:hover .exportIcon,
 .logoutButton:hover .logoutIcon {
@@ -331,6 +346,22 @@
   animation: pulseGlow 1s ease-in-out infinite;
 }
 
+.quickCaptureIcon {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    filter: drop-shadow(0 0 5px var(--glow-purple));
+    transform: scale(1);
+  }
+  50% { 
+    filter: drop-shadow(0 0 10px var(--glow-purple));
+    transform: scale(1.05);
+  }
+}
+
+.quickCaptureLabel,
 .settingsLabel,
 .exportLabel,
 .logoutLabel {

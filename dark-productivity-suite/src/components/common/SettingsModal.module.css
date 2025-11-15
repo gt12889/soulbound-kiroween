@@ -38,6 +38,53 @@
   border-radius: 12px 12px 0 0;
 }
 
+/* Tabs Navigation */
+.tabsContainer {
+  display: flex;
+  gap: 0;
+  background: var(--bg-secondary);
+  border-bottom: 2px solid var(--border-primary);
+  overflow-x: auto;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-header);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.tab.activeTab {
+  color: var(--accent-purple-light);
+  border-bottom-color: var(--accent-purple);
+  background: rgba(77, 45, 110, 0.2);
+}
+
+.tabIcon {
+  font-size: 1.25rem;
+}
+
+.tabLabel {
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+}
+
 .modalTitle {
   font-family: var(--font-header);
   font-size: 1.75rem;
@@ -122,5 +169,341 @@
   
   .modalTitle {
     font-size: 1.25rem;
+  }
+}
+
+/* Section Styles */
+.section {
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionTitle {
+  font-family: var(--font-header);
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.05em;
+}
+
+.sectionDescription {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.subsectionTitle {
+  font-family: var(--font-header);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  letter-spacing: 0.05em;
+}
+
+/* Data Management Styles */
+.dataActions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.actionButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-header);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--timing-hover) var(--ease-in-out);
+}
+
+.actionButton:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple-light);
+  box-shadow: 0 0 15px var(--glow-purple);
+  transform: translateY(-2px);
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.actionButton:disabled:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--border-primary);
+  box-shadow: none;
+  transform: none;
+}
+
+.actionIcon {
+  font-size: 1.5rem;
+}
+
+.actionText {
+  font-size: 1rem;
+}
+
+.dataDescription {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Responsive for data actions */
+@media (max-width: 768px) {
+  .dataActions {
+    flex-direction: column;
+  }
+  
+  .actionButton {
+    width: 100%;
+  }
+}
+
+/* Import Message Styles */
+.importMessage {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 2rem;
+  border-radius: 8px;
+  border: 1px solid;
+  animation: slideInDown var(--timing-normal) var(--ease-in-out);
+}
+
+.importMessage.success {
+  background: rgba(46, 125, 50, 0.1);
+  border-color: rgba(46, 125, 50, 0.5);
+  color: #81c784;
+}
+
+.importMessage.error {
+  background: rgba(211, 47, 47, 0.1);
+  border-color: rgba(211, 47, 47, 0.5);
+  color: #e57373;
+}
+
+.messageIcon {
+  font-size: 1.5rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.messageText {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.messageDismiss {
+  background: transparent;
+  border: none;
+  color: currentColor;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.messageDismiss:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .importMessage {
+    margin: 1rem 1.5rem;
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .messageText {
+    font-size: 0.875rem;
+  }
+}
+/* Account Settings Styles */
+.accountInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+}
+
+.profileIcon {
+  flex-shrink: 0;
+}
+
+.profileImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-purple);
+  object-fit: cover;
+}
+
+.profilePlaceholder {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--accent-purple);
+  border: 2px solid var(--accent-purple-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-header);
+  font-size: 2rem;
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+.profileDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profileEmail {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.profileName {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.profileProvider {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.logoutButton {
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: var(--warning-red);
+  font-family: var(--font-header);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  align-self: flex-start;
+}
+
+.logoutButton:hover {
+  background: rgba(211, 47, 47, 0.2);
+  border-color: var(--warning-red);
+  box-shadow: 0 0 15px rgba(211, 47, 47, 0.3);
+}
+
+.logoutButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notLoggedIn {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  padding: 2rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Audio Section */
+.audioSection {
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+}
+
+/* Sync Section */
+.syncSection {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+}
+
+/* Responsive for tabs */
+@media (max-width: 768px) {
+  .tabsContainer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab {
+    flex: 0 0 auto;
+    min-width: 100px;
+  }
+  
+  .tabLabel {
+    display: none;
+  }
+  
+  .tabIcon {
+    font-size: 1.5rem;
+  }
+  
+  .profileSection {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab {
+    padding: 0.875rem 1rem;
   }
 }

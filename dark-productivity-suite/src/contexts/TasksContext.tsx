@@ -36,6 +36,9 @@ interface TasksContextType {
   tagFilterMode: 'AND' | 'OR';
   setTagFilterMode: (mode: 'AND' | 'OR') => void;
   allTags: string[];
+  
+  // Import functionality
+  importTasks: (importedTasks: Task[], strategy: 'replace' | 'merge') => void;
 }
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
@@ -275,6 +278,40 @@ export function TasksProvider({ children }: TasksProviderProps) {
   }, [tasks]);
 
   /**
+   * Import tasks with merge or replace strategy
+   * Requirements: 11.3
+   */
+  const importTasks = useCallback((importedTasks: Task[], strategy: 'replace' | 'merge') => {
+    if (strategy === 'replace') {
+      // Replace all existing tasks
+      setTasks(importedTasks);
+    } else {
+      // Merge: add only unique tasks (skip duplicates)
+      setTasks(prev => {
+        const merged = [...prev];
+        
+        importedTasks.forEach(importedTask => {
+          // Check if task already exists (by title and description)
+          const isDuplicate = prev.some(existing => 
+            existing.title.trim().toLowerCase() === importedTask.title.trim().toLowerCase() &&
+            existing.description.trim().toLowerCase() === importedTask.description.trim().toLowerCase()
+          );
+          
+          if (!isDuplicate) {
+            // Generate new ID to avoid conflicts
+            merged.push({
+              ...importedTask,
+              id: crypto.randomUUID(),
+            });
+          }
+        });
+        
+        return merged;
+      });
+    }
+  }, [setTasks]);
+
+  /**
    * Filter tasks based on selected tags
    * Requirements: 14.4, 14.6
    */
@@ -320,6 +357,7 @@ export function TasksProvider({ children }: TasksProviderProps) {
     tagFilterMode,
     setTagFilterMode,
     allTags,
+    importTasks,
   };
 
   return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;

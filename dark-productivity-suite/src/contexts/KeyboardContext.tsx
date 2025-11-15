@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useAuth } from './AuthContext';
+import { cloudSyncService } from '../services/cloudSyncService';
 import {
   DEFAULT_SHORTCUTS,
   parseKeyEvent,
@@ -39,9 +41,11 @@ interface KeyboardProviderProps {
 /**
  * KeyboardProvider component
  * Manages global keyboard shortcuts, registration, and customization
- * Requirements: 9.5
+ * Requirements: 9.5, 10.3, 17.3
  */
 export function KeyboardProvider({ children }: KeyboardProviderProps) {
+  const { user, isAuthenticated } = useAuth();
+  
   // Persist custom shortcuts to LocalStorage
   const [shortcuts, setShortcuts] = useLocalStorage<KeyboardShortcut[]>(
     'keyboard-shortcuts',
@@ -56,6 +60,43 @@ export function KeyboardProvider({ children }: KeyboardProviderProps) {
   
   // Detect conflicts
   const conflicts = detectConflicts(shortcuts);
+
+  // Load keyboard shortcuts from cloud when user logs in (Requirement 10.3, 17.3)
+  useEffect(() => {
+    const loadShortcutsFromCloud = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const cloudSettings = await cloudSyncService.fetchSettings(user.id);
+        if (cloudSettings?.keyboardShortcuts && Array.isArray(cloudSettings.keyboardShortcuts)) {
+          setShortcuts(cloudSettings.keyboardShortcuts);
+          console.log('Keyboard shortcuts loaded from cloud successfully');
+        }
+      } catch (error) {
+        console.error('Failed to load keyboard shortcuts from cloud:', error);
+      }
+    };
+
+    loadShortcutsFromCloud();
+  }, [isAuthenticated, user, setShortcuts]);
+
+  // Sync keyboard shortcuts to cloud when they change (Requirement 10.3, 17.3)
+  useEffect(() => {
+    const syncShortcutsToCloud = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        await cloudSyncService.syncSettings(user.id, { keyboardShortcuts: shortcuts });
+        console.log('Keyboard shortcuts synced to cloud successfully');
+      } catch (error) {
+        console.error('Failed to sync keyboard shortcuts to cloud:', error);
+      }
+    };
+
+    // Debounce sync to avoid excessive writes
+    const timeoutId = setTimeout(syncShortcutsToCloud, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [shortcuts, isAuthenticated, user]);
 
   /**
    * Register a shortcut with its callback
