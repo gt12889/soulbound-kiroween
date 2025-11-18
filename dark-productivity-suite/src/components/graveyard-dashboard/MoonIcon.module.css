@@ -11,7 +11,7 @@
 }
 
 .moonContainer:hover {
-  background: rgba(74, 45, 110, 0.2);
+  background: var(--accent-purple);
   transform: scale(1.05);
 }
 
@@ -119,7 +119,7 @@
 .dayNumber {
   font-family: 'Cinzel', serif;
   font-size: 0.9rem;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
@@ -147,21 +147,21 @@
 }
 
 .tooltipContent {
-  background: rgba(20, 10, 30, 0.95);
-  border: 2px solid #4a2d6e;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   padding: 0.75rem;
   min-width: 180px;
   box-shadow: 
-    0 0 20px rgba(74, 45, 110, 0.5),
-    0 0 40px rgba(74, 45, 110, 0.3);
+    0 0 20px var(--glow-purple),
+    0 0 40px var(--shadow-medium);
   white-space: nowrap;
 }
 
 .tooltipDate {
   font-family: 'Cinzel', serif;
   font-size: 0.9rem;
-  color: #e0e0e0;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   font-weight: 600;
 }
@@ -169,19 +169,19 @@
 .tooltipPhase {
   font-family: 'Lora', serif;
   font-size: 0.85rem;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .tooltipIllumination {
   font-family: 'Lora', serif;
   font-size: 0.8rem;
-  color: #8a8a8a;
+  color: var(--text-tertiary);
   margin-bottom: 0.5rem;
 }
 
 .tooltipEvents {
-  border-top: 1px solid #4a2d6e;
+  border-top: 1px solid var(--border-primary);
   padding-top: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -189,7 +189,7 @@
 .tooltipEventsTitle {
   font-family: 'Cinzel', serif;
   font-size: 0.8rem;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   margin-bottom: 0.25rem;
   font-weight: 600;
 }
@@ -197,7 +197,7 @@
 .tooltipEvent {
   font-family: 'Lora', serif;
   font-size: 0.75rem;
-  color: #8a8a8a;
+  color: var(--text-tertiary);
   margin-bottom: 0.15rem;
   white-space: normal;
   max-width: 200px;
@@ -211,7 +211,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: #4a2d6e;
+  border-top-color: var(--border-primary);
 }
 
 /* Responsive adjustments - Requirement 6.4 */

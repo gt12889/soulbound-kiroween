@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import styles from './TagCloud.module.css';
 
 interface TagCloudProps {
@@ -10,9 +10,10 @@ interface TagCloudProps {
 
 /**
  * TagCloud component - visualizes all tags with usage counts
- * Requirements: 14.5, 14.6
+ * Requirements: 14.5, 14.6, 1.2
+ * Optimized with React.memo to prevent unnecessary re-renders
  */
-export function TagCloud({ tags, items, onTagClick, selectedTags = [] }: TagCloudProps) {
+function TagCloudComponent({ tags, items, onTagClick, selectedTags = [] }: TagCloudProps) {
   // Calculate tag usage counts
   const tagCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -83,3 +84,16 @@ export function TagCloud({ tags, items, onTagClick, selectedTags = [] }: TagClou
     </div>
   );
 }
+
+/**
+ * Memoized TagCloud component with custom comparison
+ * Only re-renders when tags, items count, or selectedTags change
+ * Requirements: 1.2
+ */
+export const TagCloud = memo(TagCloudComponent, (prevProps, nextProps) => {
+  return (
+    JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags) &&
+    prevProps.items.length === nextProps.items.length &&
+    JSON.stringify(prevProps.selectedTags) === JSON.stringify(nextProps.selectedTags)
+  );
+});

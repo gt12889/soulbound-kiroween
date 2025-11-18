@@ -1,12 +1,19 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import GhostWriterModal from './GhostWriterModal';
 import styles from './WritingEditor.module.css';
 
 interface WritingEditorProps {
   onTextChange?: (text: string, context: string, cursorPosition: number) => void;
+  onAcceptSuggestion?: () => boolean;
+  hasSuggestion?: boolean;
 }
 
-const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange }) => {
+const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSuggestion, hasSuggestion }) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentText, setCurrentText] = useState('');
+  const lastTabTime = useRef<number>(0);
+  const DOUBLE_TAB_THRESHOLD = 500; // milliseconds
 
   // Extract current sentence or paragraph context
   const extractContext = useCallback((text: string, position: number): string => {
@@ -61,6 +68,7 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange }) => {
     if (!editorRef.current) return;
 
     const text = editorRef.current.innerText || '';
+    setCurrentText(text);
     const position = getCursorPosition();
     const context = extractContext(text, position);
     
@@ -99,8 +107,59 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange }) => {
     }
   }, [insertSuggestion]);
 
+  // Open Ghost Writer modal
+  const handleOpenModal = () => {
+    if (currentText.trim().length > 0) {
+      setIsModalOpen(true);
+    }
+  };
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + G to open modal
+      if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+        e.preventDefault();
+        handleOpenModal();
+        return;
+      }
+
+      // Double-tab to accept suggestion (only when editor is focused)
+      if (e.key === 'Tab' && hasSuggestion && editorRef.current?.contains(document.activeElement)) {
+        const now = Date.now();
+        const timeSinceLastTab = now - lastTabTime.current;
+
+        if (timeSinceLastTab < DOUBLE_TAB_THRESHOLD) {
+          // Double-tab detected
+          e.preventDefault();
+          if (onAcceptSuggestion && onAcceptSuggestion()) {
+            console.log('[Writing Editor] Suggestion accepted via double-tab');
+          }
+          lastTabTime.current = 0; // Reset
+        } else {
+          // First tab - prevent default and record time
+          e.preventDefault();
+          lastTabTime.current = now;
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [currentText, hasSuggestion, onAcceptSuggestion]);
+
   return (
     <div className={styles.editorContainer}>
+      <div className={styles.toolbar}>
+        <button
+          className={styles.ghostButton}
+          onClick={handleOpenModal}
+          disabled={currentText.trim().length === 0}
+          title="Summon Ghost Writer (Ctrl+G)"
+        >
+          👻 Summon Ghost Writer
+        </button>
+      </div>
       <div
         ref={editorRef}
         className={styles.editor}
@@ -108,6 +167,13 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange }) => {
         onInput={handleInput}
         suppressContentEditableWarning
         data-placeholder="Begin writing your dark tales..."
+      />
+      
+      <GhostWriterModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        currentText={currentText}
+        onInsertText={insertSuggestion}
       />
     </div>
   );

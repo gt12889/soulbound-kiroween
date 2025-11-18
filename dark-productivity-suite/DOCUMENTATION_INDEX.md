@@ -162,6 +162,23 @@ This index helps you find the right documentation for your needs. All documentat
 - Testing OAuth flows
 - Production considerations
 
+**[OPENROUTER_SETUP.md](./OPENROUTER_SETUP.md)** - AI integration with NVIDIA models
+- OpenRouter account setup
+- API key configuration
+- NVIDIA model selection
+- Cost estimates and pricing
+- Testing AI suggestions
+- Troubleshooting
+- Alternative models
+
+**[AI_INTEGRATION_SUMMARY.md](./AI_INTEGRATION_SUMMARY.md)** - Technical AI integration overview
+- Implementation details
+- Multi-provider support
+- Configuration options
+- API specifications
+- Security considerations
+- Future enhancements
+
 **[FIREBASE_PRODUCTION.md](./FIREBASE_PRODUCTION.md)** - Production deployment guide
 - Production project setup
 - Security rules deployment

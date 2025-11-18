@@ -51,14 +51,23 @@ export const SyncStatusIndicator = () => {
     <div className={styles.syncIndicator}>
       <div className={styles.statusContainer}>
         {/* Online/Offline Indicator */}
-        <div className={`${styles.statusDot} ${isOnline ? styles.online : styles.offline}`} 
-             title={isOnline ? 'Online' : 'Offline'} />
+        <div 
+          className={`${styles.statusDot} ${isOnline ? styles.online : styles.offline}`} 
+          title={isOnline ? 'Online' : 'Offline'}
+          role="status"
+          aria-label={isOnline ? 'Online' : 'Offline'}
+        />
         
         {/* Sync Status */}
-        <div className={styles.statusText}>
+        <div 
+          className={styles.statusText}
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {syncStatus.syncing ? (
             <span className={styles.syncing}>
-              <span className={styles.syncSpinner} />
+              <span className={styles.syncSpinner} aria-hidden="true" />
               Syncing...
             </span>
           ) : syncStatus.error ? (

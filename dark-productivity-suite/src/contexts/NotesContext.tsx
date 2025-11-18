@@ -1,7 +1,10 @@
-import { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Note } from '../types';
+import { useToast } from './ToastContext';
+import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
+import { useUndoRedo } from '../hooks/useUndoRedo';
 
 interface NotesContextType {
   // Notes data
@@ -31,6 +34,16 @@ interface NotesContextType {
   
   // Import functionality
   importNotes: (importedNotes: Note[], strategy: 'replace' | 'merge') => void;
+  
+  // Undo/Redo functionality
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  
+  // Bulk operations
+  bulkDelete: (ids: string[]) => void;
+  bulkTag: (ids: string[], tags: string[]) => void;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
@@ -42,11 +55,22 @@ interface NotesProviderProps {
 /**
  * NotesProvider component for note management
  * Implements CRUD operations, search functionality, and storage integration
- * Requirements: 3.1, 3.2, 3.6, 7.2
+ * Requirements: 3.1, 3.2, 3.6, 7.2, 8.1
  */
 export function NotesProvider({ children }: NotesProviderProps) {
   // Persist notes to LocalStorage
   const [notes, setNotes] = useLocalStorage<Note[]>('notes', []);
+  
+  // Undo/Redo functionality
+  // Requirement: 8.1, 8.5 - Implement undo/redo with max 10 actions
+  const {
+    state: undoRedoNotes,
+    setState: setUndoRedoNotes,
+    undo: undoHistory,
+    redo: redoHistory,
+    canUndo,
+    canRedo,
+  } = useUndoRedo<Note[]>(notes, 10);
   
   // Current note state
   const [currentNoteId, setCurrentNoteId] = useState<string | null>(null);
@@ -57,10 +81,23 @@ export function NotesProvider({ children }: NotesProviderProps) {
   // Tag filtering state
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagFilterMode, setTagFilterMode] = useState<'AND' | 'OR'>('OR');
+  
+  // Toast notifications
+  // Requirement: 4.5 - Display success toast within 200ms
+  const { showToast } = useToast();
+  
+  // Screen reader announcements
+  // Requirement: 6.2, 6.3 - Announce state changes to screen readers
+  const { announce } = useScreenReaderAnnouncement();
+  
+  // Sync undo/redo state with localStorage
+  useEffect(() => {
+    setNotes(undoRedoNotes);
+  }, [undoRedoNotes, setNotes]);
 
   /**
    * Create a new note
-   * Requirements: 3.1, 7.2
+   * Requirements: 3.1, 7.2, 8.1
    */
   const createNote = useCallback((title: string, content: string = ''): Note => {
     const newNote: Note = {
@@ -73,18 +110,26 @@ export function NotesProvider({ children }: NotesProviderProps) {
       updatedAt: new Date(),
     };
     
-    setNotes(prev => [...prev, newNote]);
+    const newNotes = [...undoRedoNotes, newNote];
+    setUndoRedoNotes(newNotes);
     setCurrentNoteId(newNote.id);
     
+    // Requirement: 4.5 - Success toast for note creation
+    showToast({
+      type: 'success',
+      message: `Note "${title}" created`,
+    });
+    
     return newNote;
-  }, [setNotes]);
+  }, [undoRedoNotes, setUndoRedoNotes, showToast]);
 
   /**
    * Update an existing note
-   * Requirements: 3.1, 7.2
+   * Requirements: 3.1, 7.2, 6.2, 6.3, 8.1
    */
   const updateNote = useCallback((id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => {
-    setNotes(prev => prev.map(note => {
+    const note = undoRedoNotes.find(n => n.id === id);
+    const newNotes = undoRedoNotes.map(note => {
       if (note.id === id) {
         return {
           ...note,
@@ -93,81 +138,106 @@ export function NotesProvider({ children }: NotesProviderProps) {
         };
       }
       return note;
-    }));
-  }, [setNotes]);
+    });
+    
+    setUndoRedoNotes(newNotes);
+    
+    // Requirement: 4.5 - Success toast for note update
+    showToast({
+      type: 'success',
+      message: 'Note saved',
+    });
+    
+    // Announce to screen readers
+    if (note) {
+      announce(`Note "${note.title}" saved`);
+    }
+  }, [undoRedoNotes, setUndoRedoNotes, showToast, announce]);
 
   /**
    * Delete a note
-   * Requirements: 3.1, 7.2
+   * Requirements: 3.1, 7.2, 8.1
    */
   const deleteNote = useCallback((id: string) => {
-    setNotes(prev => prev.filter(note => note.id !== id));
+    const note = undoRedoNotes.find(n => n.id === id);
+    const newNotes = undoRedoNotes.filter(note => note.id !== id);
+    setUndoRedoNotes(newNotes);
     
     // Clear current note if it was deleted
     if (currentNoteId === id) {
       setCurrentNoteId(null);
     }
-  }, [setNotes, currentNoteId]);
+    
+    // Requirement: 4.5, 8.4 - Success toast with undo button for note deletion
+    if (note) {
+      showToast({
+        type: 'success',
+        message: `Note "${note.title}" deleted`,
+        action: {
+          label: 'Undo',
+          onClick: undoHistory,
+        },
+      });
+    }
+  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, showToast, undoHistory]);
 
   /**
    * Get a specific note by ID
    */
   const getNote = useCallback((id: string): Note | undefined => {
-    return notes.find(note => note.id === id);
-  }, [notes]);
+    return undoRedoNotes.find(note => note.id === id);
+  }, [undoRedoNotes]);
 
   /**
    * Get all unique tags from all notes
    */
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
-    notes.forEach(note => {
+    undoRedoNotes.forEach(note => {
       note.tags?.forEach(tag => tagSet.add(tag));
     });
     return Array.from(tagSet).sort();
-  }, [notes]);
+  }, [undoRedoNotes]);
 
   /**
    * Import notes with merge or replace strategy
-   * Requirements: 11.3
+   * Requirements: 11.3, 8.1
    */
   const importNotes = useCallback((importedNotes: Note[], strategy: 'replace' | 'merge') => {
     if (strategy === 'replace') {
       // Replace all existing notes
-      setNotes(importedNotes);
+      setUndoRedoNotes(importedNotes);
       setCurrentNoteId(null);
     } else {
       // Merge: add only unique notes (skip duplicates)
-      setNotes(prev => {
-        const merged = [...prev];
+      const merged = [...undoRedoNotes];
+      
+      importedNotes.forEach(importedNote => {
+        // Check if note already exists (by title and content)
+        const isDuplicate = undoRedoNotes.some(existing => 
+          existing.title.trim().toLowerCase() === importedNote.title.trim().toLowerCase() &&
+          existing.content.trim().toLowerCase() === importedNote.content.trim().toLowerCase()
+        );
         
-        importedNotes.forEach(importedNote => {
-          // Check if note already exists (by title and content)
-          const isDuplicate = prev.some(existing => 
-            existing.title.trim().toLowerCase() === importedNote.title.trim().toLowerCase() &&
-            existing.content.trim().toLowerCase() === importedNote.content.trim().toLowerCase()
-          );
-          
-          if (!isDuplicate) {
-            // Generate new ID to avoid conflicts
-            merged.push({
-              ...importedNote,
-              id: crypto.randomUUID(),
-            });
-          }
-        });
-        
-        return merged;
+        if (!isDuplicate) {
+          // Generate new ID to avoid conflicts
+          merged.push({
+            ...importedNote,
+            id: crypto.randomUUID(),
+          });
+        }
       });
+      
+      setUndoRedoNotes(merged);
     }
-  }, [setNotes]);
+  }, [undoRedoNotes, setUndoRedoNotes]);
 
   /**
    * Filter notes based on search query and tags
    * Requirements: 3.6, 14.4, 14.6
    */
   const filteredNotes = useMemo(() => {
-    let result = notes;
+    let result = undoRedoNotes;
     
     // Apply tag filtering
     if (selectedTags.length > 0) {
@@ -199,10 +269,78 @@ export function NotesProvider({ children }: NotesProviderProps) {
       const dateB = new Date(b.createdAt).getTime();
       return dateB - dateA;
     });
-  }, [notes, searchQuery, selectedTags, tagFilterMode]);
+  }, [undoRedoNotes, searchQuery, selectedTags, tagFilterMode]);
+
+  /**
+   * Undo the last action
+   * Requirement: 8.1, 8.2 - Implement undo with Ctrl+Z
+   */
+  const undo = useCallback(() => {
+    undoHistory();
+  }, [undoHistory]);
+
+  /**
+   * Redo the last undone action
+   * Requirement: 8.1, 8.3 - Implement redo with Ctrl+Y
+   */
+  const redo = useCallback(() => {
+    redoHistory();
+  }, [redoHistory]);
+
+  /**
+   * Bulk delete multiple notes
+   * Requirement: 9.5
+   */
+  const bulkDelete = useCallback((ids: string[]) => {
+    const newNotes = undoRedoNotes.filter(note => !ids.includes(note.id));
+    setUndoRedoNotes(newNotes);
+    
+    // Clear current note if it was deleted
+    if (currentNoteId && ids.includes(currentNoteId)) {
+      setCurrentNoteId(null);
+    }
+    
+    // Requirement: 4.5, 8.4 - Success toast with undo button
+    showToast({
+      type: 'success',
+      message: `${ids.length} note${ids.length > 1 ? 's' : ''} deleted`,
+      action: {
+        label: 'Undo',
+        onClick: undoHistory,
+      },
+    });
+  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, showToast, undoHistory]);
+
+  /**
+   * Bulk add tags to multiple notes
+   * Requirement: 9.5
+   */
+  const bulkTag = useCallback((ids: string[], tags: string[]) => {
+    const newNotes = undoRedoNotes.map(note => {
+      if (ids.includes(note.id)) {
+        // Merge new tags with existing tags, avoiding duplicates
+        const existingTags = note.tags || [];
+        const mergedTags = Array.from(new Set([...existingTags, ...tags]));
+        return {
+          ...note,
+          tags: mergedTags,
+          updatedAt: new Date(),
+        };
+      }
+      return note;
+    });
+    
+    setUndoRedoNotes(newNotes);
+    
+    // Requirement: 4.5 - Success toast
+    showToast({
+      type: 'success',
+      message: `Tags added to ${ids.length} note${ids.length > 1 ? 's' : ''}`,
+    });
+  }, [undoRedoNotes, setUndoRedoNotes, showToast]);
 
   const value: NotesContextType = {
-    notes,
+    notes: undoRedoNotes,
     currentNoteId,
     createNote,
     updateNote,
@@ -218,6 +356,12 @@ export function NotesProvider({ children }: NotesProviderProps) {
     setTagFilterMode,
     allTags,
     importNotes,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    bulkDelete,
+    bulkTag,
   };
 
   return <NotesContext.Provider value={value}>{children}</NotesContext.Provider>;

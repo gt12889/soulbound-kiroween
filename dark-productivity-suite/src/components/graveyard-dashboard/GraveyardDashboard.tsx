@@ -9,64 +9,76 @@ import { DEFAULT_SHORTCUTS } from '../../utils/keyboardShortcuts';
 import { useTasks } from '../../contexts/TasksContext';
 import styles from './GraveyardDashboard.module.css';
 
-type ViewMode = 'graveyard' | 'calendar' | 'archive' | 'pomodoro';
+type PanelType = 'tasks' | 'moon' | 'pomodoro' | 'archive';
+
+interface Panel {
+  id: PanelType;
+  title: string;
+  icon: string;
+  component: React.ReactNode;
+}
 
 /**
- * GraveyardDashboard - Main component combining task management and moon phase calendar
+ * GraveyardDashboard - Graveyard-themed panel dashboard
  * Requirements: 4.1, 4.6, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 9.2
  */
 export function GraveyardDashboard() {
-  const [viewMode, setViewMode] = useState<ViewMode>('graveyard');
-  
-  // Register keyboard shortcuts for task creation
+  const [selectedPanel, setSelectedPanel] = useState<PanelType>('tasks');
   const { createTask } = useTasks();
-  const taskShortcuts = DEFAULT_SHORTCUTS.filter(s => s.action === 'create-task');
   
+  const taskShortcuts = DEFAULT_SHORTCUTS.filter(s => s.action === 'create-task');
   useKeyboardShortcuts(taskShortcuts, {
     'create-task': () => {
       createTask('New Task', '', 'medium');
     },
   });
 
+  const panels: Panel[] = [
+    { id: 'tasks', title: 'Task Graveyard', icon: '🪦', component: <GraveyardView /> },
+    { id: 'moon', title: 'Moon Phases', icon: '🌙', component: <MoonPhaseCalendar /> },
+    { 
+      id: 'pomodoro', 
+      title: 'Focus Timer', 
+      icon: '⏳', 
+      component: (
+        <div className={styles.pomodoroContainer}>
+          <PomodoroTimer />
+          <PomodoroStatistics />
+        </div>
+      )
+    },
+    { id: 'archive', title: 'Archive', icon: '📦', component: <ArchiveView /> },
+  ];
+
   return (
     <div className={styles.dashboard}>
-      <div className={styles.viewToggle}>
-        <button
-          className={`${styles.toggleButton} ${viewMode === 'graveyard' ? styles.active : ''}`}
-          onClick={() => setViewMode('graveyard')}
-        >
-          🪦 Graveyard
-        </button>
-        <button
-          className={`${styles.toggleButton} ${viewMode === 'calendar' ? styles.active : ''}`}
-          onClick={() => setViewMode('calendar')}
-        >
-          🌙 Moon Calendar
-        </button>
-        <button
-          className={`${styles.toggleButton} ${viewMode === 'pomodoro' ? styles.active : ''}`}
-          onClick={() => setViewMode('pomodoro')}
-        >
-          ⏳ Pomodoro
-        </button>
-        <button
-          className={`${styles.toggleButton} ${viewMode === 'archive' ? styles.active : ''}`}
-          onClick={() => setViewMode('archive')}
-        >
-          📦 Archive
-        </button>
+      <div className={styles.graveyardScene}>
+        <div className={styles.moon}></div>
+        <div className={styles.trees}>
+          <div className={styles.tree}></div>
+          <div className={styles.tree}></div>
+          <div className={styles.tree}></div>
+        </div>
       </div>
 
-      <div className={styles.content}>
-        {viewMode === 'graveyard' && <GraveyardView />}
-        {viewMode === 'calendar' && <MoonPhaseCalendar />}
-        {viewMode === 'pomodoro' && (
-          <div className={styles.pomodoroView}>
-            <PomodoroTimer />
-            <PomodoroStatistics />
+      <div className={styles.panelGrid}>
+        {panels.map((panel) => (
+          <div
+            key={panel.id}
+            className={`${styles.panel} ${selectedPanel === panel.id ? styles.panelActive : ''}`}
+            onClick={() => setSelectedPanel(panel.id)}
+          >
+            <div className={styles.panelHeader}>
+              <span className={styles.panelIcon}>{panel.icon}</span>
+              <h3 className={styles.panelTitle}>{panel.title}</h3>
+            </div>
+            {selectedPanel === panel.id && (
+              <div className={styles.panelContent}>
+                {panel.component}
+              </div>
+            )}
           </div>
-        )}
-        {viewMode === 'archive' && <ArchiveView />}
+        ))}
       </div>
     </div>
   );

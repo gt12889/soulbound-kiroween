@@ -3,10 +3,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(77, 45, 110, 0.15);
-  border: 1px solid rgba(77, 45, 110, 0.3);
+  background: rgba(77, 45, 110, 0.4);
+  border: 1px solid rgba(77, 45, 110, 0.6);
   border-radius: 6px;
-  color: rgba(224, 224, 224, 0.3);
+  color: rgba(224, 224, 224, 0.9);
   font-family: 'Lora', 'Merriweather', Georgia, serif;
   font-size: 1rem;
   font-style: italic;
@@ -48,11 +48,11 @@
   }
 }
 
-/* Hover state - opacity from 30% to 80% */
+/* Hover state - brighter on hover */
 .ghostSuggestion.hovered {
-  color: rgba(224, 224, 224, 0.8);
-  background: rgba(77, 45, 110, 0.25);
-  border-color: rgba(77, 45, 110, 0.5);
+  color: rgba(255, 255, 255, 1);
+  background: rgba(77, 45, 110, 0.6);
+  border-color: rgba(77, 45, 110, 0.9);
   box-shadow: 
     0 6px 20px rgba(77, 45, 110, 0.4),
     0 0 30px rgba(77, 45, 110, 0.2);

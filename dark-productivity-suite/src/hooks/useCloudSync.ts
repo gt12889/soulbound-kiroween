@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { cloudSyncService } from '../services/cloudSyncService';
 import { storageService } from '../services/storageService';
 import type { SyncStatus, Note, Task, TarotReading } from '../types';
+import { useToast } from '../contexts/ToastContext';
 
 interface UseCloudSyncOptions {
   userId: string | null;
@@ -40,6 +41,10 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
   const syncIntervalRef = useRef<number | null>(null);
   const isMountedRef = useRef(true);
   const migrationAttemptedRef = useRef(false);
+  
+  // Toast notifications for sync status
+  // Requirement: 4.7 - Sync status toasts
+  const { showToast } = useToast();
 
   /**
    * Update sync status
@@ -70,11 +75,16 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
       }
     } catch (error) {
       console.error('Error syncing note:', error);
-      updateSyncStatus({ 
-        error: error instanceof Error ? error.message : 'Failed to sync note' 
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sync note';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Sync a task to cloud
@@ -96,11 +106,16 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
       }
     } catch (error) {
       console.error('Error syncing task:', error);
-      updateSyncStatus({ 
-        error: error instanceof Error ? error.message : 'Failed to sync task' 
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sync task';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Sync a tarot reading to cloud
@@ -122,11 +137,16 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
       }
     } catch (error) {
       console.error('Error syncing tarot reading:', error);
-      updateSyncStatus({ 
-        error: error instanceof Error ? error.message : 'Failed to sync tarot reading' 
+      const errorMessage = error instanceof Error ? error.message : 'Failed to sync tarot reading';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Delete a note from cloud
@@ -148,11 +168,16 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
       }
     } catch (error) {
       console.error('Error deleting note:', error);
-      updateSyncStatus({ 
-        error: error instanceof Error ? error.message : 'Failed to delete note' 
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete note';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Delete a task from cloud
@@ -174,11 +199,16 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
       }
     } catch (error) {
       console.error('Error deleting task:', error);
-      updateSyncStatus({ 
-        error: error instanceof Error ? error.message : 'Failed to delete task' 
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete task';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Manual sync trigger - process offline queue
@@ -190,7 +220,14 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
     }
 
     if (!isOnline) {
-      updateSyncStatus({ error: 'Cannot sync while offline' });
+      const errorMessage = 'Cannot sync while offline';
+      updateSyncStatus({ error: errorMessage });
+      
+      // Requirement: 4.7 - Error toast for offline sync attempt
+      showToast({
+        type: 'error',
+        message: errorMessage,
+      });
       return;
     }
 
@@ -204,14 +241,27 @@ export const useCloudSync = (options: UseCloudSyncOptions): UseCloudSyncReturn =
         pendingChanges: 0,
         error: undefined,
       });
+      
+      // Requirement: 4.7 - Success toast when sync completes
+      showToast({
+        type: 'success',
+        message: 'Sync completed successfully',
+      });
     } catch (error) {
       console.error('Error during manual sync:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Sync failed';
       updateSyncStatus({
         syncing: false,
-        error: error instanceof Error ? error.message : 'Sync failed',
+        error: errorMessage,
+      });
+      
+      // Requirement: 4.7 - Error toast for failed sync
+      showToast({
+        type: 'error',
+        message: errorMessage,
       });
     }
-  }, [userId, isOnline, updateSyncStatus]);
+  }, [userId, isOnline, updateSyncStatus, showToast]);
 
   /**
    * Handle online/offline status changes

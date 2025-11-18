@@ -54,12 +54,12 @@
 
 /* Stone structure */
 .stone {
-  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 50%, #1a1a1a 100%);
-  border: 2px solid #4a4a4a;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+  border: 2px solid var(--border-secondary);
   border-radius: 50% 50% 0 0 / 20% 20% 0 0;
   padding: 1.5rem 1rem;
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.5),
+    0 4px 8px var(--shadow-medium),
     inset 0 2px 4px rgba(255, 255, 255, 0.1);
   position: relative;
   min-height: 120px;
@@ -92,8 +92,8 @@
 
 /* Weathered texture for completed tombstones - Requirement 4.3 */
 .completed .stone {
-  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
-  border-color: #2a2a2a;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 50%, #0a0a0a 100%);
+  border-color: var(--border-secondary);
   opacity: 0.7;
   filter: grayscale(0.5);
 }
@@ -132,8 +132,8 @@
   transform: translateX(-50%);
   width: 4px;
   height: 30px;
-  background: #6a6a6a;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: var(--text-tertiary);
+  box-shadow: 0 2px 4px var(--shadow-medium);
 }
 
 .crossHorizontal {
@@ -143,14 +143,14 @@
   transform: translateX(-50%);
   width: 20px;
   height: 4px;
-  background: #6a6a6a;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  background: var(--text-tertiary);
+  box-shadow: 0 2px 4px var(--shadow-medium);
 }
 
 /* Engraved title - Requirement 4.1 */
 .title {
   font-family: 'Cinzel', serif;
-  color: #8a8a8a;
+  color: var(--text-secondary);
   text-align: center;
   text-shadow: 
     1px 1px 2px rgba(0, 0, 0, 0.8),
@@ -164,7 +164,7 @@
 .rip {
   font-family: 'Cinzel', serif;
   font-size: 0.7em;
-  color: #6a6a6a;
+  color: var(--text-tertiary);
   margin-top: 0.5rem;
   letter-spacing: 2px;
 }
@@ -193,16 +193,16 @@
 }
 
 .tooltipContent {
-  background: rgba(20, 10, 30, 0.95);
-  border: 2px solid #4a2d6e;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   padding: 1rem;
   min-width: 200px;
   max-width: 300px;
   box-shadow: 
-    0 0 20px rgba(74, 45, 110, 0.5),
-    0 0 40px rgba(74, 45, 110, 0.3),
-    inset 0 0 20px rgba(74, 45, 110, 0.2);
+    0 0 20px var(--glow-purple),
+    0 0 40px var(--shadow-medium),
+    inset 0 0 20px var(--shadow-light);
   pointer-events: auto;
   animation: ghostlyGlow 2s ease-in-out infinite;
 }
@@ -210,28 +210,28 @@
 @keyframes ghostlyGlow {
   0%, 100% {
     box-shadow: 
-      0 0 20px rgba(74, 45, 110, 0.5),
-      0 0 40px rgba(74, 45, 110, 0.3),
-      inset 0 0 20px rgba(74, 45, 110, 0.2);
+      0 0 20px var(--glow-purple),
+      0 0 40px var(--shadow-medium),
+      inset 0 0 20px var(--shadow-light);
   }
   50% {
     box-shadow: 
-      0 0 30px rgba(74, 45, 110, 0.7),
-      0 0 60px rgba(74, 45, 110, 0.5),
-      inset 0 0 30px rgba(74, 45, 110, 0.3);
+      0 0 30px var(--glow-purple),
+      0 0 60px var(--shadow-heavy),
+      inset 0 0 30px var(--shadow-medium);
   }
 }
 
 .tooltipContent h4 {
   margin: 0 0 0.5rem 0;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-family: 'Cinzel', serif;
   font-size: 1rem;
 }
 
 .tooltipContent p {
   margin: 0 0 0.75rem 0;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -241,43 +241,43 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.8rem;
-  color: #8a8a8a;
+  color: var(--text-tertiary);
   margin-bottom: 0.75rem;
 }
 
 .archiveButton {
   width: 100%;
   padding: 0.5rem;
-  background: rgba(45, 70, 45, 0.8);
-  border: 1px solid #2d4a2d;
+  background: var(--highlight-green);
+  border: 1px solid var(--highlight-green-light);
   border-radius: 4px;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-family: 'Cinzel', serif;
   cursor: pointer;
-  transition: all 0.1s ease-in-out;
+  transition: all var(--timing-hover) ease-in-out;
   margin-bottom: 0.5rem;
 }
 
 .archiveButton:hover {
-  background: rgba(45, 70, 45, 1);
-  box-shadow: 0 0 10px rgba(45, 70, 45, 0.5);
+  background: var(--highlight-green-light);
+  box-shadow: 0 0 10px var(--glow-blue);
 }
 
 .deleteButton {
   width: 100%;
   padding: 0.5rem;
-  background: rgba(110, 45, 45, 0.8);
-  border: 1px solid #6e2d2d;
+  background: var(--warning-red);
+  border: 1px solid var(--warning-red-light);
   border-radius: 4px;
-  color: #e0e0e0;
+  color: var(--text-primary);
   font-family: 'Cinzel', serif;
   cursor: pointer;
-  transition: all 0.1s ease-in-out;
+  transition: all var(--timing-hover) ease-in-out;
 }
 
 .deleteButton:hover {
-  background: rgba(110, 45, 45, 1);
-  box-shadow: 0 0 10px rgba(110, 45, 45, 0.5);
+  background: var(--warning-red-light);
+  box-shadow: 0 0 10px var(--glow-red);
 }
 
 /* Arrow pointing to tombstone */
@@ -288,7 +288,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-top-color: #4a2d6e;
+  border-top-color: var(--border-primary);
 }
 
 /* Tooltip tags styling */
@@ -306,11 +306,11 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
-  background: rgba(139, 92, 246, 0.2);
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: var(--accent-purple);
+  border: 1px solid var(--accent-purple-light);
   border-radius: 3px;
   font-size: 0.75rem;
-  color: var(--accent-purple-light);
+  color: var(--text-primary);
   font-family: 'Cinzel', serif;
 }
 
@@ -356,8 +356,8 @@
 }
 
 .archived .title {
-  color: #6a8a6a;
-  text-shadow: 0 0 5px rgba(50, 100, 50, 0.5);
+  color: var(--text-tertiary);
+  text-shadow: 0 0 5px var(--glow-blue);
 }
 
 .archived .cross {
@@ -365,7 +365,7 @@
 }
 
 .archived .rip {
-  color: #5a7a5a;
+  color: var(--text-muted);
 }
 
 /* Disable hover effect for archived tombstones */
@@ -434,4 +434,33 @@
 
 .archived .stone {
   animation: weathering 4s ease-in-out infinite;
+}
+
+/* Bulk selection checkbox - Requirement 9.1 */
+.checkboxContainer {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.selectionCheckbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--accent-purple);
+  border: 2px solid var(--border-primary);
+  border-radius: 3px;
+  background: var(--bg-primary);
+  transition: all var(--timing-hover) ease-in-out;
+}
+
+.selectionCheckbox:hover {
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.selectionCheckbox:checked {
+  background: var(--accent-purple);
+  box-shadow: 0 0 15px var(--glow-purple);
 }

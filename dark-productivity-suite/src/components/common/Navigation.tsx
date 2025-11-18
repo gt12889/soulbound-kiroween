@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAudio } from '../../hooks/useAudio';
@@ -14,7 +14,7 @@ import styles from './Navigation.module.css';
 
 /**
  * Navigation component with UI interaction sounds, data export, logout, keyboard shortcuts, and quick capture
- * Requirements: 6.1, 6.3, 7.5, 8.4, 9.1, 10.5, 13.1, 17.7, 18.6
+ * Requirements: 6.1, 6.3, 6.4, 7.5, 8.4, 9.1, 10.5, 13.1, 17.7, 18.6, 1.3
  */
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -35,6 +35,55 @@ const Navigation: React.FC = () => {
     { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest', shortcutId: 'nav-graveyard-dashboard' },
     { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
   ];
+
+  // Memoized event handlers to prevent unnecessary re-renders
+  // Requirements: 1.3
+  const handleNavClick = useCallback(() => {
+    playUIClick();
+  }, [playUIClick]);
+
+  const handleNavHover = useCallback(() => {
+    playUIHover();
+  }, [playUIHover]);
+
+  const handleExport = useCallback(() => {
+    playUIClick();
+    setIsExportDialogOpen(true);
+  }, [playUIClick]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      playUIClick();
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout failed:', error);
+      alert('Failed to logout. Please try again.');
+    }
+  }, [playUIClick, logout, navigate]);
+
+  const handleSettingsClick = useCallback(() => {
+    playUIClick();
+    setIsSettingsOpen(true);
+  }, [playUIClick]);
+
+  const handleSettingsClose = useCallback(() => {
+    playUIClick();
+    setIsSettingsOpen(false);
+  }, [playUIClick]);
+
+  const handleQuickCaptureClick = useCallback(() => {
+    playUIClick();
+    setIsQuickCaptureOpen(true);
+  }, [playUIClick]);
+
+  const handleQuickCaptureClose = useCallback(() => {
+    setIsQuickCaptureOpen(false);
+  }, []);
+
+  const handleExportDialogClose = useCallback(() => {
+    setIsExportDialogOpen(false);
+  }, []);
 
   // Register navigation shortcuts
   useEffect(() => {
@@ -80,49 +129,6 @@ const Navigation: React.FC = () => {
     };
   }, [navigate, playUIClick, registerShortcut, unregisterShortcut]);
 
-  const handleNavClick = () => {
-    playUIClick();
-  };
-
-  const handleNavHover = () => {
-    playUIHover();
-  };
-
-  const handleExport = () => {
-    playUIClick();
-    setIsExportDialogOpen(true);
-  };
-
-  const handleLogout = async () => {
-    try {
-      playUIClick();
-      await logout();
-      navigate('/login', { replace: true });
-    } catch (error) {
-      console.error('Logout failed:', error);
-      alert('Failed to logout. Please try again.');
-    }
-  };
-
-  const handleSettingsClick = () => {
-    playUIClick();
-    setIsSettingsOpen(true);
-  };
-
-  const handleSettingsClose = () => {
-    playUIClick();
-    setIsSettingsOpen(false);
-  };
-
-  const handleQuickCaptureClick = () => {
-    playUIClick();
-    setIsQuickCaptureOpen(true);
-  };
-
-  const handleQuickCaptureClose = () => {
-    setIsQuickCaptureOpen(false);
-  };
-
   return (
     <nav className={styles.navigation}>
       <Link 
@@ -131,8 +137,9 @@ const Navigation: React.FC = () => {
         onClick={handleNavClick}
         onMouseEnter={handleNavHover}
         title="Return to the forest entrance"
+        aria-label="Return to the forest entrance"
       >
-        <div className={styles.forestIcon}>🌲</div>
+        <div className={styles.forestIcon} aria-hidden="true">🌲</div>
         <h1 className={styles.title}>The Dark Forest</h1>
         <p className={styles.subtitle}>Choose Your Path</p>
       </Link>
@@ -148,8 +155,9 @@ const Navigation: React.FC = () => {
               className={styles.navLink}
               onClick={handleNavClick}
               onMouseEnter={handleNavHover}
+              aria-label={`${item.label} - ${item.description}`}
             >
-              <span className={styles.navIcon}>{item.icon}</span>
+              <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
               <div className={styles.navContent}>
                 <span className={styles.navLabel}>{item.label}</span>
                 <span className={styles.navDescription}>{item.description}</span>
@@ -163,14 +171,15 @@ const Navigation: React.FC = () => {
         {/* Sync Status Indicator - Requirements: 17.7 */}
         <SyncStatusIndicator />
         
-        {/* Quick Capture Button - Requirements: 13.1 */}
+        {/* Quick Capture Button - Requirements: 13.1, 6.1 */}
         <button 
           className={styles.quickCaptureButton}
           onClick={handleQuickCaptureClick}
           onMouseEnter={handleNavHover}
           title="Quick capture (Ctrl+K)"
+          aria-label="Quick capture (Ctrl+K)"
         >
-          <span className={styles.quickCaptureIcon}>⚡</span>
+          <span className={styles.quickCaptureIcon} aria-hidden="true">⚡</span>
           <span className={styles.quickCaptureLabel}>Quick Capture</span>
         </button>
         
@@ -179,8 +188,9 @@ const Navigation: React.FC = () => {
           onClick={handleSettingsClick}
           onMouseEnter={handleNavHover}
           title="Realm settings"
+          aria-label="Open settings"
         >
-          <span className={styles.settingsIcon}>⚙️</span>
+          <span className={styles.settingsIcon} aria-hidden="true">⚙️</span>
           <span className={styles.settingsLabel}>Settings</span>
         </button>
         
@@ -189,8 +199,9 @@ const Navigation: React.FC = () => {
           onClick={handleExport}
           onMouseEnter={handleNavHover}
           title="Preserve your journey"
+          aria-label="Export data"
         >
-          <span className={styles.exportIcon}>📜</span>
+          <span className={styles.exportIcon} aria-hidden="true">📜</span>
           <span className={styles.exportLabel}>Save Journey</span>
         </button>
         
@@ -200,19 +211,20 @@ const Navigation: React.FC = () => {
             onClick={handleLogout}
             onMouseEnter={handleNavHover}
             title="Leave the realm"
+            aria-label="Logout"
           >
-            <span className={styles.logoutIcon}>🚪</span>
+            <span className={styles.logoutIcon} aria-hidden="true">🚪</span>
             <span className={styles.logoutLabel}>Depart</span>
           </button>
         )}
         
-        <div className={styles.ornament}>🍂</div>
+        <div className={styles.ornament} aria-hidden="true">🍂</div>
       </div>
       
       <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
       <ExportDialog 
         isOpen={isExportDialogOpen} 
-        onClose={() => setIsExportDialogOpen(false)}
+        onClose={handleExportDialogClose}
         notes={notes}
         tasks={tasks}
         settings={settings}

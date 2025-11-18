@@ -1,7 +1,10 @@
-import { createContext, useContext, useCallback, useState, useMemo } from 'react';
+import { createContext, useContext, useCallback, useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Task } from '../types';
+import { useToast } from './ToastContext';
+import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
+import { useUndoRedo } from '../hooks/useUndoRedo';
 
 interface TasksContextType {
   // Tasks data
@@ -39,6 +42,17 @@ interface TasksContextType {
   
   // Import functionality
   importTasks: (importedTasks: Task[], strategy: 'replace' | 'merge') => void;
+  
+  // Undo/Redo functionality
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  
+  // Bulk operations
+  bulkDelete: (ids: string[]) => void;
+  bulkArchive: (ids: string[]) => void;
+  bulkTag: (ids: string[], tags: string[]) => void;
 }
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
@@ -50,19 +64,43 @@ interface TasksProviderProps {
 /**
  * TasksProvider component for task management
  * Implements CRUD operations, completion tracking, reordering, and storage integration
- * Requirements: 4.1, 4.2, 4.3, 4.6, 7.3
+ * Requirements: 4.1, 4.2, 4.3, 4.6, 7.3, 8.1
  */
 export function TasksProvider({ children }: TasksProviderProps) {
   // Persist tasks to LocalStorage
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
   
+  // Undo/Redo functionality
+  // Requirement: 8.1, 8.5 - Implement undo/redo with max 10 actions
+  const {
+    state: undoRedoTasks,
+    setState: setUndoRedoTasks,
+    undo: undoHistory,
+    redo: redoHistory,
+    canUndo,
+    canRedo,
+  } = useUndoRedo<Task[]>(tasks, 10);
+  
   // Tag filtering state
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagFilterMode, setTagFilterMode] = useState<'AND' | 'OR'>('OR');
+  
+  // Toast notifications
+  // Requirement: 4.5 - Display success toast within 200ms
+  const { showToast } = useToast();
+  
+  // Screen reader announcements
+  // Requirement: 6.2, 6.3 - Announce state changes to screen readers
+  const { announce } = useScreenReaderAnnouncement();
+  
+  // Sync undo/redo state with localStorage
+  useEffect(() => {
+    setTasks(undoRedoTasks);
+  }, [undoRedoTasks, setTasks]);
 
   /**
    * Create a new task
-   * Requirements: 4.1, 7.3
+   * Requirements: 4.1, 7.3, 8.1
    */
   const createTask = useCallback((
     title: string,
@@ -80,17 +118,24 @@ export function TasksProvider({ children }: TasksProviderProps) {
       createdAt: new Date(),
     };
     
-    setTasks(prev => [...prev, newTask]);
+    const newTasks = [...undoRedoTasks, newTask];
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5 - Success toast for task creation
+    showToast({
+      type: 'success',
+      message: `Task "${title}" created`,
+    });
     
     return newTask;
-  }, [setTasks]);
+  }, [undoRedoTasks, setUndoRedoTasks, showToast]);
 
   /**
    * Update an existing task
-   * Requirements: 4.1, 7.3
+   * Requirements: 4.1, 7.3, 8.1
    */
   const updateTask = useCallback((id: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) => {
-    setTasks(prev => prev.map(task => {
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id) {
         return {
           ...task,
@@ -98,30 +143,53 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5 - Success toast for task update
+    showToast({
+      type: 'success',
+      message: 'Task updated',
+    });
+  }, [undoRedoTasks, setUndoRedoTasks, showToast]);
 
   /**
    * Delete a task
-   * Requirements: 4.1, 7.3
+   * Requirements: 4.1, 7.3, 8.1
    */
   const deleteTask = useCallback((id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
-  }, [setTasks]);
+    const task = undoRedoTasks.find(t => t.id === id);
+    const newTasks = undoRedoTasks.filter(task => task.id !== id);
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5, 8.4 - Success toast with undo button for task deletion
+    if (task) {
+      showToast({
+        type: 'success',
+        message: `Task "${task.title}" deleted`,
+        action: {
+          label: 'Undo',
+          onClick: undoHistory,
+        },
+      });
+    }
+  }, [undoRedoTasks, setUndoRedoTasks, showToast, undoHistory]);
 
   /**
    * Get a specific task by ID
    */
   const getTask = useCallback((id: string): Task | undefined => {
-    return tasks.find(task => task.id === id);
-  }, [tasks]);
+    return undoRedoTasks.find(task => task.id === id);
+  }, [undoRedoTasks]);
 
   /**
    * Toggle task completion status
-   * Requirements: 4.2, 4.3, 7.3
+   * Requirements: 4.2, 4.3, 7.3, 6.2, 6.3, 8.1
    */
   const toggleTaskCompletion = useCallback((id: string) => {
-    setTasks(prev => prev.map(task => {
+    const task = undoRedoTasks.find(t => t.id === id);
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id) {
         const completed = !task.completed;
         return {
@@ -131,15 +199,22 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+    
+    // Announce to screen readers
+    if (task) {
+      announce(task.completed ? `Task "${task.title}" marked as incomplete` : `Task "${task.title}" completed`);
+    }
+  }, [undoRedoTasks, setUndoRedoTasks, announce]);
 
   /**
    * Mark task as complete
-   * Requirements: 4.2, 4.3, 7.3
+   * Requirements: 4.2, 4.3, 7.3, 8.1
    */
   const completeTask = useCallback((id: string) => {
-    setTasks(prev => prev.map(task => {
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id && !task.completed) {
         return {
           ...task,
@@ -148,15 +223,17 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Mark task as incomplete
-   * Requirements: 4.2, 7.3
+   * Requirements: 4.2, 7.3, 8.1
    */
   const uncompleteTask = useCallback((id: string) => {
-    setTasks(prev => prev.map(task => {
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id && task.completed) {
         return {
           ...task,
@@ -165,15 +242,17 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Archive a task
-   * Requirements: 15.1, 15.3
+   * Requirements: 15.1, 15.3, 8.1
    */
   const archiveTask = useCallback((id: string) => {
-    setTasks(prev => prev.map(task => {
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id && !task.archived) {
         return {
           ...task,
@@ -182,15 +261,17 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Unarchive a task (restore from archive)
-   * Requirements: 15.1, 15.3
+   * Requirements: 15.1, 15.3, 8.1
    */
   const unarchiveTask = useCallback((id: string) => {
-    setTasks(prev => prev.map(task => {
+    const newTasks = undoRedoTasks.map(task => {
       if (task.id === id && task.archived) {
         return {
           ...task,
@@ -199,8 +280,10 @@ export function TasksProvider({ children }: TasksProviderProps) {
         };
       }
       return task;
-    }));
-  }, [setTasks]);
+    });
+    
+    setUndoRedoTasks(newTasks);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Get tasks that should be suggested for archiving
@@ -211,7 +294,7 @@ export function TasksProvider({ children }: TasksProviderProps) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
-    return tasks.filter(task => {
+    return undoRedoTasks.filter(task => {
       if (!task.completed || task.archived || !task.completedAt) {
         return false;
       }
@@ -219,97 +302,91 @@ export function TasksProvider({ children }: TasksProviderProps) {
       const completedDate = new Date(task.completedAt);
       return completedDate < thirtyDaysAgo;
     });
-  }, [tasks]);
+  }, [undoRedoTasks]);
 
   /**
    * Reorder tasks by moving from startIndex to endIndex
-   * Requirements: 4.6, 7.3
+   * Requirements: 4.6, 7.3, 8.1
    */
   const reorderTasks = useCallback((startIndex: number, endIndex: number) => {
-    setTasks(prev => {
-      const result = Array.from(prev);
-      const [removed] = result.splice(startIndex, 1);
-      result.splice(endIndex, 0, removed);
-      return result;
-    });
-  }, [setTasks]);
+    const result = Array.from(undoRedoTasks);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    setUndoRedoTasks(result);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Move a specific task to a new index
-   * Requirements: 4.6, 7.3
+   * Requirements: 4.6, 7.3, 8.1
    */
   const moveTask = useCallback((taskId: string, newIndex: number) => {
-    setTasks(prev => {
-      const currentIndex = prev.findIndex(task => task.id === taskId);
-      if (currentIndex === -1) return prev;
-      
-      const result = Array.from(prev);
-      const [removed] = result.splice(currentIndex, 1);
-      result.splice(newIndex, 0, removed);
-      return result;
-    });
-  }, [setTasks]);
+    const currentIndex = undoRedoTasks.findIndex(task => task.id === taskId);
+    if (currentIndex === -1) return;
+    
+    const result = Array.from(undoRedoTasks);
+    const [removed] = result.splice(currentIndex, 1);
+    result.splice(newIndex, 0, removed);
+    setUndoRedoTasks(result);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Get active (non-archived) tasks
    * Requirements: 15.1
    */
   const activeTasks = useMemo(() => {
-    return tasks.filter(task => !task.archived);
-  }, [tasks]);
+    return undoRedoTasks.filter(task => !task.archived);
+  }, [undoRedoTasks]);
 
   /**
    * Get archived tasks
    * Requirements: 15.1, 15.4
    */
   const archivedTasks = useMemo(() => {
-    return tasks.filter(task => task.archived);
-  }, [tasks]);
+    return undoRedoTasks.filter(task => task.archived);
+  }, [undoRedoTasks]);
 
   /**
    * Get all unique tags from all tasks
    */
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
-    tasks.forEach(task => {
+    undoRedoTasks.forEach(task => {
       task.tags?.forEach(tag => tagSet.add(tag));
     });
     return Array.from(tagSet).sort();
-  }, [tasks]);
+  }, [undoRedoTasks]);
 
   /**
    * Import tasks with merge or replace strategy
-   * Requirements: 11.3
+   * Requirements: 11.3, 8.1
    */
   const importTasks = useCallback((importedTasks: Task[], strategy: 'replace' | 'merge') => {
     if (strategy === 'replace') {
       // Replace all existing tasks
-      setTasks(importedTasks);
+      setUndoRedoTasks(importedTasks);
     } else {
       // Merge: add only unique tasks (skip duplicates)
-      setTasks(prev => {
-        const merged = [...prev];
+      const merged = [...undoRedoTasks];
+      
+      importedTasks.forEach(importedTask => {
+        // Check if task already exists (by title and description)
+        const isDuplicate = undoRedoTasks.some(existing => 
+          existing.title.trim().toLowerCase() === importedTask.title.trim().toLowerCase() &&
+          existing.description.trim().toLowerCase() === importedTask.description.trim().toLowerCase()
+        );
         
-        importedTasks.forEach(importedTask => {
-          // Check if task already exists (by title and description)
-          const isDuplicate = prev.some(existing => 
-            existing.title.trim().toLowerCase() === importedTask.title.trim().toLowerCase() &&
-            existing.description.trim().toLowerCase() === importedTask.description.trim().toLowerCase()
-          );
-          
-          if (!isDuplicate) {
-            // Generate new ID to avoid conflicts
-            merged.push({
-              ...importedTask,
-              id: crypto.randomUUID(),
-            });
-          }
-        });
-        
-        return merged;
+        if (!isDuplicate) {
+          // Generate new ID to avoid conflicts
+          merged.push({
+            ...importedTask,
+            id: crypto.randomUUID(),
+          });
+        }
       });
+      
+      setUndoRedoTasks(merged);
     }
-  }, [setTasks]);
+  }, [undoRedoTasks, setUndoRedoTasks]);
 
   /**
    * Filter tasks based on selected tags
@@ -335,8 +412,95 @@ export function TasksProvider({ children }: TasksProviderProps) {
     });
   }, [activeTasks, selectedTags, tagFilterMode]);
 
+  /**
+   * Undo the last action
+   * Requirement: 8.1, 8.2 - Implement undo with Ctrl+Z
+   */
+  const undo = useCallback(() => {
+    undoHistory();
+  }, [undoHistory]);
+
+  /**
+   * Redo the last undone action
+   * Requirement: 8.1, 8.3 - Implement redo with Ctrl+Y
+   */
+  const redo = useCallback(() => {
+    redoHistory();
+  }, [redoHistory]);
+
+  /**
+   * Bulk delete multiple tasks
+   * Requirement: 9.5
+   */
+  const bulkDelete = useCallback((ids: string[]) => {
+    const newTasks = undoRedoTasks.filter(task => !ids.includes(task.id));
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5, 8.4 - Success toast with undo button
+    showToast({
+      type: 'success',
+      message: `${ids.length} task${ids.length > 1 ? 's' : ''} deleted`,
+      action: {
+        label: 'Undo',
+        onClick: undoHistory,
+      },
+    });
+  }, [undoRedoTasks, setUndoRedoTasks, showToast, undoHistory]);
+
+  /**
+   * Bulk archive multiple tasks
+   * Requirement: 9.5
+   */
+  const bulkArchive = useCallback((ids: string[]) => {
+    const newTasks = undoRedoTasks.map(task => {
+      if (ids.includes(task.id) && !task.archived) {
+        return {
+          ...task,
+          archived: true,
+          archivedAt: new Date(),
+        };
+      }
+      return task;
+    });
+    
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5 - Success toast
+    showToast({
+      type: 'success',
+      message: `${ids.length} task${ids.length > 1 ? 's' : ''} archived`,
+    });
+  }, [undoRedoTasks, setUndoRedoTasks, showToast]);
+
+  /**
+   * Bulk add tags to multiple tasks
+   * Requirement: 9.5
+   */
+  const bulkTag = useCallback((ids: string[], tags: string[]) => {
+    const newTasks = undoRedoTasks.map(task => {
+      if (ids.includes(task.id)) {
+        // Merge new tags with existing tags, avoiding duplicates
+        const existingTags = task.tags || [];
+        const mergedTags = Array.from(new Set([...existingTags, ...tags]));
+        return {
+          ...task,
+          tags: mergedTags,
+        };
+      }
+      return task;
+    });
+    
+    setUndoRedoTasks(newTasks);
+    
+    // Requirement: 4.5 - Success toast
+    showToast({
+      type: 'success',
+      message: `Tags added to ${ids.length} task${ids.length > 1 ? 's' : ''}`,
+    });
+  }, [undoRedoTasks, setUndoRedoTasks, showToast]);
+
   const value: TasksContextType = {
-    tasks,
+    tasks: undoRedoTasks,
     filteredTasks,
     activeTasks,
     archivedTasks,
@@ -358,6 +522,13 @@ export function TasksProvider({ children }: TasksProviderProps) {
     setTagFilterMode,
     allTags,
     importTasks,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    bulkDelete,
+    bulkArchive,
+    bulkTag,
   };
 
   return <TasksContext.Provider value={value}>{children}</TasksContext.Provider>;

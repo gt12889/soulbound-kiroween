@@ -25,12 +25,13 @@ Secure your data and sync across devices with our mystical authentication system
 ### 📖 Necronomicon Notes
 Ancient wisdom meets modern note-taking with AI-powered writing assistance and markdown support.
 
-- **AI Ghost Writer** - Context-aware writing suggestions with spectral effects
+- **AI Ghost Writer** - Context-aware writing suggestions powered by NVIDIA AI models via OpenRouter
 - **Markdown Support** - Full markdown syntax with live preview
 - **Tag Organization** - Categorize notes with flexible tagging system
 - **Full-text Search** - Find notes instantly with highlighted results
 - **Ancient Book Aesthetic** - Parchment styling with dripping ink animations
 - **Split View Editor** - Edit and preview markdown simultaneously
+- **Offline Fallback** - Pattern-based suggestions when AI is unavailable
 
 ### ⚰️ Graveyard Dashboard
 Task management with a dark twist. Watch your tasks rise and rest as tombstones.
@@ -121,6 +122,7 @@ Immersive audio to enhance your productivity ritual.
 ### Firebase & Backend
 - **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)** - Firebase configuration guide
 - **[OAUTH_SETUP.md](./OAUTH_SETUP.md)** - Social authentication setup (Google, GitHub)
+- **[OPENROUTER_SETUP.md](./OPENROUTER_SETUP.md)** - AI integration with NVIDIA models for Ghost Writer
 - **[FIREBASE_CONFIG_README.md](./FIREBASE_CONFIG_README.md)** - Configuration file details
 - **[FIREBASE_PRODUCTION.md](./FIREBASE_PRODUCTION.md)** - Production deployment guide
 - **[ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md)** - Environment variables configuration

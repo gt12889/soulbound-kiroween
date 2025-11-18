@@ -78,8 +78,10 @@ const NecronomiconNotes: React.FC = () => {
         <button
           className={styles.tagCloudToggle}
           onClick={() => setShowTagCloud(!showTagCloud)}
+          aria-label={showTagCloud ? 'Hide tag cloud' : 'Show tag cloud'}
+          aria-expanded={showTagCloud}
         >
-          {showTagCloud ? '▼' : '▶'} Tag Cloud
+          <span aria-hidden="true">{showTagCloud ? '▼' : '▶'}</span> Tag Cloud
         </button>
         
         {showTagCloud && (

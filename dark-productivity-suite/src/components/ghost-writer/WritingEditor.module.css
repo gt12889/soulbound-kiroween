@@ -6,6 +6,47 @@
   padding: 2rem;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   overflow: auto;
+  gap: 1rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  background: rgba(26, 26, 26, 0.4);
+  border: 1px solid rgba(77, 45, 110, 0.2);
+  border-radius: 8px;
+}
+
+.ghostButton {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+  border: 1px solid rgba(157, 78, 221, 0.4);
+  border-radius: 6px;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ghostButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(99, 102, 241, 0.3) 100%);
+  border-color: rgba(157, 78, 221, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+}
+
+.ghostButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ghostButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .editor {
@@ -25,6 +66,12 @@
     0 0 20px rgba(77, 45, 110, 0.2),
     inset 0 0 30px rgba(0, 0, 0, 0.5);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .editor:focus {

@@ -7,6 +7,7 @@
 import { useState, useRef } from 'react';
 import type { DragEvent } from 'react';
 import { importService, type ImportResult, type ImportData } from '../../services/importService';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import type { Note, Task } from '../../types';
 import styles from './ImportDialog.module.css';
 
@@ -25,6 +26,13 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
   const [mergeStrategy, setMergeStrategy] = useState<'replace' | 'merge'>('merge');
   const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Focus trap for modal - Requirements: 5.5, 5.6
+  const dialogRef = useFocusTrap({
+    isActive: isOpen,
+    onEscape: onClose,
+    restoreFocus: true,
+  });
 
   if (!isOpen) return null;
 
@@ -131,7 +139,7 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
 
   return (
     <div className={styles.overlay} onClick={handleClose}>
-      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.dialog} onClick={(e) => e.stopPropagation()} ref={dialogRef}>
         <div className={styles.header}>
           <h2 className={styles.title}>Import Data</h2>
           <button className={styles.closeButton} onClick={handleClose} aria-label="Close">

@@ -435,6 +435,68 @@ code, pre {
 }
 
 /* ===================================
+   Focus Indicators - Requirement 5.2
+   =================================== */
+
+/* Global focus styles for all focusable elements */
+*:focus {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+  transition: outline var(--timing-hover) var(--ease-in-out);
+}
+
+/* Enhanced focus for interactive elements */
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus,
+[role="button"]:focus,
+[tabindex]:not([tabindex="-1"]):focus {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(74, 45, 110, 0.3);
+}
+
+/* Focus-visible for keyboard navigation only */
+*:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(74, 45, 110, 0.3);
+}
+
+/* Special focus styles for buttons */
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+  box-shadow: 0 0 15px var(--glow-purple);
+}
+
+/* Focus styles for inputs and textareas */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 0;
+  border-color: var(--accent-purple-light);
+  box-shadow: 0 0 0 4px rgba(74, 45, 110, 0.2), inset 0 0 10px rgba(74, 45, 110, 0.1);
+}
+
+/* Focus styles for links */
+a:focus-visible {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+  text-decoration: underline;
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+/* ===================================
    Responsive Design - Requirement 6.4
    =================================== */
 

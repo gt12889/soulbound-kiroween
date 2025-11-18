@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import type { Task } from '../../types';
 import { useAudio } from '../../hooks/useAudio';
+import { ConfirmDialog } from '../common/ConfirmDialog';
 import styles from './Tombstone.module.css';
 
 interface TombstoneProps {
@@ -10,16 +11,32 @@ interface TombstoneProps {
   onArchive?: (id: string) => void;
   isDragging?: boolean;
   isArchived?: boolean;
+  isSelected?: boolean;
+  onToggleSelection?: (id: string) => void;
+  showCheckbox?: boolean;
 }
 
 /**
  * Tombstone component - renders a task as a gravestone
- * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 8.4, 15.2, 15.4, 15.5
+ * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 8.4, 15.2, 15.4, 15.5, 1.2, 9.1
+ * Optimized with React.memo to prevent unnecessary re-renders
  */
-export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragging = false, isArchived = false }: TombstoneProps) {
+function TombstoneComponent({ 
+  task, 
+  onToggleComplete, 
+  onDelete, 
+  onArchive, 
+  isDragging = false, 
+  isArchived = false,
+  isSelected = false,
+  onToggleSelection,
+  showCheckbox = false
+}: TombstoneProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [animationType, setAnimationType] = useState<'sink' | 'deepSink' | 'restore' | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const { playTombstoneRise, playTombstoneSink } = useAudio();
 
   // Play rise sound when tombstone is first created (not completed)
@@ -49,12 +66,17 @@ export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragg
     }, task.completed ? 0 : 1200); // Sink animation duration
   };
 
-  const handleArchive = (e: React.MouseEvent) => {
+  const handleArchiveClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setShowArchiveConfirm(true);
+  };
+
+  const handleArchiveConfirm = () => {
     if (onArchive && task.completed) {
       setIsAnimating(true);
       setAnimationType('deepSink');
       playTombstoneSink();
+      setShowArchiveConfirm(false);
       
       // Delay archiving to allow animation to play (1.8s for deep sink)
       setTimeout(() => {
@@ -63,6 +85,16 @@ export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragg
         setAnimationType(null);
       }, 1800);
     }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(task.id);
+    setShowDeleteConfirm(false);
   };
 
   const priorityClass = {
@@ -83,13 +115,49 @@ export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragg
     !task.completed && !isAnimating ? styles.rising : '',
   ].filter(Boolean).join(' ');
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isArchived && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      handleToggleComplete();
+    }
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (onToggleSelection) {
+      onToggleSelection(task.id);
+    }
+  };
+
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
       className={tombstoneClasses}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       onClick={isArchived ? undefined : handleToggleComplete}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={isArchived ? -1 : 0}
+      aria-label={`${task.title} - ${task.completed ? 'Completed' : 'Active'} task. Press Enter or Space to ${task.completed ? 'restore' : 'complete'}.`}
     >
+      {/* Bulk selection checkbox - Requirement 9.1 */}
+      {showCheckbox && onToggleSelection && (
+        <div className={styles.checkboxContainer}>
+          <input
+            type="checkbox"
+            className={styles.selectionCheckbox}
+            checked={isSelected}
+            onChange={handleCheckboxChange}
+            onClick={handleCheckboxClick}
+            aria-label={`Select ${task.title}`}
+          />
+        </div>
+      )}
+
       {/* Tombstone shape */}
       <div className={styles.stone}>
         {/* Cross at top */}
@@ -135,17 +203,14 @@ export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragg
                 {task.completed && onArchive && (
                   <button
                     className={styles.archiveButton}
-                    onClick={handleArchive}
+                    onClick={handleArchiveClick}
                   >
                     Archive
                   </button>
                 )}
                 <button
                   className={styles.deleteButton}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(task.id);
-                  }}
+                  onClick={handleDeleteClick}
                 >
                   Remove
                 </button>
@@ -154,6 +219,56 @@ export function Tombstone({ task, onToggleComplete, onDelete, onArchive, isDragg
           </div>
         </div>
       )}
+
+      {/* Confirmation Dialogs - Requirement 11.1, 11.4 */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Task"
+        message={`Are you sure you want to delete "${task.title}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        destructive={true}
+        showDontAskAgain={true}
+        dontAskAgainKey="task-delete"
+      />
+
+      <ConfirmDialog
+        isOpen={showArchiveConfirm}
+        title="Archive Task"
+        message={`Are you sure you want to archive "${task.title}"?`}
+        confirmLabel="Archive"
+        cancelLabel="Cancel"
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setShowArchiveConfirm(false)}
+        showDontAskAgain={true}
+        dontAskAgainKey="task-archive"
+      />
     </div>
   );
 }
+
+/**
+ * Memoized Tombstone component with custom comparison
+ * Only re-renders when task properties that affect display change
+ * Requirements: 1.2, 9.1
+ */
+export const Tombstone = memo(TombstoneComponent, (prevProps, nextProps) => {
+  // Re-render if any of these properties change
+  return (
+    prevProps.task.id === nextProps.task.id &&
+    prevProps.task.title === nextProps.task.title &&
+    prevProps.task.description === nextProps.task.description &&
+    prevProps.task.completed === nextProps.task.completed &&
+    prevProps.task.priority === nextProps.task.priority &&
+    prevProps.task.archived === nextProps.task.archived &&
+    prevProps.isDragging === nextProps.isDragging &&
+    prevProps.isArchived === nextProps.isArchived &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.showCheckbox === nextProps.showCheckbox &&
+    JSON.stringify(prevProps.task.tags) === JSON.stringify(nextProps.task.tags) &&
+    prevProps.task.completedAt === nextProps.task.completedAt &&
+    prevProps.task.archivedAt === nextProps.task.archivedAt
+  );
+});

@@ -1,13 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTasks } from '../../contexts/TasksContext';
 import { useAudio } from '../../hooks/useAudio';
 import { Tombstone } from './Tombstone';
 import { TagFilter } from '../common/TagFilter';
+import { ConfirmDialog } from '../common/ConfirmDialog';
+import SkeletonLoader from '../common/SkeletonLoader';
+import EmptyState from '../common/EmptyState';
 import styles from './ArchiveView.module.css';
 
 /**
  * ArchiveView component - displays archived tasks with weathered tombstones
- * Requirements: 15.4, 15.5
+ * Requirements: 15.4, 15.5, 2.1, 2.4
  */
 export function ArchiveView() {
   const { 
@@ -21,7 +24,19 @@ export function ArchiveView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagFilterMode, setTagFilterMode] = useState<'AND' | 'OR'>('OR');
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate initial data loading
+  // Requirements: 2.1, 2.4
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter archived tasks by search and tags
   const filteredArchivedTasks = useMemo(() => {
@@ -64,18 +79,21 @@ export function ArchiveView() {
 
   const handleDeleteClick = (taskId: string) => {
     playUIClick();
-    setShowDeleteConfirm(taskId);
+    setTaskToDelete(taskId);
+    setShowDeleteConfirm(true);
   };
 
-  const handleConfirmDelete = (taskId: string) => {
-    playUIClick();
-    deleteTask(taskId);
-    setShowDeleteConfirm(null);
+  const handleConfirmDelete = () => {
+    if (taskToDelete) {
+      deleteTask(taskToDelete);
+      setTaskToDelete(null);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const handleCancelDelete = () => {
-    playUIClick();
-    setShowDeleteConfirm(null);
+    setTaskToDelete(null);
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -122,11 +140,14 @@ export function ArchiveView() {
 
       {/* Archived Tombstones Grid */}
       <div className={styles.tombstoneGrid}>
-        {sortedTasks.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p>The archive is empty...</p>
-            <p>Completed tasks will rest here</p>
-          </div>
+        {isLoading ? (
+          <SkeletonLoader type="task" count={6} />
+        ) : sortedTasks.length === 0 ? (
+          <EmptyState
+            icon="📦"
+            title="The Archive Rests Empty"
+            message="No tasks have been archived yet. Complete and archive tasks from the Graveyard to preserve them here for eternity."
+          />
         ) : (
           sortedTasks.map((task) => (
             <div key={task.id} className={styles.tombstoneWrapper}>
@@ -148,39 +169,33 @@ export function ArchiveView() {
                   ↑ Restore
                 </button>
                 
-                {showDeleteConfirm === task.id ? (
-                  <div className={styles.deleteConfirm}>
-                    <span className={styles.confirmText}>Delete forever?</span>
-                    <button
-                      className={styles.confirmButton}
-                      onClick={() => handleConfirmDelete(task.id)}
-                      onMouseEnter={playUIHover}
-                    >
-                      Yes
-                    </button>
-                    <button
-                      className={styles.cancelButton}
-                      onClick={handleCancelDelete}
-                      onMouseEnter={playUIHover}
-                    >
-                      No
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    className={styles.deleteButton}
-                    onClick={() => handleDeleteClick(task.id)}
-                    onMouseEnter={playUIHover}
-                    title="Delete permanently"
-                  >
-                    ✕ Delete
-                  </button>
-                )}
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => handleDeleteClick(task.id)}
+                  onMouseEnter={playUIHover}
+                  title="Delete permanently"
+                >
+                  ✕ Delete
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Confirmation Dialog - Requirement 11.1, 11.4 */}
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete Archived Task"
+        message="Are you sure you want to permanently delete this archived task? This action cannot be undone."
+        confirmLabel="Delete Forever"
+        cancelLabel="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        destructive={true}
+        showDontAskAgain={true}
+        dontAskAgainKey="archive-delete"
+      />
     </div>
   );
 }

@@ -59,9 +59,10 @@ const AudioController: React.FC = () => {
           className={styles.expandButton}
           onClick={toggleExpanded}
           title="Volume Control"
-          aria-label="Toggle volume control"
+          aria-label={isExpanded ? 'Collapse volume control' : 'Expand volume control'}
+          aria-expanded={isExpanded}
         >
-          <svg className={styles.expandIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg className={styles.expandIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

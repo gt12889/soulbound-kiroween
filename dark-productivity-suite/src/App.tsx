@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -6,24 +6,33 @@ import { KeyboardProvider } from './contexts/KeyboardContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { NotesProvider } from './contexts/NotesContext';
 import { TasksProvider } from './contexts/TasksContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Navigation from './components/common/Navigation';
-// import LoadingTransition from './components/common/LoadingTransition';
 import AudioController from './components/common/AudioController';
 import { KeyboardShortcutsPanel } from './components/common/KeyboardShortcutsPanel';
 import QuickCapture from './components/common/QuickCapture';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import LoadingFallback from './components/common/LoadingFallback';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { ToastContainer } from './components/common/ToastNotification';
+// Keep auth pages as regular imports for faster initial load
 import LandingPage from './components/landing/LandingPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import PasswordReset from './components/auth/PasswordReset';
-import TerminalTarot from './components/terminal-tarot/TerminalTarot';
-import GhostWriter from './components/ghost-writer/GhostWriter';
-import NecronomiconNotes from './components/necronomicon-notes/NecronomiconNotes';
-import { GraveyardDashboard } from './components/graveyard-dashboard/GraveyardDashboard';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useUndoRedoShortcuts } from './hooks/useUndoRedoShortcuts';
 import { useSettingsInitialization, useSettingsPersistence } from './hooks/useSettingsInitialization';
 import { DEFAULT_SHORTCUTS } from './utils/keyboardShortcuts';
 import './App.css';
+
+// Lazy load main application routes for code splitting
+// Requirements: 1.4, 1.5
+const TerminalTarot = lazy(() => import('./components/terminal-tarot/TerminalTarot'));
+const GhostWriter = lazy(() => import('./components/ghost-writer/GhostWriter'));
+const NecronomiconNotes = lazy(() => import('./components/necronomicon-notes/NecronomiconNotes'));
+const GraveyardDashboard = lazy(() => import('./components/graveyard-dashboard/GraveyardDashboard').then(module => ({ default: module.GraveyardDashboard })));
+const ForestHub = lazy(() => import('./components/forest-hub/ForestHub'));
 
 const AppContent: React.FC = () => {
   // const [isLoading, setIsLoading] = useState(false);
@@ -73,8 +82,13 @@ const AppContent: React.FC = () => {
     }
   );
 
-  const showNavigation = !isLandingPage && !isAuthPage;
-  const contentClass = isLandingPage || isAuthPage ? 'landing-content' : 'main-content';
+  // Register undo/redo keyboard shortcuts (Ctrl+Z, Ctrl+Y)
+  // Requirements: 8.2, 8.3, 8.4
+  useUndoRedoShortcuts();
+
+  const isForestHub = location.pathname === '/forest-hub';
+  const showNavigation = !isLandingPage && !isAuthPage && !isForestHub;
+  const contentClass = isLandingPage || isAuthPage || isForestHub ? 'landing-content' : 'main-content';
 
   // Settings load in the background - don't block the UI
 
@@ -82,49 +96,95 @@ const AppContent: React.FC = () => {
     <div className="app">
       {showNavigation && <Navigation />}
       <main className={contentClass}>
-        {/* <LoadingTransition isLoading={isLoading} minDisplayTime={500} /> */}
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/password-reset" element={<PasswordReset />} />
-          <Route 
-            path="/terminal-tarot" 
-            element={
-              <ProtectedRoute>
-                <TerminalTarot />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/ghost-writer" 
-            element={
-              <ProtectedRoute>
-                <GhostWriter />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/necronomicon-notes" 
-            element={
-              <ProtectedRoute>
-                <NecronomiconNotes />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/graveyard-dashboard" 
-            element={
-              <ProtectedRoute>
-                <GraveyardDashboard />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route 
+              path="/" 
+              element={
+                <ErrorBoundary>
+                  <LandingPage />
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/login" 
+              element={
+                <ErrorBoundary>
+                  <LoginPage />
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <ErrorBoundary>
+                  <RegisterPage />
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/password-reset" 
+              element={
+                <ErrorBoundary>
+                  <PasswordReset />
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/forest-hub" 
+              element={
+                <ErrorBoundary>
+                  <ForestHub />
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/terminal-tarot" 
+              element={
+                <ErrorBoundary>
+                  <ProtectedRoute>
+                    <TerminalTarot />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/ghost-writer" 
+              element={
+                <ErrorBoundary>
+                  <ProtectedRoute>
+                    <GhostWriter />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/necronomicon-notes" 
+              element={
+                <ErrorBoundary>
+                  <ProtectedRoute>
+                    <NecronomiconNotes />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              } 
+            />
+            <Route 
+              path="/graveyard-dashboard" 
+              element={
+                <ErrorBoundary>
+                  <ProtectedRoute>
+                    <GraveyardDashboard />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              } 
+            />
+          </Routes>
+        </Suspense>
       </main>
       {showNavigation && <AudioController />}
       <KeyboardShortcutsPanel />
       <QuickCapture isOpen={showQuickCapture} onClose={() => setShowQuickCapture(false)} />
+      <ToastContainer />
     </div>
   );
 };
@@ -135,13 +195,15 @@ const App: React.FC = () => {
       <AuthProvider>
         <AppProvider>
           <ThemeProvider>
-            <KeyboardProvider>
-              <NotesProvider>
-                <TasksProvider>
-                  <AppContent />
-                </TasksProvider>
-              </NotesProvider>
-            </KeyboardProvider>
+            <ToastProvider>
+              <KeyboardProvider>
+                <NotesProvider>
+                  <TasksProvider>
+                    <AppContent />
+                  </TasksProvider>
+                </NotesProvider>
+              </KeyboardProvider>
+            </ToastProvider>
           </ThemeProvider>
         </AppProvider>
       </AuthProvider>

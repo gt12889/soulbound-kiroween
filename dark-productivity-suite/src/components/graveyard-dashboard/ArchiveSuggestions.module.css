@@ -34,7 +34,7 @@
   overflow: hidden;
   box-shadow: 
     0 0 40px var(--glow-purple),
-    0 0 80px rgba(74, 45, 110, 0.3);
+    0 0 80px var(--shadow-medium);
   animation: slideIn 0.3s ease-out;
 }
 

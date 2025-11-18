@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import styles from './TagFilter.module.css';
 
 interface TagFilterProps {
@@ -11,9 +11,10 @@ interface TagFilterProps {
 
 /**
  * TagFilter component for filtering by tags
- * Requirements: 14.4, 14.6
+ * Requirements: 14.4, 14.6, 1.2
+ * Optimized with React.memo to prevent unnecessary re-renders
  */
-export function TagFilter({ 
+function TagFilterComponent({ 
   availableTags, 
   selectedTags, 
   onTagsChange,
@@ -107,3 +108,16 @@ export function TagFilter({
     </div>
   );
 }
+
+/**
+ * Memoized TagFilter component with custom comparison
+ * Only re-renders when availableTags, selectedTags, or filterMode change
+ * Requirements: 1.2
+ */
+export const TagFilter = memo(TagFilterComponent, (prevProps, nextProps) => {
+  return (
+    JSON.stringify(prevProps.availableTags) === JSON.stringify(nextProps.availableTags) &&
+    JSON.stringify(prevProps.selectedTags) === JSON.stringify(nextProps.selectedTags) &&
+    prevProps.filterMode === nextProps.filterMode
+  );
+});

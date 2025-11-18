@@ -18,8 +18,8 @@
   font-family: var(--font-body);
   font-weight: 500;
   color: var(--text-primary);
-  background: rgba(26, 26, 26, 0.6);
-  border: 1px solid rgba(157, 78, 221, 0.3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -40,7 +40,7 @@
   transform: translate(-50%, -50%);
   width: 0;
   height: 0;
-  background: radial-gradient(circle, rgba(157, 78, 221, 0.4) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--glow-purple) 0%, transparent 70%);
   border-radius: 50%;
   transition: all 0.5s ease;
   pointer-events: none;
@@ -80,7 +80,7 @@
 
 .socialButton:hover:not(:disabled) .socialIcon {
   transform: scale(1.1) rotate(5deg);
-  filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.8));
+  filter: drop-shadow(0 0 8px var(--glow-purple));
 }
 
 /* Button Text */
@@ -89,7 +89,7 @@
 }
 
 .socialButton:hover:not(:disabled) .buttonText {
-  text-shadow: 0 0 10px rgba(157, 78, 221, 0.6);
+  text-shadow: 0 0 10px var(--glow-purple);
 }
 
 /* Mystical Particles */
@@ -112,9 +112,9 @@
 .particle {
   position: absolute;
   font-size: 0.8rem;
-  color: rgba(157, 78, 221, 0.8);
+  color: var(--accent-purple-light);
   animation: particleFloat 2s ease-in-out infinite;
-  filter: drop-shadow(0 0 4px rgba(157, 78, 221, 0.6));
+  filter: drop-shadow(0 0 4px var(--glow-purple));
 }
 
 .particle:nth-child(1) {
@@ -150,7 +150,7 @@
 .loadingSpinner {
   font-size: 1.3rem;
   animation: spin 1s linear infinite;
-  filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.8));
+  filter: drop-shadow(0 0 8px var(--glow-purple));
 }
 
 @keyframes spin {
@@ -164,16 +164,16 @@
 
 /* Google Button Specific Styles */
 .googleButton {
-  border-color: rgba(157, 78, 221, 0.3);
+  border-color: var(--border-primary);
 }
 
 .googleButton:hover:not(:disabled) {
-  border-color: rgba(157, 78, 221, 0.6);
-  background: rgba(26, 26, 26, 0.8);
+  border-color: var(--accent-purple-light);
+  background: var(--bg-tertiary);
   transform: translateY(-2px);
   box-shadow: 
-    0 4px 15px rgba(157, 78, 221, 0.4),
-    0 0 30px rgba(157, 78, 221, 0.2);
+    0 4px 15px var(--glow-purple),
+    0 0 30px var(--shadow-medium);
 }
 
 .googleButton:active:not(:disabled) {
@@ -181,21 +181,21 @@
 }
 
 .googleButton .iconSvg {
-  color: #9d4edd;
+  color: var(--accent-purple-light);
 }
 
 /* GitHub Button Specific Styles */
 .githubButton {
-  border-color: rgba(157, 78, 221, 0.3);
+  border-color: var(--border-primary);
 }
 
 .githubButton:hover:not(:disabled) {
-  border-color: rgba(157, 78, 221, 0.6);
-  background: rgba(26, 26, 26, 0.8);
+  border-color: var(--accent-purple-light);
+  background: var(--bg-tertiary);
   transform: translateY(-2px);
   box-shadow: 
-    0 4px 15px rgba(157, 78, 221, 0.4),
-    0 0 30px rgba(157, 78, 221, 0.2);
+    0 4px 15px var(--glow-purple),
+    0 0 30px var(--shadow-medium);
 }
 
 .githubButton:active:not(:disabled) {
@@ -203,7 +203,7 @@
 }
 
 .githubButton .iconSvg {
-  color: #9d4edd;
+  color: var(--accent-purple-light);
 }
 
 /* Mystical Hover Animation */
@@ -217,7 +217,7 @@
   background: linear-gradient(
     45deg,
     transparent,
-    rgba(157, 78, 221, 0.5),
+    var(--accent-purple-light),
     transparent
   );
   border-radius: 8px;
@@ -251,7 +251,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(157, 78, 221, 0.3),
+    var(--shadow-medium),
     transparent
   );
   transition: left 0.5s ease;
@@ -280,7 +280,7 @@
 
 /* Accessibility - Focus States */
 .socialButton:focus-visible {
-  outline: 2px solid rgba(157, 78, 221, 0.8);
+  outline: 2px solid var(--accent-purple-light);
   outline-offset: 2px;
 }
 

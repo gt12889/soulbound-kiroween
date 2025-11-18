@@ -1,0 +1,215 @@
+/**
+ * Toast Notification Styles
+ * Requirements: 4.2, 4.3, 4.4
+ * 
+ * Mystical-themed toast notifications with glow effects and animations
+ */
+
+.container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 400px;
+}
+
+.toast {
+  pointer-events: auto;
+  background: rgba(26, 26, 26, 0.95);
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  animation: slideIn 0.3s ease-out;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.toast:hover {
+  transform: translateX(-4px);
+}
+
+.toast.exiting {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Requirement 4.2: Success toasts with green glow effects */
+.toast.success {
+  border-color: #2d4a3e;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(74, 110, 94, 0.4),
+    inset 0 0 20px rgba(74, 110, 94, 0.1);
+}
+
+.toast.success .icon {
+  color: #4a6e5e;
+  text-shadow: 0 0 10px rgba(74, 110, 94, 0.8);
+}
+
+/* Requirement 4.3: Error toasts with red glow effects */
+.toast.error {
+  border-color: #4a1a1a;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(110, 45, 45, 0.4),
+    inset 0 0 20px rgba(110, 45, 45, 0.1);
+}
+
+.toast.error .icon {
+  color: #6e2d2d;
+  text-shadow: 0 0 10px rgba(110, 45, 45, 0.8);
+}
+
+/* Requirement 4.4: Info toasts with blue glow effects */
+.toast.info {
+  border-color: #3d5a80;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(61, 90, 128, 0.4),
+    inset 0 0 20px rgba(61, 90, 128, 0.1);
+}
+
+.toast.info .icon {
+  color: #5a7fa0;
+  text-shadow: 0 0 10px rgba(61, 90, 128, 0.8);
+}
+
+/* Warning toasts with amber glow effects */
+.toast.warning {
+  border-color: #6e4a1a;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(110, 74, 45, 0.4),
+    inset 0 0 20px rgba(110, 74, 45, 0.1);
+}
+
+.toast.warning .icon {
+  color: #a07a5a;
+  text-shadow: 0 0 10px rgba(110, 74, 45, 0.8);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.icon {
+  font-size: 20px;
+  font-weight: bold;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message {
+  color: #e0e0e0;
+  font-size: 14px;
+  line-height: 1.4;
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.action {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 6px 12px;
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.action:active {
+  transform: scale(0.98);
+}
+
+/* Requirement 4.4: Slide-in/slide-out animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+
+  .toast {
+    padding: 12px;
+  }
+
+  .message {
+    font-size: 13px;
+  }
+}
+
+/* Requirement 14.6: Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+
+  .toast.exiting {
+    animation: none;
+    opacity: 0;
+  }
+
+  .toast:hover {
+    transform: none;
+  }
+
+  .action:hover {
+    transform: none;
+  }
+
+  .action:active {
+    transform: none;
+  }
+}

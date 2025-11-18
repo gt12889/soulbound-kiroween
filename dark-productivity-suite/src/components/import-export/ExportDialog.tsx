@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { exportService, type ExportFormat, type ExportOptions } from '../../services/exportService';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import type { Note, Task, AppSettings, TarotReading, PomodoroSession } from '../../types';
 import styles from './ExportDialog.module.css';
 
@@ -43,6 +44,29 @@ export function ExportDialog({
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setFormat('json');
+    setIncludeNotes(true);
+    setIncludeTasks(true);
+    setIncludeSettings(true);
+    setIncludeTarotReadings(true);
+    setIncludePomodoroSessions(true);
+    setUseDateRange(false);
+    setStartDate('');
+    setEndDate('');
+    setEncrypt(false);
+    setEncryptionPassword('');
+    setError(null);
+    onClose();
+  };
+
+  // Focus trap for modal - Requirements: 5.5, 5.6
+  const dialogRef = useFocusTrap({
+    isActive: isOpen,
+    onEscape: handleClose,
+    restoreFocus: true,
+  });
 
   const handleExport = async () => {
     setError(null);
@@ -105,22 +129,6 @@ export function ExportDialog({
     }
   };
 
-  const handleClose = () => {
-    setFormat('json');
-    setIncludeNotes(true);
-    setIncludeTasks(true);
-    setIncludeSettings(true);
-    setIncludeTarotReadings(true);
-    setIncludePomodoroSessions(true);
-    setUseDateRange(false);
-    setStartDate('');
-    setEndDate('');
-    setEncrypt(false);
-    setEncryptionPassword('');
-    setError(null);
-    onClose();
-  };
-
   // Calculate total items to export
   const getTotalItems = () => {
     let total = 0;
@@ -133,7 +141,7 @@ export function ExportDialog({
 
   return (
     <div className={styles.overlay} onClick={handleClose}>
-      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
+      <div className={styles.dialog} onClick={(e) => e.stopPropagation()} ref={dialogRef}>
         <div className={styles.header}>
           <h2 className={styles.title}>Export Data</h2>
           <button className={styles.closeButton} onClick={handleClose} aria-label="Close">

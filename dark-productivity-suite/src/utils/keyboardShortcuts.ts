@@ -75,6 +75,22 @@ export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
     category: 'actions',
     customizable: true,
   },
+  {
+    id: 'action-undo',
+    action: 'undo',
+    keys: ['Control', 'z'],
+    description: 'Undo last action',
+    category: 'actions',
+    customizable: true,
+  },
+  {
+    id: 'action-redo',
+    action: 'redo',
+    keys: ['Control', 'y'],
+    description: 'Redo last undone action',
+    category: 'actions',
+    customizable: true,
+  },
   // Search shortcut
   {
     id: 'search',

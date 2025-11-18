@@ -204,7 +204,7 @@
     width: 100%;
     max-height: 200px;
     border-right: none;
-    border-bottom: 2px solid #2d1b4e;
+    border-bottom: 2px solid var(--border-primary);
   }
 
   .header {
@@ -222,4 +222,139 @@
   .noteItemTitle {
     font-size: 0.9rem;
   }
+}
+
+/* Bulk selection UI - Requirement 9.1 */
+.headerButtons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bulkModeButton {
+  width: 36px;
+  height: 36px;
+  background: var(--highlight-green);
+  border: 1px solid var(--highlight-green-light);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--timing-hover) ease-in-out;
+  box-shadow: 0 2px 8px var(--shadow-medium);
+}
+
+.bulkModeButton:hover {
+  background: var(--highlight-green-light);
+  box-shadow: 0 0 15px var(--glow-blue);
+  transform: scale(1.05);
+}
+
+.bulkModeButton.active {
+  background: var(--highlight-green-light);
+  border-color: var(--highlight-green-light);
+  box-shadow: 0 0 15px var(--glow-blue);
+}
+
+.bulkToolbar {
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bulkToolbarTop {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.bulkButton {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--accent-purple);
+  border: 1px solid var(--accent-purple-light);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-header);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--timing-hover) ease-in-out;
+}
+
+.bulkButton:hover:not(:disabled) {
+  background: var(--accent-purple-light);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.bulkButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.selectionCount {
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-style: italic;
+  padding: 0.25rem 0;
+}
+
+.bulkActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.bulkActionButton {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--accent-purple);
+  border: 1px solid var(--accent-purple-light);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-header);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--timing-hover) ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.bulkActionButton:hover {
+  background: var(--accent-purple-light);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.bulkActionButton.destructive {
+  background: var(--warning-red);
+  border-color: var(--warning-red-light);
+}
+
+.bulkActionButton.destructive:hover {
+  background: var(--warning-red-light);
+  box-shadow: 0 0 10px var(--glow-red);
+}
+
+.selectionCheckbox {
+  width: 18px;
+  height: 18px;
+  margin-right: 0.75rem;
+  cursor: pointer;
+  accent-color: var(--accent-purple);
+  flex-shrink: 0;
+}
+
+.noteItem.bulkSelected {
+  background: var(--accent-purple);
+  border-left: 3px solid var(--accent-purple-light);
+  padding-left: calc(1rem - 3px);
 }

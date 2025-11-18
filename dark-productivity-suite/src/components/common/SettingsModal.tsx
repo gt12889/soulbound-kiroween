@@ -9,6 +9,7 @@ import { useTasks } from '../../contexts/TasksContext';
 import { useApp } from '../../contexts/AppContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useKeyboard } from '../../contexts/KeyboardContext';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import type { ImportData } from '../../services/importService';
 import styles from './SettingsModal.module.css';
 
@@ -23,7 +24,7 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
-type TabId = 'account' | 'appearance' | 'keyboard' | 'audio' | 'data';
+type TabId = 'account' | 'appearance' | 'keyboard' | 'audio' | 'ai' | 'data';
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { notes, importNotes } = useNotes();
@@ -36,6 +37,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [importMessage, setImportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // Focus trap for modal - Requirements: 5.5, 5.6
+  const modalRef = useFocusTrap({
+    isActive: isOpen,
+    onEscape: onClose,
+    restoreFocus: true,
+  });
 
   if (!isOpen) return null;
 
@@ -205,6 +213,102 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
           </section>
         );
 
+      case 'ai':
+        return (
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>AI Assistant Settings</h3>
+            <p className={styles.sectionDescription}>
+              Configure AI providers for the Ghost Writer feature. You'll need an API key from one of the supported providers.
+            </p>
+            
+            <div className={styles.aiProviderInfo}>
+              <h4 className={styles.subsectionTitle}>Supported Providers</h4>
+              
+              <div className={styles.providerCard}>
+                <div className={styles.providerHeader}>
+                  <span className={styles.providerIcon}>🤖</span>
+                  <strong>OpenRouter</strong>
+                  <span className={styles.providerBadge}>Recommended</span>
+                </div>
+                <p className={styles.providerDescription}>
+                  Access multiple AI models (NVIDIA, Meta, Anthropic) through a single API.
+                </p>
+                <a 
+                  href="https://openrouter.ai/keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.providerLink}
+                >
+                  Get API Key →
+                </a>
+                <div className={styles.envVarHint}>
+                  <code>VITE_OPENROUTER_API_KEY</code>
+                  <code>VITE_AI_PROVIDER=openrouter</code>
+                </div>
+              </div>
+
+              <div className={styles.providerCard}>
+                <div className={styles.providerHeader}>
+                  <span className={styles.providerIcon}>✨</span>
+                  <strong>Google Gemini</strong>
+                  <span className={styles.providerBadge}>Free Tier</span>
+                </div>
+                <p className={styles.providerDescription}>
+                  Google's advanced language model with generous free tier for creative writing.
+                </p>
+                <a 
+                  href="https://makersuite.google.com/app/apikey" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.providerLink}
+                >
+                  Get API Key →
+                </a>
+                <div className={styles.envVarHint}>
+                  <code>VITE_GEMINI_API_KEY</code>
+                  <code>VITE_AI_PROVIDER=gemini</code>
+                </div>
+              </div>
+
+              <div className={styles.providerCard}>
+                <div className={styles.providerHeader}>
+                  <span className={styles.providerIcon}>🔷</span>
+                  <strong>OpenAI</strong>
+                </div>
+                <p className={styles.providerDescription}>
+                  GPT-3.5 and GPT-4 models for high-quality text generation.
+                </p>
+                <a 
+                  href="https://platform.openai.com/api-keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.providerLink}
+                >
+                  Get API Key →
+                </a>
+                <div className={styles.envVarHint}>
+                  <code>VITE_OPENROUTER_API_KEY</code>
+                  <code>VITE_AI_PROVIDER=openai</code>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.setupInstructions}>
+              <h4 className={styles.subsectionTitle}>Setup Instructions</h4>
+              <ol className={styles.instructionsList}>
+                <li>Choose a provider and get an API key from the links above</li>
+                <li>Create a <code>.env</code> file in your project root (copy from <code>.env.example</code>)</li>
+                <li>Add your API key and provider settings to the <code>.env</code> file</li>
+                <li>Restart the development server for changes to take effect</li>
+              </ol>
+              <p className={styles.setupNote}>
+                <strong>Note:</strong> API keys are stored locally and never sent to our servers. 
+                They're only used to communicate directly with your chosen AI provider.
+              </p>
+            </div>
+          </section>
+        );
+
       case 'data':
         return (
           <section className={styles.section}>
@@ -237,7 +341,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   return (
     <>
       <div className={styles.modalBackdrop} onClick={handleBackdropClick}>
-        <div className={styles.modalContent}>
+        <div className={styles.modalContent} ref={modalRef}>
           <div className={styles.modalHeader}>
             <h2 className={styles.modalTitle}>Realm Settings</h2>
             <button className={styles.closeButton} onClick={onClose} title="Close settings">
@@ -274,6 +378,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
             >
               <span className={styles.tabIcon}>🔊</span>
               <span className={styles.tabLabel}>Audio</span>
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'ai' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('ai')}
+            >
+              <span className={styles.tabIcon}>🤖</span>
+              <span className={styles.tabLabel}>AI</span>
             </button>
             <button
               className={`${styles.tab} ${activeTab === 'data' ? styles.activeTab : ''}`}

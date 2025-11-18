@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useRef, useMemo, useState, lazy, Suspense, memo } from 'react';
 import { useNotes } from '../../contexts/NotesContext';
 import { aiService } from '../../services/aiService';
 import { useAudio } from '../../hooks/useAudio';
 import { TagManager } from '../common/TagManager';
-import MarkdownEditor from './MarkdownEditor';
+import LoadingFallback from '../common/LoadingFallback';
+import ErrorBoundary from '../common/ErrorBoundary';
 import type { GhostSuggestion as GhostSuggestionType } from '../../types';
 import styles from './NotePage.module.css';
+
+// Lazy load MarkdownEditor for better performance
+// Requirement: 1.6
+const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
 
 interface NotePageProps {
   noteId: string;
@@ -15,8 +20,9 @@ interface NotePageProps {
  * NotePage component - Renders a single note with parchment styling
  * Completely rebuilt to prevent text mirroring issues
  * Features: Markdown support, AI suggestions, text formatting, tags, search highlighting
+ * Requirements: 1.2 - Optimized with React.memo
  */
-const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
+const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
   const { getNote, updateNote, searchQuery, allTags } = useNotes();
   const note = getNote(noteId);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -276,12 +282,16 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
       {/* Main Content Area */}
       {note.markdown ? (
         <div className={styles.markdownContainer}>
-          <MarkdownEditor
-            content={note.content}
-            onChange={(content) => updateNote(noteId, { content })}
-            viewMode={markdownViewMode}
-            onViewModeChange={setMarkdownViewMode}
-          />
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback message="Preparing ancient scrolls..." />}>
+              <MarkdownEditor
+                content={note.content}
+                onChange={(content) => updateNote(noteId, { content })}
+                viewMode={markdownViewMode}
+                onViewModeChange={setMarkdownViewMode}
+              />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       ) : (
         <div className={styles.parchment} dir="ltr">
@@ -386,5 +396,14 @@ const NotePage: React.FC<NotePageProps> = ({ noteId }) => {
     </div>
   );
 };
+
+/**
+ * Memoized NotePage component
+ * Only re-renders when noteId changes
+ * Requirements: 1.2
+ */
+const NotePage = memo(NotePageComponent, (prevProps, nextProps) => {
+  return prevProps.noteId === nextProps.noteId;
+});
 
 export default NotePage;

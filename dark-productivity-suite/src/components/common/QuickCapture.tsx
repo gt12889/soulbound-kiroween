@@ -6,7 +6,7 @@ import styles from './QuickCapture.module.css';
 /**
  * QuickCapture Component
  * Floating modal for quickly capturing notes or tasks
- * Requirements: 13.2, 13.3, 13.6
+ * Requirements: 13.2, 13.3, 13.6, 6.4
  */
 
 interface QuickCaptureProps {
@@ -123,46 +123,50 @@ const QuickCapture: React.FC<QuickCaptureProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={styles.backdrop} onClick={handleBackdropClick}>
+    <div className={styles.backdrop} onClick={handleBackdropClick} role="dialog" aria-modal="true" aria-labelledby="quick-capture-title">
       <div className={`${styles.modal} ${showConfirmation ? styles.confirming : ''}`}>
         {showConfirmation ? (
-          <div className={styles.confirmation}>
-            <div className={styles.confirmationIcon}>✓</div>
+          <div className={styles.confirmation} role="status" aria-live="polite">
+            <div className={styles.confirmationIcon} aria-hidden="true">✓</div>
             <p className={styles.confirmationText}>
               {captureType === 'note' ? 'Note' : 'Task'} captured
             </p>
           </div>
         ) : (
           <>
-            <div className={styles.header}>
-              <h2 className={styles.title}>Quick Capture</h2>
+            <header className={styles.header}>
+              <h2 className={styles.title} id="quick-capture-title">Quick Capture</h2>
               <button
                 className={styles.closeButton}
                 onClick={handleClose}
                 type="button"
-                aria-label="Close"
+                aria-label="Close quick capture dialog"
               >
-                ✕
+                <span aria-hidden="true">✕</span>
               </button>
-            </div>
+            </header>
 
             <form onSubmit={handleSubmit} className={styles.form}>
               {/* Type selector */}
-              <div className={styles.typeSelector}>
+              <div className={styles.typeSelector} role="group" aria-label="Capture type">
                 <button
                   type="button"
                   className={`${styles.typeButton} ${captureType === 'note' ? styles.active : ''}`}
                   onClick={() => setCaptureType('note')}
+                  aria-label="Capture as note"
+                  aria-pressed={captureType === 'note'}
                 >
-                  <span className={styles.typeIcon}>📝</span>
+                  <span className={styles.typeIcon} aria-hidden="true">📝</span>
                   Note
                 </button>
                 <button
                   type="button"
                   className={`${styles.typeButton} ${captureType === 'task' ? styles.active : ''}`}
                   onClick={() => setCaptureType('task')}
+                  aria-label="Capture as task"
+                  aria-pressed={captureType === 'task'}
                 >
-                  <span className={styles.typeIcon}>⚰️</span>
+                  <span className={styles.typeIcon} aria-hidden="true">⚰️</span>
                   Task
                 </button>
               </div>
@@ -200,7 +204,11 @@ const QuickCapture: React.FC<QuickCaptureProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Submit button */}
-              <button type="submit" className={styles.submitButton}>
+              <button 
+                type="submit" 
+                className={styles.submitButton}
+                aria-label={`Capture ${captureType === 'note' ? 'note' : 'task'}`}
+              >
                 Capture {captureType === 'note' ? 'Note' : 'Task'}
               </button>
             </form>
