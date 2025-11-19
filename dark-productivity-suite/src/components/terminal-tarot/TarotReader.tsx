@@ -126,7 +126,6 @@ const TarotReader: React.FC = () => {
           <div className={styles.githubInput}>
             <input
               type="text"
-              className={styles.githubUrlInput}
               placeholder="https://github.com/username/repository"
               value={githubUrl}
               onChange={handleGithubUrlChange}
@@ -136,7 +135,7 @@ const TarotReader: React.FC = () => {
               aria-describedby={error ? 'github-error' : undefined}
             />
             <button 
-              className={styles.githubSubmit}
+              className={`${styles.githubSubmit} button-primary`}
               onClick={handleGitHubReading}
               onMouseEnter={playUIHover}
               disabled={!githubUrl.trim()}
@@ -149,7 +148,7 @@ const TarotReader: React.FC = () => {
           
           <div className={styles.controls}>
             <button 
-              className={styles.demoButton}
+              className={`${styles.demoButton} button-secondary`}
               onClick={handleDemoReading}
               onMouseEnter={playUIHover}
               aria-label="Try demo reading with sample data"
@@ -206,7 +205,7 @@ const TarotReader: React.FC = () => {
 
           <div className={styles.actions}>
             <button 
-              className={styles.newReadingButton}
+              className={`${styles.newReadingButton} button-primary`}
               onClick={handleNewReading}
               aria-label="Generate a new tarot reading"
             >

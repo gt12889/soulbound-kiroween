@@ -100,7 +100,6 @@ export function TagManager({ tags, allTags, onTagsChange, placeholder = 'Add tag
             onFocus={() => inputValue.trim() && setShowSuggestions(suggestions.length > 0)}
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             placeholder={tags.length === 0 ? placeholder : ''}
-            className={styles.input}
           />
           {showSuggestions && (
             <div className={styles.suggestions}>

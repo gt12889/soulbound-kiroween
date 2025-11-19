@@ -155,7 +155,7 @@ export function PomodoroTimer() {
               className={styles.configInput}
             />
           </div>
-          <button onClick={handleSaveConfig} className={styles.saveButton}>
+          <button onClick={handleSaveConfig} className={`${styles.saveButton} button-primary`}>
             Save Configuration
           </button>
         </div>
@@ -225,13 +225,13 @@ export function PomodoroTimer() {
 
       <div className={styles.controls}>
         <button
-          className={`${styles.controlButton} ${styles.primary}`}
+          className={`${styles.controlButton} ${styles.primary} button-primary`}
           onClick={handleToggle}
         >
           {!isRunning ? '▶️ Start' : isPaused ? '▶️ Resume' : '⏸️ Pause'}
         </button>
         <button
-          className={styles.controlButton}
+          className={`${styles.controlButton} button-secondary`}
           onClick={reset}
           disabled={!isRunning && timeRemaining === totalDuration}
         >

@@ -30,13 +30,13 @@
 }
 
 .configButton {
-  background: transparent;
-  border: 1px solid var(--border-secondary);
-  color: var(--text-secondary);
+  /* Inherits global button styles */
+  background: transparent; /* Override default background */
+  border: 1px solid var(--border-secondary); /* Specific border */
+  color: var(--text-secondary); /* Specific color */
   font-size: 1.2rem;
   padding: 0.5rem;
   border-radius: 6px;
-  cursor: pointer;
   transition: all 0.3s ease;
 }
 
@@ -106,9 +106,10 @@
 }
 
 .configInput {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
+  /* Inherits global input styles */
+  background: var(--bg-primary); /* Override global background */
+  border: 1px solid var(--border-primary); /* Override global border */
+  color: var(--text-primary); /* Override global text color */
   padding: 0.5rem;
   border-radius: 4px;
   width: 80px;
@@ -123,18 +124,17 @@
 }
 
 .saveButton {
+  /* Inherits global button styles and will use .button-primary */
   width: 100%;
-  background: var(--accent-purple);
-  border: none;
-  color: var(--text-primary);
+  background: var(--accent-purple); /* Keep specific background */
+  border: none; /* Override global border */
+  color: var(--text-primary); /* Keep specific color */
   padding: 0.75rem;
-  border-radius: 6px;
-  cursor: pointer;
   font-weight: 600;
-  transition: all 0.3s ease;
 }
 
 .saveButton:hover {
+  /* Handled by global button:hover and .button-primary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 20px var(--glow-purple);
 }
@@ -146,16 +146,15 @@
 }
 
 .typeButton {
+  /* Inherits global button styles */
   flex: 1;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-secondary);
-  color: var(--text-secondary);
+  background: var(--bg-tertiary); /* Specific background */
+  border: 2px solid var(--border-secondary); /* Specific border */
+  color: var(--text-secondary); /* Specific color */
   padding: 0.75rem;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.3s ease;
 }
 
 .typeButton:hover:not(:disabled) {
@@ -339,16 +338,15 @@
 }
 
 .controlButton {
+  /* Inherits global button styles */
   flex: 1;
-  background: var(--bg-tertiary);
-  border: 2px solid var(--border-primary);
-  color: var(--text-primary);
+  background: var(--bg-tertiary); /* Specific background */
+  border: 2px solid var(--border-primary); /* Specific border */
+  color: var(--text-primary); /* Specific color */
   padding: 1rem;
   border-radius: 8px;
-  cursor: pointer;
   font-size: 1rem;
   font-weight: 600;
-  transition: all 0.3s ease;
 }
 
 .controlButton:hover:not(:disabled) {
@@ -358,11 +356,13 @@
 }
 
 .controlButton.primary {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple-light);
+  /* This will use .button-primary */
+  background: var(--accent-purple); /* Override global primary background */
+  border-color: var(--accent-purple-light); /* Override global primary border color */
 }
 
 .controlButton.primary:hover:not(:disabled) {
+  /* Handled by global button:hover and .button-primary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 20px var(--glow-purple);
 }

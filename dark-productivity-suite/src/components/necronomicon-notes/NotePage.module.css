@@ -291,6 +291,7 @@
 }
 
 .toolbarButton {
+  /* Inherits global button styles */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -302,7 +303,6 @@
   color: #b0b0b0;
   font-family: var(--font-serif);
   font-size: 1.2rem;
-  cursor: pointer;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
   min-width: 70px;
@@ -417,6 +417,7 @@
 }
 
 .sizeButton {
+  /* Inherits global button styles */
   padding: 0.5rem 0.75rem;
   background: rgba(157, 78, 221, 0.2);
   border: 1px solid rgba(157, 78, 221, 0.4);
@@ -424,8 +425,6 @@
   color: #e0e0e0;
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .sizeButton:hover {
@@ -450,11 +449,11 @@
 }
 
 .colorButton {
+  /* Inherits global button styles */
   width: 36px;
   height: 36px;
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
 }
@@ -489,6 +488,7 @@
 }
 
 .styleButton {
+  /* Inherits global button styles */
   padding: 0.5rem 0.75rem;
   background: rgba(157, 78, 221, 0.2);
   border: 1px solid rgba(157, 78, 221, 0.4);
@@ -496,8 +496,6 @@
   color: #e0e0e0;
   font-size: 1rem;
   font-family: var(--font-serif);
-  cursor: pointer;
-  transition: all 0.2s ease;
   min-width: 40px;
 }
 
@@ -570,19 +568,15 @@
 }
 
 .dismissButton {
+  /* Inherits global button styles */
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   color: #b0b0b0;
   font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .dismissButton:hover {

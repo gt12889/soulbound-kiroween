@@ -93,7 +93,7 @@ const ForestHub: React.FC = () => {
     <div className={styles.forestHub}>
       <div className={styles.sectionsContainer}>
         {TREE_SECTIONS.map((section) => (
-          <div
+          <button
             key={section.id}
             className={styles.section}
             style={{
@@ -103,8 +103,6 @@ const ForestHub: React.FC = () => {
             onClick={() => handleSectionClick(section.route)}
             onMouseEnter={playUIHover}
             onKeyDown={(e) => handleKeyDown(e, section.route)}
-            role="button"
-            tabIndex={0}
             aria-label={`Navigate to ${section.title}: ${section.description}`}
           >
             <div className={styles.iconHint}>
@@ -115,7 +113,7 @@ const ForestHub: React.FC = () => {
                 {section.title}
               </div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>

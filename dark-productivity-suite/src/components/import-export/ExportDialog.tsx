@@ -161,7 +161,6 @@ export function ExportDialog({
                   value="json"
                   checked={format === 'json'}
                   onChange={(e) => setFormat(e.target.value as ExportFormat)}
-                  className={styles.radioInput}
                 />
                 <div className={styles.formatContent}>
                   <div className={styles.formatIcon}>📄</div>
@@ -181,7 +180,6 @@ export function ExportDialog({
                   value="markdown"
                   checked={format === 'markdown'}
                   onChange={(e) => setFormat(e.target.value as ExportFormat)}
-                  className={styles.radioInput}
                 />
                 <div className={styles.formatContent}>
                   <div className={styles.formatIcon}>📝</div>
@@ -201,7 +199,6 @@ export function ExportDialog({
                   value="csv"
                   checked={format === 'csv'}
                   onChange={(e) => setFormat(e.target.value as ExportFormat)}
-                  className={styles.radioInput}
                 />
                 <div className={styles.formatContent}>
                   <div className={styles.formatIcon}>📊</div>
@@ -225,7 +222,6 @@ export function ExportDialog({
                   type="checkbox"
                   checked={includeNotes}
                   onChange={(e) => setIncludeNotes(e.target.checked)}
-                  className={styles.checkbox}
                 />
                 <span className={styles.checkboxText}>
                   Notes <span className={styles.count}>({notes.length})</span>
@@ -237,7 +233,6 @@ export function ExportDialog({
                   type="checkbox"
                   checked={includeTasks}
                   onChange={(e) => setIncludeTasks(e.target.checked)}
-                  className={styles.checkbox}
                 />
                 <span className={styles.checkboxText}>
                   Tasks <span className={styles.count}>({tasks.length})</span>
@@ -249,7 +244,6 @@ export function ExportDialog({
                   type="checkbox"
                   checked={includeSettings}
                   onChange={(e) => setIncludeSettings(e.target.checked)}
-                  className={styles.checkbox}
                 />
                 <span className={styles.checkboxText}>Settings</span>
               </label>
@@ -259,7 +253,6 @@ export function ExportDialog({
                   type="checkbox"
                   checked={includeTarotReadings}
                   onChange={(e) => setIncludeTarotReadings(e.target.checked)}
-                  className={styles.checkbox}
                 />
                 <span className={styles.checkboxText}>
                   Tarot Readings <span className={styles.count}>({tarotReadings.length})</span>
@@ -271,7 +264,6 @@ export function ExportDialog({
                   type="checkbox"
                   checked={includePomodoroSessions}
                   onChange={(e) => setIncludePomodoroSessions(e.target.checked)}
-                  className={styles.checkbox}
                 />
                 <span className={styles.checkboxText}>
                   Pomodoro Sessions <span className={styles.count}>({pomodoroSessions.length})</span>
@@ -287,7 +279,6 @@ export function ExportDialog({
                 type="checkbox"
                 checked={useDateRange}
                 onChange={(e) => setUseDateRange(e.target.checked)}
-                className={styles.checkbox}
               />
               <span className={styles.checkboxText}>Filter by Date Range</span>
             </label>
@@ -300,7 +291,7 @@ export function ExportDialog({
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className={styles.dateField}
+
                   />
                 </div>
                 <div className={styles.dateInput}>
@@ -309,7 +300,7 @@ export function ExportDialog({
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className={styles.dateField}
+
                   />
                 </div>
               </div>
@@ -323,7 +314,6 @@ export function ExportDialog({
                 type="checkbox"
                 checked={encrypt}
                 onChange={(e) => setEncrypt(e.target.checked)}
-                className={styles.checkbox}
               />
               <span className={styles.checkboxText}>Encrypt Export</span>
             </label>
@@ -337,7 +327,6 @@ export function ExportDialog({
                     value={encryptionPassword}
                     onChange={(e) => setEncryptionPassword(e.target.value)}
                     placeholder="Enter password"
-                    className={styles.passwordInput}
                   />
                 </label>
                 <p className={styles.encryptionNote}>
@@ -374,11 +363,11 @@ export function ExportDialog({
 
           {/* Actions */}
           <div className={styles.actions}>
-            <button className={styles.cancelButton} onClick={handleClose} disabled={isExporting}>
+            <button className={`${styles.cancelButton} button-secondary`} onClick={handleClose} disabled={isExporting}>
               Cancel
             </button>
             <button
-              className={`${styles.exportButton} ${isExporting ? styles.exporting : ''}`}
+              className={`${styles.exportButton} ${isExporting ? styles.exporting : ''} button-primary`}
               onClick={handleExport}
               disabled={isExporting || getTotalItems() === 0}
             >

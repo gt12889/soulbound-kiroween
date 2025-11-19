@@ -116,14 +116,14 @@ export function ArchiveSuggestions() {
                 </div>
                 <div className={styles.taskActions}>
                   <button
-                    className={styles.archiveButton}
+                    className={`${styles.archiveButton} button-primary`}
                     onClick={() => handleArchiveOne(task.id)}
                     onMouseEnter={playUIHover}
                   >
                     Archive
                   </button>
                   <button
-                    className={styles.dismissButton}
+                    className={`${styles.dismissButton} button-secondary`}
                     onClick={() => handleDismiss(task.id)}
                     onMouseEnter={playUIHover}
                   >
@@ -137,14 +137,14 @@ export function ArchiveSuggestions() {
 
         <div className={styles.footer}>
           <button
-            className={styles.archiveAllButton}
+            className={`${styles.archiveAllButton} button-primary`}
             onClick={handleArchiveAll}
             onMouseEnter={playUIHover}
           >
             Archive All
           </button>
           <button
-            className={styles.dismissAllButton}
+            className={`${styles.dismissAllButton} button-secondary`}
             onClick={handleDismissAll}
             onMouseEnter={playUIHover}
           >

@@ -48,14 +48,14 @@
 }
 
 .actionButton {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  /* Inherits global button styles */
+  background: transparent; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  padding: 0.25rem 0.5rem; /* Specific padding */
+  border-radius: 4px; /* Specific border-radius */
+  font-size: 1rem; /* Specific font size */
   transition: all 0.2s ease;
-  font-size: 1rem;
 }
 
 .actionButton:hover {

@@ -39,7 +39,7 @@ const ThemeSelector: React.FC = () => {
           const isPreview = previewTheme?.id === theme.id;
           
           return (
-            <div
+            <button
               key={theme.id}
               className={`${styles.themeCard} ${isActive ? styles.active : ''} ${isPreview ? styles.preview : ''}`}
               onClick={() => handleThemeClick(theme.id as ThemeId)}
@@ -105,7 +105,7 @@ const ThemeSelector: React.FC = () => {
                 <h4 className={styles.themeName}>{theme.name}</h4>
                 {isActive && <span className={styles.activeIndicator}>Active</span>}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

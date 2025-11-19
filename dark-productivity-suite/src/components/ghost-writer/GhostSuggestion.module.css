@@ -1,16 +1,5 @@
 .ghostSuggestion {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  background: rgba(77, 45, 110, 0.4);
-  border: 1px solid rgba(77, 45, 110, 0.6);
-  border-radius: 6px;
-  color: rgba(224, 224, 224, 0.9);
-  font-family: 'Lora', 'Merriweather', Georgia, serif;
-  font-size: 1rem;
-  font-style: italic;
-  cursor: pointer;
+  /* Inherits global button styles */
   opacity: 0;
   transform: translateY(-5px);
   transition: 

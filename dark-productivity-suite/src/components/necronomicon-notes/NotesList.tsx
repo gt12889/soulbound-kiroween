@@ -141,11 +141,11 @@ const NotesList: React.FC<NotesListProps> = ({ onNoteSelect, selectedNoteId }) =
       <div className={styles.header}>
         <h3 className={styles.title}>Inscriptions</h3>
         <div className={styles.headerButtons}>
-          <button className={styles.createButton} onClick={handleCreateNote} title="Create new note">
+          <button className={`${styles.createButton} button-primary`} onClick={handleCreateNote} title="Create new note">
             <span className={styles.createIcon}>+</span>
           </button>
           <button 
-            className={`${styles.bulkModeButton} ${bulkSelectionMode ? styles.active : ''}`}
+            className={`${styles.bulkModeButton} ${bulkSelectionMode ? styles.active : ''} button-primary`}
             onClick={handleToggleBulkMode}
             title={bulkSelectionMode ? 'Exit bulk selection mode' : 'Enter bulk selection mode'}
           >
@@ -159,14 +159,14 @@ const NotesList: React.FC<NotesListProps> = ({ onNoteSelect, selectedNoteId }) =
         <div className={styles.bulkToolbar}>
           <div className={styles.bulkToolbarTop}>
             <button
-              className={styles.bulkButton}
+              className={`${styles.bulkButton} button-secondary`}
               onClick={handleSelectAll}
               aria-label="Select all notes"
             >
               Select All
             </button>
             <button
-              className={styles.bulkButton}
+              className={`${styles.bulkButton} button-secondary`}
               onClick={handleSelectNone}
               aria-label="Clear selection"
               disabled={!hasSelection}
@@ -182,14 +182,14 @@ const NotesList: React.FC<NotesListProps> = ({ onNoteSelect, selectedNoteId }) =
               </div>
               <div className={styles.bulkActions}>
                 <button
-                  className={styles.bulkActionButton}
+                  className={`${styles.bulkActionButton} button-secondary`}
                   onClick={handleBulkTagClick}
                   aria-label="Add tags to selected notes"
                 >
                   🏷️ Tag
                 </button>
                 <button
-                  className={`${styles.bulkActionButton} ${styles.destructive}`}
+                  className={`${styles.bulkActionButton} button-danger`}
                   onClick={handleBulkDeleteClick}
                   aria-label="Delete selected notes"
                 >
@@ -224,7 +224,6 @@ const NotesList: React.FC<NotesListProps> = ({ onNoteSelect, selectedNoteId }) =
                 {bulkSelectionMode && (
                   <input
                     type="checkbox"
-                    className={styles.selectionCheckbox}
                     checked={isSelected(note.id)}
                     onChange={() => toggleSelection(note.id)}
                     onClick={(e) => e.stopPropagation()}

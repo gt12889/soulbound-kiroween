@@ -31,6 +31,7 @@
 }
 
 .createButton {
+  /* Inherits global button styles and will use .button-primary */
   width: 36px;
   height: 36px;
   background: linear-gradient(135deg, var(--accent-purple-dark), var(--accent-purple));
@@ -38,15 +39,10 @@
   border-radius: 50%;
   color: var(--text-primary);
   font-size: 1.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.1s ease-in-out;
-  box-shadow: 0 2px 8px var(--shadow-medium);
 }
 
 .createButton:hover {
+  /* Handled by global button:hover and .button-primary:hover */
   background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
   box-shadow: 0 0 15px var(--glow-purple);
   transform: scale(1.05);
@@ -149,18 +145,15 @@
 }
 
 .deleteButton {
+  /* Inherits global button styles */
   width: 24px;
   height: 24px;
-  background: transparent;
-  border: 1px solid transparent;
+  background: transparent; /* Specific background */
+  border: 1px solid transparent; /* Specific border */
   border-radius: 4px;
   color: var(--text-secondary);
   font-size: 1.5rem;
   line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   opacity: 0;
   transition: all 0.1s ease-in-out;
   flex-shrink: 0;
@@ -232,19 +225,14 @@
 }
 
 .bulkModeButton {
+  /* Inherits global button styles and will use .button-primary */
   width: 36px;
   height: 36px;
-  background: var(--highlight-green);
-  border: 1px solid var(--highlight-green-light);
+  background: var(--highlight-green); /* Specific background */
+  border: 1px solid var(--highlight-green-light); /* Specific border */
   border-radius: 50%;
   color: var(--text-primary);
   font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--timing-hover) ease-in-out;
-  box-shadow: 0 2px 8px var(--shadow-medium);
 }
 
 .bulkModeButton:hover {
@@ -275,26 +263,25 @@
 }
 
 .bulkButton {
+  /* Inherits global button styles and will use .button-secondary */
   flex: 1;
   padding: 0.5rem;
-  background: var(--accent-purple);
-  border: 1px solid var(--accent-purple-light);
+  background: var(--accent-purple); /* Specific background */
+  border: 1px solid var(--accent-purple-light); /* Specific border */
   border-radius: 4px;
   color: var(--text-primary);
   font-family: var(--font-header);
   font-size: 0.8rem;
-  cursor: pointer;
-  transition: all var(--timing-hover) ease-in-out;
 }
 
 .bulkButton:hover:not(:disabled) {
+  /* Handled by global button:hover and .button-secondary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 10px var(--glow-purple);
 }
 
 .bulkButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .selectionCount {
@@ -313,23 +300,18 @@
 }
 
 .bulkActionButton {
+  /* Inherits global button styles and will use .button-secondary/.button-danger */
   flex: 1;
-  padding: 0.5rem;
-  background: var(--accent-purple);
-  border: 1px solid var(--accent-purple-light);
+  background: var(--accent-purple); /* Specific background */
+  border: 1px solid var(--accent-purple-light); /* Specific border */
   border-radius: 4px;
   color: var(--text-primary);
   font-family: var(--font-header);
   font-size: 0.8rem;
-  cursor: pointer;
-  transition: all var(--timing-hover) ease-in-out;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
 }
 
 .bulkActionButton:hover {
+  /* Handled by global button:hover and .button-secondary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 10px var(--glow-purple);
 }
@@ -340,17 +322,49 @@
 }
 
 .bulkActionButton.destructive:hover {
+  /* Handled by global .button-danger:hover */
   background: var(--warning-red-light);
   box-shadow: 0 0 10px var(--glow-red);
 }
 
 .selectionCheckbox {
+  /* Inherits global input styles for checkboxes */
   width: 18px;
   height: 18px;
   margin-right: 0.75rem;
   cursor: pointer;
   accent-color: var(--accent-purple);
   flex-shrink: 0;
+}
+
+.deleteButton {
+  /* Inherits global button styles */
+  width: 24px;
+  height: 24px;
+  background: transparent; /* Specific background */
+  border: 1px solid transparent; /* Specific border */
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  line-height: 1;
+  opacity: 0;
+  transition: all 0.1s ease-in-out;
+  flex-shrink: 0;
+}
+
+.noteItem:hover .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton:hover {
+  background: var(--warning-red);
+  border-color: var(--warning-red-light);
+  color: var(--warning-red-light);
+  transform: scale(1.1);
+}
+
+.deleteButton:active {
+  transform: scale(0.9);
 }
 
 .noteItem.bulkSelected {

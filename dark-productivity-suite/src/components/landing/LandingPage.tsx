@@ -57,7 +57,7 @@ const LandingPage: React.FC = () => {
             Three paths lie before you, each leading to ancient powers. 
             Choose wisely, traveler, for the forest remembers all who enter.
           </p>
-          <button className={styles.ctaButton} onClick={handleGetStarted}>
+          <button className={`${styles.ctaButton} button-primary`} onClick={handleGetStarted}>
             <span className={styles.ctaIcon}>🌙</span>
             <span>Enter the Forest</span>
           </button>
@@ -77,18 +77,16 @@ const LandingPage: React.FC = () => {
         <h2 className={styles.sectionTitle}>Three Paths Through the Woods</h2>
         <div className={styles.featureGrid}>
           {features.map((feature) => (
-            <div
+            <button
               key={feature.path}
               className={styles.featureCard}
               onClick={() => handleFeatureClick(feature.path)}
-              role="button"
-              tabIndex={0}
             >
               <div className={styles.featureIcon}>{feature.icon}</div>
               <h3 className={styles.featureTitle}>{feature.title}</h3>
               <p className={styles.featureDescription}>{feature.description}</p>
               <div className={styles.featureArrow}>→</div>
-            </div>
+            </button>
           ))}
         </div>
       </section>
@@ -149,7 +147,7 @@ const LandingPage: React.FC = () => {
       {/* Footer CTA */}
       <section className={styles.footerCta}>
         <h2 className={styles.footerTitle}>The forest awaits, traveler...</h2>
-        <button className={styles.ctaButton} onClick={handleGetStarted}>
+        <button className={`${styles.ctaButton} button-primary`} onClick={handleGetStarted}>
           <span className={styles.ctaIcon}>🌲</span>
           <span>Step Into the Woods</span>
         </button>

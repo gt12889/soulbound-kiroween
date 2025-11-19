@@ -134,14 +134,12 @@ function TombstoneComponent({
   };
 
   return (
-    <div
+    <button
       className={tombstoneClasses}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       onClick={isArchived ? undefined : handleToggleComplete}
       onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={isArchived ? -1 : 0}
       aria-label={`${task.title} - ${task.completed ? 'Completed' : 'Active'} task. Press Enter or Space to ${task.completed ? 'restore' : 'complete'}.`}
     >
       {/* Bulk selection checkbox - Requirement 9.1 */}
@@ -172,6 +170,9 @@ function TombstoneComponent({
         {/* RIP text for completed tasks */}
         {task.completed && <div className={styles.rip}>R.I.P.</div>}
       </div>
+      
+      {/* Ground base */}
+      <div className={styles.ground}></div>
 
       {/* Ghostly tooltip on hover */}
       {showTooltip && (
@@ -202,14 +203,14 @@ function TombstoneComponent({
               <>
                 {task.completed && onArchive && (
                   <button
-                    className={styles.archiveButton}
+                    className={`${styles.archiveButton} button-primary`}
                     onClick={handleArchiveClick}
                   >
                     Archive
                   </button>
                 )}
                 <button
-                  className={styles.deleteButton}
+                  className={`${styles.deleteButton} button-danger`}
                   onClick={handleDeleteClick}
                 >
                   Remove
@@ -245,7 +246,7 @@ function TombstoneComponent({
         showDontAskAgain={true}
         dontAskAgainKey="task-archive"
       />
-    </div>
+    </button>
   );
 }
 

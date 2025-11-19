@@ -180,7 +180,6 @@ const QuickCapture: React.FC<QuickCaptureProps> = ({ isOpen, onClose }) => {
                   ref={inputRef}
                   id="quick-capture-title"
                   type="text"
-                  className={styles.input}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={captureType === 'note' ? 'Enter note title...' : 'Enter task title...'}
@@ -195,7 +194,6 @@ const QuickCapture: React.FC<QuickCaptureProps> = ({ isOpen, onClose }) => {
                 </label>
                 <textarea
                   id="quick-capture-content"
-                  className={styles.textarea}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder={captureType === 'note' ? 'Enter note content...' : 'Enter task description...'}
@@ -206,7 +204,7 @@ const QuickCapture: React.FC<QuickCaptureProps> = ({ isOpen, onClose }) => {
               {/* Submit button */}
               <button 
                 type="submit" 
-                className={styles.submitButton}
+                className={`${styles.submitButton} button-primary`}
                 aria-label={`Capture ${captureType === 'note' ? 'note' : 'task'}`}
               >
                 Capture {captureType === 'note' ? 'Note' : 'Task'}

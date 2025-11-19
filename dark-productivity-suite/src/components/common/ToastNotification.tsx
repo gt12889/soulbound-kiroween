@@ -53,7 +53,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast }) => {
       </div>
       {toast.action && (
         <button
-          className={styles.action}
+          className={`${styles.action} button-secondary`}
           onClick={(e) => {
             e.stopPropagation();
             handleActionClick();

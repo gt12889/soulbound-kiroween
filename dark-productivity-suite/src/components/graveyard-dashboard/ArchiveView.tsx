@@ -111,7 +111,6 @@ export function ArchiveView() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search archived tasks..."
-            className={styles.searchInput}
           />
         </div>
 
@@ -161,7 +160,7 @@ export function ArchiveView() {
               
               <div className={styles.actions}>
                 <button
-                  className={styles.restoreButton}
+                  className={`${styles.restoreButton} button-primary`}
                   onClick={() => handleRestore(task.id)}
                   onMouseEnter={playUIHover}
                   title="Restore task"
@@ -170,7 +169,7 @@ export function ArchiveView() {
                 </button>
                 
                 <button
-                  className={styles.deleteButton}
+                  className={`${styles.deleteButton} button-danger`}
                   onClick={() => handleDeleteClick(task.id)}
                   onMouseEnter={playUIHover}
                   title="Delete permanently"

@@ -19,15 +19,14 @@
 }
 
 .ghostButton {
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
-  border: 1px solid rgba(157, 78, 221, 0.4);
+  /* Inherits global button styles and will use .button-primary */
+  padding: 0.75rem 1.5rem; /* Specific padding */
+  background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%); /* Specific background */
+  border: 1px solid rgba(157, 78, 221, 0.4); /* Specific border */
   border-radius: 6px;
-  color: var(--text-primary, #e0e0e0);
+  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.5rem;

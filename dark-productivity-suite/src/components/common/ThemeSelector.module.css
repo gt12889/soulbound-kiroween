@@ -36,7 +36,6 @@
   border: 2px solid var(--border-secondary);
   border-radius: 8px;
   padding: 1.5rem;
-  cursor: pointer;
   transition: all 500ms var(--ease-in-out); /* Smooth theme transition (Requirement 10.2) */
   position: relative;
   overflow: hidden;

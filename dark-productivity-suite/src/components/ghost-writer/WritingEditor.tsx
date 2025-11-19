@@ -160,7 +160,7 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
     <div className={styles.editorContainer}>
       <div className={styles.toolbar}>
         <button
-          className={styles.ghostButton}
+          className={`${styles.ghostButton} button-primary`}
           onClick={handleOpenModal}
           disabled={currentText.trim().length === 0}
           title="Summon Ghost Writer (Ctrl+G)"

@@ -69,19 +69,16 @@
 }
 
 .closeButton {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 2rem;
-  cursor: pointer;
+  /* Inherits global button styles */
+  background: none; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  font-size: 1.5rem; /* Specific font size */
   padding: 0;
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 4px; /* Unique shape */
   transition: all 0.2s ease;
-  border-radius: 4px;
 }
 
 .closeButton:hover {
@@ -131,27 +128,25 @@
 }
 
 .browseButton {
-  background: var(--accent-purple);
-  color: var(--text-primary);
-  border: 1px solid var(--accent-purple-light);
+  /* Inherits global button styles and will use .button-primary */
+  background: var(--accent-purple); /* Keep specific background */
+  color: var(--text-primary); /* Keep specific color */
+  border: 1px solid var(--accent-purple-light); /* Keep specific border */
   padding: 0.75rem 2rem;
   font-size: 1rem;
   border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Cinzel', serif;
   margin: 1rem 0;
 }
 
 .browseButton:hover:not(:disabled) {
+  /* Handled by global button:hover and .button-primary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 15px var(--glow-purple);
   transform: translateY(-2px);
 }
 
 .browseButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .fileInput {
@@ -369,9 +364,10 @@
 }
 
 .radioInput {
+  /* Inherits global input styles for radio buttons */
   margin-top: 0.25rem;
   cursor: pointer;
-  accent-color: var(--accent-purple);
+  accent-color: var(--accent-purple); /* Keep for thematic coloring */
 }
 
 .radioText {
@@ -396,19 +392,19 @@
 
 .cancelButton,
 .importButton {
+  /* These will inherit global button styles */
   padding: 0.75rem 2rem;
   font-size: 1rem;
   border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Cinzel', serif;
-  border: 1px solid;
+  font-family: 'Cinzel', serif; /* Keep specific font */
+  border: 1px solid; /* Keep border */
 }
 
 .cancelButton {
-  background: transparent;
-  color: var(--text-secondary);
-  border-color: var(--border-primary);
+  /* Will use .button-secondary */
+  background: transparent; /* Override global secondary background */
+  color: var(--text-secondary); /* Override global secondary text color */
+  border-color: var(--border-primary); /* Override global secondary border */
 }
 
 .cancelButton:hover {
@@ -417,9 +413,10 @@
 }
 
 .importButton {
-  background: var(--accent-purple);
-  color: var(--text-primary);
-  border-color: var(--accent-purple-light);
+  /* Will use .button-primary */
+  background: var(--accent-purple); /* Override global primary background */
+  color: var(--text-primary); /* Override global primary text color */
+  border-color: var(--accent-purple-light); /* Override global primary border color */
 }
 
 .importButton:hover {

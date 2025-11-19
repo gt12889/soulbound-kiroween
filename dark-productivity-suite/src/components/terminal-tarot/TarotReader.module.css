@@ -40,27 +40,22 @@
   margin: 2rem 0;
 }
 
-.generateButton,
 .demoButton,
 .newReadingButton {
+  /* These will inherit global button styles */
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-family: 'Cinzel', 'Georgia', serif;
-  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
   color: var(--text-primary);
   border: 2px solid var(--accent-purple-light);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  transition: all 0.25s ease-in-out;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
-.generateButton:hover,
 .demoButton:hover,
 .newReadingButton:hover {
   background: linear-gradient(135deg, #4a2d6e 0%, #6e3d8e 100%);
@@ -126,6 +121,7 @@
 }
 
 .githubUrlInput {
+  /* Inherits global input styles */
   flex: 1;
   padding: 1rem 1.25rem;
   font-size: 1.05rem;
@@ -150,6 +146,7 @@
 }
 
 .githubSubmit {
+  /* Inherits global button styles and will use .button-primary */
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-family: 'Cinzel', 'Georgia', serif;
@@ -157,8 +154,6 @@
   color: var(--text-primary);
   border: 2px solid var(--accent-purple-light);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
   letter-spacing: 2px;
   text-transform: uppercase;
   white-space: nowrap;
@@ -168,6 +163,7 @@
 }
 
 .githubSubmit:hover {
+  /* Handled by global button:hover and .button-primary:hover */
   background: linear-gradient(135deg, #4a2d6e 0%, #6e3d8e 100%);
   box-shadow: 0 0 20px rgba(77, 45, 110, 0.6);
   transform: translateY(-2px);

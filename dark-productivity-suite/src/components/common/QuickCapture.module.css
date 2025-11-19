@@ -97,18 +97,15 @@
 }
 
 .closeButton {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  cursor: pointer;
+  /* Inherits global button styles */
+  background: transparent; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  font-size: 1.5rem; /* Specific font size for close icon */
   padding: 0.5rem;
   width: 36px;
   height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  border-radius: 50%; /* Unique shape */
   transition: all var(--timing-hover) var(--ease-in-out);
 }
 
@@ -131,20 +128,14 @@
 }
 
 .typeButton {
+  /* Inherits global button styles for font, transitions, etc. */
   flex: 1;
   padding: 0.75rem 1rem;
   background: var(--bg-secondary);
   border: 2px solid var(--border-primary);
   border-radius: 8px;
   color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all var(--timing-hover) var(--ease-in-out);
+  /* font-family, font-size, cursor, display, align-items, justify-content, gap, transition handled globally */
 }
 
 .typeButton:hover {
@@ -182,15 +173,7 @@
 
 .input,
 .textarea {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  transition: all var(--timing-hover) var(--ease-in-out);
+  /* Styling is now handled by global input/textarea styles in App.css */
 }
 
 .input:focus,
@@ -203,8 +186,7 @@
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
+  /* Handled by global input/textarea placeholder styles */
 }
 
 .textarea {
@@ -214,19 +196,8 @@
 
 /* Submit button */
 .submitButton {
-  width: 100%;
-  padding: 1rem;
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
-  border: none;
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-family: var(--font-header);
-  font-size: 1rem;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  transition: all var(--timing-hover) var(--ease-in-out);
-  position: relative;
-  overflow: hidden;
+  /* Inherits global button styles and will use .button-primary */
+  width: 100%; /* Keep layout-specific property */
 }
 
 .submitButton::before {
@@ -248,12 +219,11 @@
 }
 
 .submitButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px var(--glow-purple);
+  /* Handled by global button:hover and .button-primary:hover */
 }
 
 .submitButton:active {
-  transform: translateY(0);
+  /* Handled by global button:active */
 }
 
 /* Hint text */

@@ -43,15 +43,7 @@
 }
 
 .searchInput {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-family: 'Lora', serif;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  /* Styling is now handled by global input styles in App.css */
 }
 
 .searchInput:focus {
@@ -61,151 +53,43 @@
 }
 
 .searchInput::placeholder {
-  color: var(--text-muted);
-  font-style: italic;
+  /* Handled by global input placeholder styles */
 }
 
 .filterSection {
   width: 100%;
 }
 
-/* Stats Section */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-bottom: 2rem;
-  padding: 1.5rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-}
-
-.statItem {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.statValue {
-  font-family: 'Cinzel', serif;
-  font-size: 2rem;
-  color: var(--accent-purple-light);
-  text-shadow: 0 0 10px var(--glow-purple);
-}
-
-.statLabel {
-  font-family: 'Lora', serif;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Tombstone Grid */
-.tombstoneGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
-}
-
-.tombstoneWrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-/* Actions */
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  padding: 0.5rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.tombstoneWrapper:hover .actions {
-  opacity: 1;
-}
-
-.restoreButton,
-.deleteButton {
+.restoreButton {
+  /* Inherits global button styles and will use .button-primary */
   padding: 0.5rem 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
+  border: 1px solid var(--border-primary); /* Keep specific border */
   border-radius: 4px;
-  color: var(--text-primary);
-  font-family: 'Lora', serif;
+  font-family: 'Lora', serif; /* Keep specific font */
   font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .restoreButton:hover {
-  background: var(--highlight-green);
-  border-color: var(--highlight-green-light);
+  /* Handled by global button:hover and .button-primary:hover */
+  background: var(--highlight-green); /* Override global primary background */
+  border-color: var(--highlight-green-light); /* Override global primary border color */
   box-shadow: 0 0 10px var(--highlight-green);
   transform: translateY(-2px);
 }
 
+.deleteButton {
+  /* Will use .button-danger */
+  background: var(--warning-red); /* Override global danger background */
+  color: var(--text-primary); /* Override global danger color */
+}
+
 .deleteButton:hover {
-  background: var(--warning-red);
-  border-color: var(--warning-red-light);
+  /* Handled by global button:hover and .button-danger:hover, but specific box-shadow and transform retained */
   box-shadow: 0 0 10px var(--glow-red);
   transform: translateY(-2px);
 }
 
-/* Delete Confirmation */
-.deleteConfirm {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
 
-.confirmText {
-  font-family: 'Lora', serif;
-  font-size: 0.9rem;
-  color: var(--warning-red-light);
-  font-style: italic;
-}
-
-.confirmButton,
-.cancelButton {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  font-family: 'Lora', serif;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.confirmButton {
-  background: var(--warning-red);
-  color: var(--text-primary);
-}
-
-.confirmButton:hover {
-  background: var(--warning-red-dark);
-  box-shadow: 0 0 10px var(--glow-red);
-}
-
-.cancelButton {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.cancelButton:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--accent-purple);
-}
 
 /* Empty State */
 .emptyState {

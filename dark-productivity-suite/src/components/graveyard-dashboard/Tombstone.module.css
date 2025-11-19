@@ -54,12 +54,12 @@
 
 /* Stone structure */
 .stone {
-  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
-  border: 2px solid var(--border-secondary);
+  background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border: 2px solid #4a4a4a;
   border-radius: 50% 50% 0 0 / 20% 20% 0 0;
   padding: 1.5rem 1rem;
   box-shadow: 
-    0 4px 8px var(--shadow-medium),
+    0 4px 8px rgba(0, 0, 0, 0.5),
     inset 0 2px 4px rgba(255, 255, 255, 0.1);
   position: relative;
   min-height: 120px;
@@ -70,76 +70,30 @@
   gap: 0.5rem;
 }
 
-/* Size based on priority/difficulty - Requirement 4.4 */
-/* Low difficulty = small tombstone */
+/* Size based on priority - Requirement 4.4 */
 .priorityLow .stone {
-  min-height: 90px;
-  width: 90px;
-  font-size: 0.75rem;
-  padding: 1rem 0.75rem;
+  min-height: 100px;
+  width: 100px;
+  font-size: 0.8rem;
 }
 
-.priorityLow .cross {
-  width: 20px;
-  height: 20px;
-}
-
-.priorityLow .crossVertical {
-  width: 3px;
-  height: 20px;
-}
-
-.priorityLow .crossHorizontal {
-  width: 14px;
-  height: 3px;
-  top: 6px;
-}
-
-/* Medium difficulty = medium tombstone */
 .priorityMedium .stone {
-  min-height: 130px;
-  width: 130px;
-  font-size: 0.95rem;
-  padding: 1.5rem 1rem;
+  min-height: 120px;
+  width: 120px;
+  font-size: 0.9rem;
 }
 
-/* High difficulty = large imposing tombstone */
 .priorityHigh .stone {
-  min-height: 180px;
-  width: 180px;
-  font-size: 1.1rem;
+  min-height: 150px;
+  width: 150px;
+  font-size: 1rem;
   border-width: 3px;
-  padding: 2rem 1.25rem;
-  box-shadow: 
-    0 6px 12px var(--shadow-heavy),
-    inset 0 2px 6px rgba(255, 255, 255, 0.15);
-}
-
-.priorityHigh .cross {
-  width: 40px;
-  height: 40px;
-}
-
-.priorityHigh .crossVertical {
-  width: 5px;
-  height: 40px;
-}
-
-.priorityHigh .crossHorizontal {
-  width: 26px;
-  height: 5px;
-  top: 10px;
-}
-
-.priorityHigh .title {
-  font-size: 1.1em;
-  font-weight: 700;
 }
 
 /* Weathered texture for completed tombstones - Requirement 4.3 */
 .completed .stone {
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 50%, #0a0a0a 100%);
-  border-color: var(--border-secondary);
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  border-color: #2a2a2a;
   opacity: 0.7;
   filter: grayscale(0.5);
 }
@@ -178,8 +132,8 @@
   transform: translateX(-50%);
   width: 4px;
   height: 30px;
-  background: var(--text-tertiary);
-  box-shadow: 0 2px 4px var(--shadow-medium);
+  background: #6a6a6a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .crossHorizontal {
@@ -189,14 +143,14 @@
   transform: translateX(-50%);
   width: 20px;
   height: 4px;
-  background: var(--text-tertiary);
-  box-shadow: 0 2px 4px var(--shadow-medium);
+  background: #6a6a6a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Engraved title - Requirement 4.1 */
 .title {
   font-family: 'Cinzel', serif;
-  color: var(--text-secondary);
+  color: #8a8a8a;
   text-align: center;
   text-shadow: 
     1px 1px 2px rgba(0, 0, 0, 0.8),
@@ -210,7 +164,7 @@
 .rip {
   font-family: 'Cinzel', serif;
   font-size: 0.7em;
-  color: var(--text-tertiary);
+  color: #6a6a6a;
   margin-top: 0.5rem;
   letter-spacing: 2px;
 }
@@ -239,16 +193,16 @@
 }
 
 .tooltipContent {
-  background: var(--bg-primary);
-  border: 2px solid var(--border-primary);
+  background: rgba(20, 10, 30, 0.95);
+  border: 2px solid #4a2d6e;
   border-radius: 8px;
   padding: 1rem;
   min-width: 200px;
   max-width: 300px;
   box-shadow: 
-    0 0 20px var(--glow-purple),
-    0 0 40px var(--shadow-medium),
-    inset 0 0 20px var(--shadow-light);
+    0 0 20px rgba(74, 45, 110, 0.5),
+    0 0 40px rgba(74, 45, 110, 0.3),
+    inset 0 0 20px rgba(74, 45, 110, 0.2);
   pointer-events: auto;
   animation: ghostlyGlow 2s ease-in-out infinite;
 }
@@ -256,28 +210,28 @@
 @keyframes ghostlyGlow {
   0%, 100% {
     box-shadow: 
-      0 0 20px var(--glow-purple),
-      0 0 40px var(--shadow-medium),
-      inset 0 0 20px var(--shadow-light);
+      0 0 20px rgba(74, 45, 110, 0.5),
+      0 0 40px rgba(74, 45, 110, 0.3),
+      inset 0 0 20px rgba(74, 45, 110, 0.2);
   }
   50% {
     box-shadow: 
-      0 0 30px var(--glow-purple),
-      0 0 60px var(--shadow-heavy),
-      inset 0 0 30px var(--shadow-medium);
+      0 0 30px rgba(74, 45, 110, 0.7),
+      0 0 60px rgba(74, 45, 110, 0.5),
+      inset 0 0 30px rgba(74, 45, 110, 0.3);
   }
 }
 
 .tooltipContent h4 {
   margin: 0 0 0.5rem 0;
-  color: var(--text-primary);
+  color: #e0e0e0;
   font-family: 'Cinzel', serif;
   font-size: 1rem;
 }
 
 .tooltipContent p {
   margin: 0 0 0.75rem 0;
-  color: var(--text-secondary);
+  color: #b0b0b0;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -287,43 +241,25 @@
   flex-direction: column;
   gap: 0.25rem;
   font-size: 0.8rem;
-  color: var(--text-tertiary);
+  color: #8a8a8a;
   margin-bottom: 0.75rem;
-}
-
-.archiveButton {
-  width: 100%;
-  padding: 0.5rem;
-  background: var(--highlight-green);
-  border: 1px solid var(--highlight-green-light);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-family: 'Cinzel', serif;
-  cursor: pointer;
-  transition: all var(--timing-hover) ease-in-out;
-  margin-bottom: 0.5rem;
-}
-
-.archiveButton:hover {
-  background: var(--highlight-green-light);
-  box-shadow: 0 0 10px var(--glow-blue);
 }
 
 .deleteButton {
   width: 100%;
   padding: 0.5rem;
-  background: var(--warning-red);
-  border: 1px solid var(--warning-red-light);
+  background: rgba(110, 45, 45, 0.8);
+  border: 1px solid #6e2d2d;
   border-radius: 4px;
-  color: var(--text-primary);
+  color: #e0e0e0;
   font-family: 'Cinzel', serif;
   cursor: pointer;
-  transition: all var(--timing-hover) ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 .deleteButton:hover {
-  background: var(--warning-red-light);
-  box-shadow: 0 0 10px var(--glow-red);
+  background: rgba(110, 45, 45, 1);
+  box-shadow: 0 0 10px rgba(110, 45, 45, 0.5);
 }
 
 /* Arrow pointing to tombstone */
@@ -334,179 +270,5 @@
   left: 50%;
   transform: translateX(-50%);
   border: 8px solid transparent;
-  border-top-color: var(--border-primary);
-}
-
-/* Tooltip tags styling */
-.tooltipTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin: 0.75rem 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.tooltipTag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  background: var(--accent-purple);
-  border: 1px solid var(--accent-purple-light);
-  border-radius: 3px;
-  font-size: 0.75rem;
-  color: var(--text-primary);
-  font-family: 'Cinzel', serif;
-}
-
-/* Archived tombstone styling - weathered and moss-covered - Requirements: 15.4, 15.5 */
-.archived .stone {
-  background: linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 50%, #050a05 100%);
-  border-color: #2a3a2a;
-  opacity: 0.6;
-  filter: grayscale(0.7) sepia(0.3);
-  position: relative;
-}
-
-/* Moss effect overlay */
-.archived .stone::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 30%, rgba(50, 100, 50, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 60%, rgba(40, 80, 40, 0.2) 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, rgba(30, 70, 30, 0.25) 0%, transparent 45%);
-  border-radius: inherit;
-  pointer-events: none;
-}
-
-/* Weathering cracks */
-.archived .stone::after {
-  content: '';
-  position: absolute;
-  top: 10%;
-  left: 15%;
-  right: 15%;
-  bottom: 10%;
-  background: 
-    linear-gradient(45deg, transparent 48%, rgba(0, 0, 0, 0.3) 49%, rgba(0, 0, 0, 0.3) 51%, transparent 52%),
-    linear-gradient(-45deg, transparent 48%, rgba(0, 0, 0, 0.2) 49%, rgba(0, 0, 0, 0.2) 51%, transparent 52%);
-  background-size: 30px 30px;
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.archived .title {
-  color: var(--text-tertiary);
-  text-shadow: 0 0 5px var(--glow-blue);
-}
-
-.archived .cross {
-  opacity: 0.5;
-}
-
-.archived .rip {
-  color: var(--text-muted);
-}
-
-/* Disable hover effect for archived tombstones */
-.archived:hover {
-  transform: scale(1.02);
-  cursor: default;
-}
-
-/* Deep sink animation for archiving (1.5-2.0s) - Requirement 15.2 */
-@keyframes deepSink {
-  0% {
-    transform: translateY(0) scale(1) rotateX(0deg);
-    opacity: 1;
-  }
-  30% {
-    transform: translateY(50%) scale(0.9) rotateX(10deg);
-    opacity: 0.7;
-  }
-  60% {
-    transform: translateY(120%) scale(0.7) rotateX(20deg);
-    opacity: 0.4;
-  }
-  100% {
-    transform: translateY(200%) scale(0.5) rotateX(30deg);
-    opacity: 0;
-  }
-}
-
-.tombstone.deepSinking {
-  animation: deepSink 1.8s ease-in-out;
-}
-
-/* Rise animation for restoring from archive - Requirement 15.2 */
-@keyframes restoreRise {
-  0% {
-    transform: translateY(200%) scale(0.5) rotateX(30deg);
-    opacity: 0;
-  }
-  40% {
-    transform: translateY(120%) scale(0.7) rotateX(20deg);
-    opacity: 0.4;
-  }
-  70% {
-    transform: translateY(50%) scale(0.9) rotateX(10deg);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(0) scale(1) rotateX(0deg);
-    opacity: 1;
-  }
-}
-
-.tombstone.restoring {
-  animation: restoreRise 1.8s ease-in-out;
-}
-
-/* Weathering effect animation for archived tombstones */
-@keyframes weathering {
-  0%, 100% {
-    filter: grayscale(0.7) sepia(0.3);
-  }
-  50% {
-    filter: grayscale(0.8) sepia(0.4);
-  }
-}
-
-.archived .stone {
-  animation: weathering 4s ease-in-out infinite;
-}
-
-/* Bulk selection checkbox - Requirement 9.1 */
-.checkboxContainer {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.selectionCheckbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: var(--accent-purple);
-  border: 2px solid var(--border-primary);
-  border-radius: 3px;
-  background: var(--bg-primary);
-  transition: all var(--timing-hover) ease-in-out;
-}
-
-.selectionCheckbox:hover {
-  box-shadow: 0 0 10px var(--glow-purple);
-}
-
-.selectionCheckbox:checked {
-  background: var(--accent-purple);
-  box-shadow: 0 0 15px var(--glow-purple);
+  border-top-color: #4a2d6e;
 }

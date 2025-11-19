@@ -179,7 +179,7 @@ const GhostWriterModal: React.FC<GhostWriterModalProps> = ({
             {error && (
               <div className={styles.error}>
                 <p>⚠️ {error}</p>
-                <button className={styles.retryButton} onClick={handleRegenerate}>
+                <button className={`${styles.retryButton} button-danger`} onClick={handleRegenerate}>
                   Try Again
                 </button>
               </div>
@@ -195,14 +195,14 @@ const GhostWriterModal: React.FC<GhostWriterModalProps> = ({
 
         <div className={styles.footer}>
           <button
-            className={styles.secondaryButton}
+            className={`${styles.secondaryButton} button-secondary`}
             onClick={handleRegenerate}
             disabled={isLoading}
           >
             🔄 Regenerate
           </button>
           <button
-            className={styles.primaryButton}
+            className={`${styles.primaryButton} button-primary`}
             onClick={handleAccept}
             disabled={isLoading || !suggestion}
           >

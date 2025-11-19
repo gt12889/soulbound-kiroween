@@ -236,17 +236,17 @@ export function GraveyardView() {
         
         <div className={styles.headerActions}>
           <button
-            className={styles.createButton}
+            className={`${styles.createButton} button-primary`}
             onClick={handleToggleForm}
             onMouseEnter={playUIHover}
-            aria-label={showCreateForm ? 'Cancel task creation' : 'Create new task'}
+            aria-label={showCreateForm ? 'Cancel task creation' : 'Raise new task'}
           >
             {showCreateForm ? 'Cancel' : '+ Raise New Task'}
           </button>
           
           {/* Bulk selection toggle - Requirement 9.1 */}
           <button
-            className={`${styles.bulkModeButton} ${bulkSelectionMode ? styles.active : ''}`}
+            className={`${styles.bulkModeButton} ${bulkSelectionMode ? styles.active : ''} button-primary`}
             onClick={handleToggleBulkMode}
             onMouseEnter={playUIHover}
             aria-label={bulkSelectionMode ? 'Exit bulk selection mode' : 'Enter bulk selection mode'}
@@ -261,7 +261,7 @@ export function GraveyardView() {
         <div className={styles.bulkToolbar}>
           <div className={styles.bulkToolbarLeft}>
             <button
-              className={styles.bulkButton}
+              className={`${styles.bulkButton} button-secondary`}
               onClick={handleSelectAll}
               onMouseEnter={playUIHover}
               aria-label="Select all tasks"
@@ -269,7 +269,7 @@ export function GraveyardView() {
               Select All
             </button>
             <button
-              className={styles.bulkButton}
+              className={`${styles.bulkButton} button-secondary`}
               onClick={handleSelectNone}
               onMouseEnter={playUIHover}
               aria-label="Clear selection"
@@ -288,7 +288,7 @@ export function GraveyardView() {
             <div className={styles.bulkToolbarRight}>
               <span className={styles.bulkActionsLabel}>Bulk Actions:</span>
               <button
-                className={styles.bulkActionButton}
+                className={`${styles.bulkActionButton} button-secondary`}
                 onClick={handleBulkTagClick}
                 onMouseEnter={playUIHover}
                 aria-label="Add tags to selected tasks"
@@ -296,7 +296,7 @@ export function GraveyardView() {
                 🏷️ Tag
               </button>
               <button
-                className={styles.bulkActionButton}
+                className={`${styles.bulkActionButton} button-secondary`}
                 onClick={handleBulkArchiveClick}
                 onMouseEnter={playUIHover}
                 aria-label="Archive selected tasks"
@@ -304,7 +304,7 @@ export function GraveyardView() {
                 📦 Archive
               </button>
               <button
-                className={`${styles.bulkActionButton} ${styles.destructive}`}
+                className={`${styles.bulkActionButton} button-danger`}
                 onClick={handleBulkDeleteClick}
                 onMouseEnter={playUIHover}
                 aria-label="Delete selected tasks"
@@ -367,7 +367,7 @@ export function GraveyardView() {
           
           <button 
             type="submit" 
-            className={styles.submitButton}
+            className={`${styles.submitButton} button-primary`}
             onMouseEnter={playUIHover}
           >
             Create Task
@@ -377,7 +377,7 @@ export function GraveyardView() {
 
       {/* Tag Cloud Toggle */}
       <button
-        className={styles.tagCloudToggle}
+        className={`${styles.tagCloudToggle} button-secondary`}
         onClick={() => setShowTagCloud(!showTagCloud)}
         onMouseEnter={playUIHover}
         aria-label={showTagCloud ? 'Hide tag cloud' : 'Show tag cloud'}

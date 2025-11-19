@@ -91,7 +91,7 @@ const GhostSuggestion: React.FC<GhostSuggestionProps> = ({
   };
 
   return (
-    <div
+    <button
       className={`${styles.ghostSuggestion} ${isVisible ? styles.visible : ''} ${
         isFadingOut ? styles.fadingOut : ''
       } ${isHovered ? styles.hovered : ''}`}
@@ -99,13 +99,11 @@ const GhostSuggestion: React.FC<GhostSuggestionProps> = ({
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      role="button"
-      tabIndex={0}
       aria-label="Accept suggestion"
     >
       <span className={styles.suggestionText}>{suggestion.text}</span>
       <span className={styles.ghostIcon}>👻</span>
-    </div>
+    </button>
   );
 };
 

@@ -63,13 +63,13 @@
 }
 
 .removeButton {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.25rem;
+  /* Inherits global button styles */
+  background: none; /* Override background */
+  border: none; /* Override border */
+  color: var(--text-secondary); /* Specific color */
+  font-size: 1.25rem; /* Specific font size */
   line-height: 1;
-  cursor: pointer;
-  padding: 0;
+  padding: 0; /* Override padding */
   margin-left: 0.125rem;
   transition: color 0.2s ease;
 }
@@ -85,19 +85,19 @@
 }
 
 .input {
+  /* Styling is now handled by global input styles in App.css */
   width: 100%;
-  background: transparent;
-  border: none;
+  background: transparent; /* Override global background */
+  border: none; /* Override global border */
   outline: none;
   color: var(--text-primary);
-  font-family: 'Lora', serif;
-  font-size: 0.875rem;
-  padding: 0.375rem 0;
+  font-family: 'Lora', serif; /* Specific font */
+  font-size: 0.875rem; /* Specific font size */
+  padding: 0.375rem 0; /* Specific padding */
 }
 
 .input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
+  /* Handled by global input placeholder styles */
 }
 
 .suggestions {
@@ -127,19 +127,19 @@
 }
 
 .suggestion {
+  /* Inherits global button styles */
   width: 100%;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.625rem 0.75rem;
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  font-family: 'Cinzel', serif;
+  padding: 0.625rem 0.75rem; /* Specific padding */
+  background: transparent; /* Override background */
+  border: none; /* Override border */
+  color: var(--text-primary); /* Specific color */
+  font-family: 'Cinzel', serif; /* Specific font */
   font-size: 0.875rem;
   text-align: left;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  /* Removed cursor, transition as handled globally */
 }
 
 .suggestion:hover,

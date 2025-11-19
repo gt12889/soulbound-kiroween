@@ -161,13 +161,13 @@ export function KeyboardShortcutsPanel() {
                           )}
                           <div className={styles.editActions}>
                             <button
-                              className={styles.saveButton}
+                              className={`${styles.saveButton} button-primary`}
                               onClick={handleSaveEdit}
                               disabled={recordedKeys.length === 0 || !!validationError}
                             >
                               Save
                             </button>
-                            <button className={styles.cancelButton} onClick={handleCancelEdit}>
+                            <button className={`${styles.cancelButton} button-secondary`} onClick={handleCancelEdit}>
                               Cancel
                             </button>
                           </div>
@@ -178,14 +178,14 @@ export function KeyboardShortcutsPanel() {
                           {shortcut.customizable && (
                             <div className={styles.actions}>
                               <button
-                                className={styles.editButton}
+                                className={`${styles.editButton} button-secondary`}
                                 onClick={() => handleStartEdit(shortcut.id)}
                                 title="Customize shortcut"
                               >
                                 Edit
                               </button>
                               <button
-                                className={styles.resetButton}
+                                className={`${styles.resetButton} button-secondary`}
                                 onClick={() => handleReset(shortcut.id)}
                                 title="Reset to default"
                               >
@@ -204,7 +204,7 @@ export function KeyboardShortcutsPanel() {
         </div>
 
         <div className={styles.footer}>
-          <button className={styles.resetAllButton} onClick={handleResetAll}>
+          <button className={`${styles.resetAllButton} button-danger`} onClick={handleResetAll}>
             Reset All to Defaults
           </button>
         </div>

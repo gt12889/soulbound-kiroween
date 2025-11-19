@@ -11,51 +11,49 @@
 }
 
 .searchInput {
-  width: 100%;
-  padding: 0.75rem 2.5rem 0.75rem 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
+  /* Inherits global input styles */
+  padding: 0.75rem 2.5rem 0.75rem 1rem; /* Specific padding */
+  background: var(--bg-secondary); /* Specific background */
+  border: 1px solid var(--border-primary); /* Specific border */
   border-radius: 8px;
   color: var(--text-primary);
-  font-family: 'Lora', 'Merriweather', serif;
+  font-family: 'Lora', 'Merriweather', serif; /* Specific font */
   font-size: 0.95rem;
   outline: none;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 4px var(--shadow-medium); /* Specific shadow */
 }
 
 .searchInput::placeholder {
-  color: rgba(176, 176, 176, 0.5);
-  font-style: italic;
+  /* Handled by global input placeholder styles */
 }
 
 .searchInput:focus {
   border-color: var(--accent-purple-light);
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 15px rgba(157, 78, 221, 0.3);
-  background: rgba(26, 26, 26, 0.95);
+    inset 0 2px 4px var(--shadow-medium),
+    0 0 15px var(--glow-purple);
+  background: var(--bg-secondary); /* Specific focus background */
 }
 
 /* Glow effect when typing */
 .searchInput:not(:placeholder-shown) {
   border-color: var(--accent-purple-light);
   box-shadow: 
-    inset 0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(157, 78, 221, 0.4);
+    inset 0 2px 4px var(--shadow-medium),
+    0 0 20px var(--glow-purple);
   animation: searchGlow 2s ease-in-out infinite;
 }
 
 @keyframes searchGlow {
   0%, 100% {
     box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.3),
-      0 0 15px rgba(157, 78, 221, 0.3);
+      inset 0 2px 4px var(--shadow-medium),
+      0 0 15px var(--glow-purple);
   }
   50% {
     box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.3),
-      0 0 25px rgba(157, 78, 221, 0.5);
+      inset 0 2px 4px var(--shadow-medium),
+      0 0 25px var(--glow-purple);
   }
 }
 
@@ -77,20 +75,17 @@
 }
 
 .clearButton {
+  /* Inherits global button styles and will use .button-danger */
   position: absolute;
   right: 2.5rem;
   width: 24px;
   height: 24px;
-  background: var(--warning-red);
-  border: 1px solid var(--warning-red-light);
+  background: var(--warning-red); /* Specific background */
+  border: 1px solid var(--warning-red-light); /* Specific border */
   border-radius: 50%;
-  color: var(--text-primary);
+  color: var(--text-primary); /* Specific color */
   font-size: 1.2rem;
   line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   opacity: 0.7;
   transition: all var(--timing-hover) ease;
   z-index: 1;

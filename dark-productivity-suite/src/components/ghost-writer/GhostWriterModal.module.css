@@ -67,22 +67,21 @@
 }
 
 .closeButton {
-  background: none;
-  border: none;
-  color: var(--text-secondary, #a0a0a0);
-  font-size: 1.5rem;
-  cursor: pointer;
+  /* Inherits global button styles */
+  background: none; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  font-size: 1.5rem; /* Specific font size for close icon */
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 4px; /* Unique shape */
   transition: all 0.2s ease;
   line-height: 1;
 }
 
 .closeButton:hover {
-  color: var(--text-primary, #e0e0e0);
+  color: var(--text-primary);
   background: rgba(255, 255, 255, 0.1);
 }
-
 .content {
   flex: 1;
   display: flex;
@@ -145,20 +144,18 @@
 }
 
 .retryButton {
-  background: rgba(220, 38, 38, 0.2);
-  border: 1px solid rgba(220, 38, 38, 0.4);
-  color: #fca5a5;
+  /* Inherits global button styles and will use .button-danger */
+  background: var(--warning-red-dark); /* Specific background for error */
+  border: 1px solid var(--warning-red); /* Specific border for error */
+  color: var(--text-primary); /* Specific color for error */
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 0.85rem;
-  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .retryButton:hover {
-  background: rgba(220, 38, 38, 0.3);
-  border-color: rgba(220, 38, 38, 0.6);
+  /* Handled by global .button-danger:hover */
 }
 
 .suggestion {
@@ -189,41 +186,33 @@
 }
 
 .primaryButton, .secondaryButton {
+  /* These will inherit global button styles */
   padding: 0.6rem 1.25rem;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
   white-space: nowrap;
+  /* Removed specific background, color, border as they will be handled by global classes */
 }
 
 .primaryButton {
-  background: linear-gradient(135deg, var(--accent-purple, #9d4edd) 0%, #6366f1 100%);
-  color: white;
-  box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+  /* This will use .button-primary */
 }
 
 .primaryButton:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(157, 78, 221, 0.4);
+  /* Handled by global .button-primary:hover */
 }
 
 .primaryButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .secondaryButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary, #e0e0e0);
-  border: 1px solid rgba(157, 78, 221, 0.3);
+  /* This will use .button-secondary */
 }
 
 .secondaryButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(157, 78, 221, 0.5);
+  /* Handled by global .button-secondary:hover */
 }
 
 @media (max-width: 768px) {

@@ -69,19 +69,16 @@
 }
 
 .closeButton {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 2rem;
-  cursor: pointer;
+  /* Inherits global button styles */
+  background: none; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  font-size: 2rem; /* Specific font size */
   padding: 0;
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 4px; /* Unique shape */
   transition: all 0.2s ease;
-  border-radius: 4px;
 }
 
 .closeButton:hover {
@@ -144,67 +141,16 @@
 }
 
 .formatOption .radioInput {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.formatContent {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.formatIcon {
-  font-size: 2rem;
-  opacity: 0.8;
-}
-
-.formatInfo {
-  flex: 1;
-}
-
-.formatName {
-  font-family: 'Cinzel', serif;
-  font-size: 1.1rem;
-  color: var(--text-primary);
-  margin-bottom: 0.25rem;
-}
-
-.formatDescription {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.3;
-}
-
-/* Checkbox Group */
-.checkboxGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-}
-
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.checkboxLabel:hover {
-  background: var(--bg-secondary);
+  /* Inherits global input styles for radio buttons */
+  position: absolute; /* Keep absolute positioning */
+  opacity: 0; /* Keep hidden */
+  pointer-events: none; /* Keep pointer-events disabled */
 }
 
 .checkbox {
+  /* Inherits global input styles for checkboxes */
   cursor: pointer;
-  accent-color: var(--accent-purple);
+  accent-color: var(--accent-purple); /* Keep for thematic coloring */
   width: 18px;
   height: 18px;
 }
@@ -245,13 +191,7 @@
 }
 
 .dateField {
-  padding: 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: all 0.2s ease;
+  /* Inherits global input styles for date fields */
 }
 
 .dateField:focus {
@@ -260,32 +200,8 @@
   box-shadow: 0 0 10px rgba(77, 45, 110, 0.3);
 }
 
-/* Encryption Section */
-.encryptionSection {
-  margin-top: 0.5rem;
-  padding: 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-}
-
-.passwordLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-family: 'Cinzel', serif;
-}
-
 .passwordInput {
-  padding: 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  color: var(--text-primary);
-  font-size: 1rem;
-  transition: all 0.2s ease;
+  /* Inherits global input styles for password inputs */
 }
 
 .passwordInput:focus {
@@ -350,22 +266,22 @@
 
 .cancelButton,
 .exportButton {
+  /* These will inherit global button styles */
   padding: 0.75rem 2rem;
   font-size: 1rem;
   border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Cinzel', serif;
-  border: 1px solid;
+  font-family: 'Cinzel', serif; /* Keep specific font */
+  border: 1px solid; /* Keep border */
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 .cancelButton {
-  background: transparent;
-  color: var(--text-secondary);
-  border-color: var(--border-primary);
+  /* Will use .button-secondary */
+  background: transparent; /* Override global secondary background */
+  color: var(--text-secondary); /* Override global secondary text color */
+  border-color: var(--border-primary); /* Override global secondary border */
 }
 
 .cancelButton:hover:not(:disabled) {
@@ -374,27 +290,27 @@
 }
 
 .cancelButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .exportButton {
-  background: var(--accent-purple);
-  color: var(--text-primary);
-  border-color: var(--accent-purple-light);
+  /* Will use .button-primary */
+  background: var(--accent-purple); /* Override global primary background */
+  color: var(--text-primary); /* Override global primary text color */
+  border-color: var(--accent-purple-light); /* Override global primary border color */
   position: relative;
   overflow: hidden;
 }
 
 .exportButton:hover:not(:disabled) {
+  /* Handled by global button:hover and .button-primary:hover */
   background: var(--accent-purple-light);
   box-shadow: 0 0 15px var(--glow-purple);
   transform: translateY(-2px);
 }
 
 .exportButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .exportButton.exporting {

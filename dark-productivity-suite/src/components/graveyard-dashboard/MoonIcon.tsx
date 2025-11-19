@@ -30,11 +30,12 @@ export function MoonIcon({ date, moonPhase, isSelected, hasEvents, events, onSel
   ].filter(Boolean).join(' ');
 
   return (
-    <div
+    <button
       className={styles.moonContainer}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       onClick={handleClick}
+      aria-label={`${date.toDateString()}, ${moonPhase.name} phase, ${moonPhase.illumination}% illuminated. ${hasEvents ? `Contains ${events.length} task(s).` : 'No tasks.'}`}
     >
       {/* Event indicator - Requirement 5.6 */}
       {hasEvents && (
@@ -91,7 +92,7 @@ export function MoonIcon({ date, moonPhase, isSelected, hasEvents, events, onSel
           </div>
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

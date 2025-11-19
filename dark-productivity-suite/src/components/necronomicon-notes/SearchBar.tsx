@@ -29,7 +29,6 @@ const SearchBar: React.FC = () => {
       <div className={styles.searchContainer}>
         <input
           type="text"
-          className={styles.searchInput}
           placeholder="Search inscriptions..."
           value={localQuery}
           onChange={(e) => setLocalQuery(e.target.value)}
@@ -37,7 +36,7 @@ const SearchBar: React.FC = () => {
         />
         {localQuery && (
           <button
-            className={styles.clearButton}
+            className={`${styles.clearButton} button-danger`}
             onClick={handleClear}
             aria-label="Clear search"
             title="Clear search"

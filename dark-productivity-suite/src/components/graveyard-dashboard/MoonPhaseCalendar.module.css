@@ -25,6 +25,7 @@
 }
 
 .navButton {
+  /* Inherits global button styles */
   background: var(--accent-purple);
   border: 2px solid var(--accent-purple-light);
   border-radius: 8px;
@@ -32,11 +33,7 @@
   font-size: 1.2rem;
   width: 40px;
   height: 40px;
-  cursor: pointer;
-  transition: all var(--timing-hover) ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Removed cursor, transition, display, align-items, justify-content as handled globally */
 }
 
 .navButton:hover:not(:disabled) {

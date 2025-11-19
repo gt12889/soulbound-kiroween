@@ -78,7 +78,7 @@ function TagFilterComponent({
             {selectedTags.length > 0 && (
               <button
                 type="button"
-                className={styles.clearButton}
+                className={`${styles.clearButton} button-secondary`}
                 onClick={clearFilters}
               >
                 Clear All

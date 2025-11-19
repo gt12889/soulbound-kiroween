@@ -103,7 +103,6 @@
   background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
   border: 2px solid var(--accent-purple-light);
   border-radius: 12px;
-  cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px var(--shadow-medium);
   letter-spacing: 0.05em;
@@ -201,7 +200,6 @@
   background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--bg-secondary) 100%);
   border: 2px solid var(--border-primary);
   border-radius: 16px;
-  cursor: pointer;
   transition: all 0.3s ease;
   overflow: hidden;
 }

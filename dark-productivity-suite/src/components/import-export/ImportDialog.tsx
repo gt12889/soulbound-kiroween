@@ -164,7 +164,7 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
                 </p>
                 <p className={styles.uploadSubtext}>or</p>
                 <button
-                  className={styles.browseButton}
+                  className={`${styles.browseButton} button-primary`}
                   onClick={handleBrowseClick}
                   disabled={isProcessing}
                 >
@@ -293,15 +293,13 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
                   <h4 className={styles.mergeTitle}>Import Strategy</h4>
                   <div className={styles.radioGroup}>
                     <label className={styles.radioLabel}>
-                      <input
-                        type="radio"
-                        name="mergeStrategy"
-                        value="merge"
-                        checked={mergeStrategy === 'merge'}
-                        onChange={(e) => setMergeStrategy(e.target.value as 'merge')}
-                        className={styles.radioInput}
-                      />
-                      <span className={styles.radioText}>
+                                        <input
+                                          type="radio"
+                                          name="mergeStrategy"
+                                          value="merge"
+                                          checked={mergeStrategy === 'merge'}
+                                          onChange={(e) => setMergeStrategy(e.target.value as 'merge')}
+                                        />                      <span className={styles.radioText}>
                         <strong>Merge</strong> - Add imported items to existing data (skip duplicates)
                       </span>
                     </label>
@@ -312,7 +310,6 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
                         value="replace"
                         checked={mergeStrategy === 'replace'}
                         onChange={(e) => setMergeStrategy(e.target.value as 'replace')}
-                        className={styles.radioInput}
                       />
                       <span className={styles.radioText}>
                         <strong>Replace</strong> - Replace all existing data with imported data
@@ -324,10 +321,10 @@ export function ImportDialog({ isOpen, onClose, onImport, existingNotes, existin
 
               {/* Actions */}
               <div className={styles.actions}>
-                <button className={styles.cancelButton} onClick={handleClose}>
+                <button className={`${styles.cancelButton} button-secondary`} onClick={handleClose}>
                   Cancel
                 </button>
-                <button className={styles.importButton} onClick={handleImport}>
+                <button className={`${styles.importButton} button-primary`} onClick={handleImport}>
                   Import Data
                 </button>
               </div>

@@ -3,6 +3,7 @@
 }
 
 .toggleButton {
+  /* Inherits global button styles for font, transitions, etc. */
   width: 100%;
   display: flex;
   align-items: center;
@@ -14,8 +15,7 @@
   color: var(--text-primary);
   font-family: 'Cinzel', serif;
   font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  /* Removed cursor, transition as handled globally */
 }
 
 .toggleButton:hover {
@@ -29,72 +29,8 @@
   border-color: var(--accent-purple);
 }
 
-.icon {
-  color: var(--accent-purple-light);
-  font-size: 0.875rem;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.375rem;
-  background: var(--accent-purple);
-  border-radius: 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.arrow {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  transition: transform 0.2s ease;
-}
-
-.filterContent {
-  background: var(--bg-secondary);
-  border: 1px solid var(--accent-purple);
-  border-top: none;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  padding: 1rem;
-  animation: filterExpand 0.3s ease;
-}
-
-@keyframes filterExpand {
-  from {
-    opacity: 0;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 500px;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-}
-
-.filterHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--border-secondary);
-}
-
-.modeSelector {
-  display: flex;
-  gap: 0.5rem;
-}
-
 .modeButton {
+  /* Inherits global button styles */
   padding: 0.375rem 0.75rem;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-primary);
@@ -103,8 +39,7 @@
   font-family: 'Cinzel', serif;
   font-size: 0.75rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  /* Removed cursor, transition as handled globally */
 }
 
 .modeButton:hover {
@@ -120,15 +55,15 @@
 }
 
 .clearButton {
-  padding: 0.375rem 0.75rem;
-  background: transparent;
-  border: 1px solid var(--border-primary);
+  /* Inherits global button styles, will use .button-secondary class */
+  padding: 0.375rem 0.75rem; /* Specific padding */
+  background: transparent; /* Specific background */
+  border: 1px solid var(--border-primary); /* Specific border */
   border-radius: 3px;
-  color: var(--text-secondary);
-  font-family: 'Lora', serif;
+  color: var(--text-secondary); /* Specific color */
+  font-family: 'Lora', serif; /* Specific font */
   font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  /* Removed cursor, transition as handled globally */
 }
 
 .clearButton:hover {
@@ -144,6 +79,7 @@
 }
 
 .tagButton {
+  /* Inherits global button styles */
   display: flex;
   align-items: center;
   gap: 0.375rem;
@@ -154,8 +90,7 @@
   color: var(--text-primary);
   font-family: 'Cinzel', serif;
   font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  /* Removed cursor, transition as handled globally */
 }
 
 .tagButton:hover {
