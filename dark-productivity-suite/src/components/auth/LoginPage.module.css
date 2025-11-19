@@ -8,7 +8,8 @@
   justify-content: center;
   padding: 2rem;
   background: linear-gradient(180deg, var(--bg-primary) 0%, var(--accent-purple-dark) 50%, var(--bg-primary) 100%);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Background Effects */
@@ -113,7 +114,8 @@
   background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--bg-secondary) 100%);
   border: 2px solid var(--accent-purple-light);
   border-radius: 20px;
-  padding: 3rem 2.5rem;
+  padding: 2rem 2rem;
+  margin: 2rem auto;
   box-shadow: 
     0 0 40px var(--glow-purple),
     inset 0 0 60px var(--shadow-light);
@@ -515,14 +517,20 @@
 @media (max-width: 768px) {
   .loginPage {
     padding: 1rem;
+    align-items: flex-start;
   }
 
   .portalFrame {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1.25rem;
+    margin: 1rem auto;
   }
 
   .formTitle {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .formSubtitle {
+    font-size: 0.9rem;
   }
 
   .portalGlow {
@@ -535,24 +543,43 @@
   }
 
   .backLink {
+    position: fixed;
     top: 1rem;
     left: 1rem;
     padding: 0.5rem 1rem;
     font-size: 0.85rem;
   }
+
+  .portalTop {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+
+  .formHeader {
+    margin-bottom: 1.5rem;
+  }
+
+  .formGroup {
+    margin-bottom: 1.25rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .loginPage {
+    padding: 0.5rem;
+  }
+
   .portalFrame {
-    padding: 1.5rem 1rem;
+    padding: 1.25rem 1rem;
+    margin: 0.5rem auto;
   }
 
   .formTitle {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .portalTitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .socialButtons {
@@ -566,5 +593,37 @@
 
   .floatingRune {
     display: none;
+  }
+
+  .backLink {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .portalTop {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .formHeader {
+    margin-bottom: 1rem;
+  }
+
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+
+  .submitButton {
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+  }
+
+  .registerPrompt {
+    padding-top: 1rem;
+  }
+
+  .portalBottom {
+    margin-top: 1rem;
+    padding-top: 1rem;
   }
 }
