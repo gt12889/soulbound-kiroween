@@ -1,5 +1,5 @@
 .navigation {
-  width: 250px;
+  width: var(--nav-width);
   height: 100vh;
   background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   border-right: 2px solid var(--border-primary);
@@ -378,7 +378,6 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .navigation {
-    width: 200px;
     padding: 1.5rem 0.75rem;
   }
   

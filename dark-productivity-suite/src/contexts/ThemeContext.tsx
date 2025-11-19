@@ -43,7 +43,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Load theme from cloud when user logs in (Requirement 10.4)
   useEffect(() => {
     const loadThemeFromCloud = async () => {
-      if (!isAuthenticated || !user) {
+      if (!isAuthenticated || !user || !db) { // Null check for db
         setCloudSyncEnabled(false);
         return;
       }
@@ -115,7 +115,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   // Sync theme to cloud when it changes (Requirement 10.4)
   useEffect(() => {
     const syncThemeToCloud = async () => {
-      if (!cloudSyncEnabled || !isAuthenticated || !user) {
+      if (!cloudSyncEnabled || !isAuthenticated || !user || !db) { // Null check for db
         return;
       }
 

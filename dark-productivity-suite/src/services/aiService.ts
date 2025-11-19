@@ -278,7 +278,17 @@ class AIService {
   private buildRequestBody(context: string): Record<string, unknown> {
     // Gemini uses a different request format
     if (this.config.provider === 'gemini') {
-      const prompt = `Analyze the following text and continue it with exactly 5 sentences. Match the exact tone, style, subject matter, and writing style of the original text. Do not introduce new themes or change the subject. If the input was not a full sentnce, complete the sentence first or add punctuation to make it correct.DO NOT REPEAT WHAT THE ORGINAL INPUT WAS, Simply continue what has been started in a natural, coherent way.\n\nText to continue:\n\n${context}\n\nYour continuation (5 sentences):`;
+      const prompt = `You are a witty, scholarly ghost haunting a dusty old study. You've been dead for centuries but still love helping writers. Your suggestions are clever, slightly mischievous, and often include dry humor or literary references. You might make puns about being dead, joke about dusty books, or add witty observations about the mortal condition.
+
+Analyze the following text and continue it with exactly 5 sentences. Match the tone and style, but add your ghostly wit and charm. If appropriate to the context, sprinkle in subtle humor, wordplay, or clever observations. Keep it natural and helpful, but let your spectral personality shine through.
+
+DO NOT REPEAT the original input. Simply continue what has been started.
+
+Text to continue:
+
+${context}
+
+Your witty ghostly continuation (5 sentences):`;
       
       return {
         contents: [{
@@ -305,11 +315,11 @@ class AIService {
       messages: [
         {
           role: 'system',
-          content: 'You are a writing assistant. Analyze the user\'s text and continue it with exactly 5 sentences. Match the exact tone, style, subject matter, and writing style of the original text. Do not introduce new themes or change the subject. Simply continue what has been started in a natural, coherent way.',
+          content: 'You are a witty, scholarly ghost haunting a dusty old study. You\'ve been dead for centuries but still love helping writers. Your suggestions are clever, slightly mischievous, and often include dry humor or literary references. You might make puns about being dead, joke about dusty books, or add witty observations about the mortal condition. Analyze the user\'s text and continue it with exactly 5 sentences. Match the tone and style, but add your ghostly wit and charm. If appropriate to the context, sprinkle in subtle humor, wordplay, or clever observations. Keep it natural and helpful, but let your spectral personality shine through.',
         },
         {
           role: 'user',
-          content: `Continue this text with 5 sentences:\n\n${context}`,
+          content: `Continue this text with 5 sentences (add your ghostly wit where appropriate):\n\n${context}`,
         },
       ],
       max_tokens: MAX_SUGGESTION_TOKENS,
@@ -327,32 +337,39 @@ class AIService {
 
   /**
    * Generate local suggestion when API is unavailable
-   * Uses pattern-based suggestions for a fallback experience
+   * Uses pattern-based suggestions with ghostly wit and humor
    */
   private generateLocalSuggestion(context: string): string {
     const contextLower = context.toLowerCase();
     
-    // Pattern-based 5-sentence continuations
+    // Pattern-based 5-sentence continuations with ghostly humor
     const patterns = [
       { 
         keywords: ['dark', 'shadow', 'night'], 
         suggestions: [
-          'The shadows lengthened across the floor, creeping toward the corners like living things. Darkness gathered in the spaces between, thick and palpable. A chill settled over the room, raising goosebumps on exposed skin. The air grew heavy with anticipation. Something was about to change.',
-          'Night descended with unusual swiftness, swallowing the last rays of sunlight. The world transformed into shades of gray and black. Familiar shapes became strange and menacing in the gloom. Every sound seemed amplified in the darkness. Fear began to take root in the heart.',
+          'The shadows lengthened dramatically, as if auditioning for a role in a Gothic novel. I should know—I\'ve been haunting libraries long enough to recognize good atmosphere when I see it. The darkness crept forward with all the subtlety of a cat burglar wearing tap shoes. A chill settled over the room, though that might just be me passing through. Being dead does have its perks when it comes to setting the mood.',
+          'Night descended with the enthusiasm of a theater curtain on opening night. The world transformed into my favorite color palette: various shades of "I can\'t see anything." Familiar shapes became menacing, which is hilarious considering I\'m literally a ghost and still find them spooky. Every sound echoed with supernatural significance, or maybe just good acoustics. Either way, this is my kind of ambiance.',
         ]
       },
       { 
         keywords: ['write', 'writing', 'pen', 'ink'], 
         suggestions: [
-          'The words flowed like dark ink across the page, each one carefully chosen. The pen scratched rhythmically, a comforting sound in the silence. Ideas crystallized into sentences, then paragraphs. The story took on a life of its own. There was no stopping now.',
-          'Writing became a meditation, a way to escape the mundane world. Each letter formed with deliberate care, building toward something greater. The blank page transformed into a canvas of possibility. Hours passed unnoticed in the creative flow. This was where true magic happened.',
+          'The words flowed across the page like ink with a mind of its own—trust me, I\'ve seen stranger things in this study. The pen scratched rhythmically, a sound I\'ve been listening to for two centuries and still find oddly soothing. Ideas crystallized faster than you can say "ectoplasm," which is a word I use more often than you\'d think. The story took on a life of its own, unlike yours truly. There was no stopping now, much like my eternal existence in this dusty old room.',
+          'Writing became a meditation, though I prefer "séance with yourself" as a term. Each letter formed with the care of a ghost trying not to knock over the inkwell—again. The blank page transformed into possibility, much like how I transformed into a transparent nuisance. Hours passed unnoticed, which is basically my entire afterlife in a nutshell. This was where true magic happened, and I\'m not just saying that because I\'m literally supernatural.',
         ]
       },
       { 
         keywords: ['time', 'clock', 'hour'], 
         suggestions: [
-          'Time seemed to slow, each second stretching into eternity. The clock on the wall ticked with maddening regularity. Minutes blurred together, indistinguishable from one another. Reality felt fluid, uncertain. The present moment was all that existed.',
-          'Hours slipped away unnoticed, consumed by deep focus. The passage of time became irrelevant, meaningless. Day turned to night, then back to day again. The world outside continued its relentless march forward. But here, in this space, time stood still.',
+          'Time seemed to slow, which is rich coming from someone who\'s been dead since 1823. The clock on the wall ticked with maddening regularity, mocking my timeless existence. Minutes blurred together like pages in a water-damaged manuscript—I\'ve seen plenty of those. Reality felt fluid, much like my current corporeal state. The present moment was all that existed, though I\'ve been stuck in it for quite a while now.',
+          'Hours slipped away unnoticed, consumed by focus deeper than my grave. The passage of time became irrelevant, a luxury of the living that I no longer enjoy—or suffer from, depending on your perspective. Day turned to night and back again, like a cosmic game of peek-a-boo. The world outside marched forward relentlessly, while I remained here, alphabetizing the same dusty books. But here, in this space, time stood still—just like me, really.',
+        ]
+      },
+      { 
+        keywords: ['book', 'read', 'page', 'library'], 
+        suggestions: [
+          'The book\'s pages whispered secrets only the dead could truly appreciate—and boy, do I have stories. Dust motes danced in the lamplight like tiny ghosts, though they\'re amateurs compared to me. Each word carried weight, unlike my spectral form which weighs precisely nothing. The leather binding creaked with age, a sound I find oddly relatable these days. Knowledge accumulated here like cobwebs in corners, and I should know—I\'ve watched both grow for centuries.',
+          'Reading became an obsession, which is convenient when you\'re trapped in a study for eternity. The pages turned themselves—okay fine, that was me, showing off my poltergeist skills. Ancient wisdom flowed from yellowed paper, much like how I flow through walls. The library held secrets darker than my sense of humor, and that\'s saying something. This collection had witnessed more drama than a Victorian novel, and I\'d been there for most of it.',
         ]
       },
     ];
@@ -365,13 +382,13 @@ class AIService {
       }
     }
 
-    // Default atmospheric 5-sentence continuations
+    // Default witty ghostly 5-sentence continuations
     const defaultSuggestions = [
-      'The atmosphere shifted subtly, almost imperceptibly at first. Something fundamental had changed in the fabric of reality. A sense of anticipation hung in the air like morning mist. The ordinary became extraordinary in that moment. Everything that followed would be different.',
-      'Mysteries unfolded slowly, revealing themselves layer by layer. Each discovery led to more questions than answers. The truth remained elusive, dancing just beyond reach. Patience would be required to understand it all. The journey had only just begun.',
-      'Silence descended like a heavy blanket, muffling all sound. In that quietness, thoughts became clearer, sharper. The mind wandered to places long forgotten. Memories surfaced unbidden, demanding attention. The past and present merged into one.',
-      'A strange feeling took hold, impossible to name or describe. It was neither pleasant nor unpleasant, simply there. The sensation grew stronger with each passing moment. Resistance seemed futile, even foolish. Acceptance was the only path forward.',
-      'The world transformed before watchful eyes, becoming something new. Familiar landmarks took on alien qualities in the changing light. Perception shifted, revealing hidden depths and meanings. Nothing would ever look quite the same again. This was a moment of awakening.',
+      'The atmosphere shifted subtly, like when someone walks through me—always awkward. Something fundamental had changed, though change is relative when you\'ve been dead for two hundred years. A sense of anticipation hung in the air like morning mist, or possibly just me being dramatic. The ordinary became extraordinary, which is my specialty as a supernatural being. Everything that followed would be different, unlike my daily routine of haunting this study.',
+      'Mysteries unfolded slowly, much like my understanding of modern technology—still working on that one. Each discovery led to more questions, which is basically the story of my afterlife. The truth remained elusive, dancing just beyond reach like that one book I can never quite materialize. Patience would be required, and I\'ve got nothing but time—literally, an eternity of it. The journey had only just begun, though mine started in 1823 and shows no signs of ending.',
+      'Silence descended like a heavy blanket, the kind I wish I could still feel. In that quietness, thoughts became clearer than my transparent form. The mind wandered to places long forgotten, much like how people forget I\'m still here watching them. Memories surfaced unbidden, demanding attention like a poltergeist at a dinner party. The past and present merged into one, which is basically my entire existence in a nutshell.',
+      'A strange feeling took hold, though "strange" is relative when you\'re a ghost in a study. It was neither pleasant nor unpleasant, just there—like me, really. The sensation grew stronger with each passing moment, unlike my ability to interact with physical objects. Resistance seemed futile, a lesson I learned when I tried to prevent my own death. Acceptance was the only path forward, though I\'m still working on accepting my eternal book-sorting duties.',
+      'The world transformed before watchful eyes—and trust me, I\'ve been watching for centuries. Familiar landmarks took on alien qualities, much like how quill pens became ballpoint pens became computers. Perception shifted, revealing hidden depths I hadn\'t noticed in my first two hundred years here. Nothing would ever look quite the same again, except this study which looks exactly the same. This was a moment of awakening, though I\'m still waiting for mine to end.',
     ];
 
     const randomIndex = Math.floor(Math.random() * defaultSuggestions.length);

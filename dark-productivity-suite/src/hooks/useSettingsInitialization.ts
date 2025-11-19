@@ -37,7 +37,7 @@ class CloudSettingsTimeoutError extends Error {
  * Prevents memory leaks by allowing cleanup
  */
 function createCancellableTimeout(ms: number) {
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: number;
   const promise = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => reject(new CloudSettingsTimeoutError()), ms);
   });

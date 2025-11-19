@@ -59,33 +59,19 @@
 }
 
 .actionButton {
-  padding: 0.75rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary, #e0e0e0);
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(75, 0, 130, 0.2));
-  border: 2px solid rgba(138, 43, 226, 0.5);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 15px rgba(138, 43, 226, 0.3);
+  /* Styling is now handled by global button and .button-primary styles in App.css */
 }
 
 .actionButton:hover {
-  background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(75, 0, 130, 0.3));
-  border-color: rgba(138, 43, 226, 0.8);
-  box-shadow: 0 0 25px rgba(138, 43, 226, 0.5);
-  transform: translateY(-2px);
+  /* Hover styles are handled globally */
 }
 
 .actionButton:active {
-  transform: translateY(0);
-  box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
+  /* Active styles are handled globally */
 }
 
 .actionButton:focus-visible {
-  outline: 2px solid rgba(138, 43, 226, 0.8);
-  outline-offset: 2px;
+  /* Focus styles are handled globally */
 }
 
 /* Reduced motion support - Requirement 14.6 */

@@ -14,7 +14,7 @@ interface TasksContextType {
   archivedTasks: Task[];
   
   // CRUD operations
-  createTask: (title: string, description: string, priority?: Task['priority']) => Task;
+  createTask: (title: string, description: string, priority?: Task['priority'], tags?: string[]) => Task;
   updateTask: (id: string, updates: Partial<Omit<Task, 'id' | 'createdAt'>>) => void;
   deleteTask: (id: string) => void;
   getTask: (id: string) => Task | undefined;
@@ -105,7 +105,8 @@ export function TasksProvider({ children }: TasksProviderProps) {
   const createTask = useCallback((
     title: string,
     description: string,
-    priority: Task['priority'] = 'medium'
+    priority: Task['priority'] = 'medium',
+    tags: string[] = []
   ): Task => {
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -114,7 +115,7 @@ export function TasksProvider({ children }: TasksProviderProps) {
       priority,
       completed: false,
       archived: false,
-      tags: [],
+      tags,
       createdAt: new Date(),
     };
     

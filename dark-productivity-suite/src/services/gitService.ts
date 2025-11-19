@@ -187,6 +187,73 @@ export async function isGitRepository(repoPath: string = '.'): Promise<boolean> 
 }
 
 /**
+ * Fetches commits from a GitHub repository
+ * @param githubUrl - GitHub repository URL (e.g., https://github.com/username/repo)
+ * @returns Array of commits from the past 30 days
+ */
+export async function getGitHubCommits(githubUrl: string): Promise<GitCommit[]> {
+  try {
+    // Parse GitHub URL to extract owner and repo
+    const urlPattern = /github\.com\/([^\/]+)\/([^\/]+)/;
+    const match = githubUrl.match(urlPattern);
+    
+    if (!match) {
+      throw new Error('Invalid GitHub URL. Please use format: https://github.com/username/repository');
+    }
+
+    const [, owner, repoName] = match;
+    const repo = repoName.replace(/\.git$/, ''); // Remove .git if present
+
+    // Calculate date 30 days ago
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const since = thirtyDaysAgo.toISOString();
+
+    // Fetch commits from GitHub API (no auth required for public repos)
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?since=${since}&per_page=100`;
+    
+    const response = await fetch(apiUrl, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Repository not found. Make sure the repository is public and the URL is correct.');
+      }
+      throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Ensure data is an array
+    if (!Array.isArray(data)) {
+      throw new Error('Unexpected response format from GitHub API');
+    }
+
+    // Transform GitHub API response to our GitCommit format
+    const commits: GitCommit[] = data.map((commit: any) => ({
+      oid: commit.sha,
+      message: commit.commit.message,
+      author: {
+        name: commit.commit.author.name,
+        email: commit.commit.author.email,
+        timestamp: Math.floor(new Date(commit.commit.author.date).getTime() / 1000),
+      },
+    }));
+
+    return commits;
+  } catch (error) {
+    console.error('Error fetching GitHub commits:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Failed to fetch commits from GitHub repository');
+  }
+}
+
+/**
  * Generates demo commit data for testing when no git repository is available
  * @returns Array of demo commits
  */

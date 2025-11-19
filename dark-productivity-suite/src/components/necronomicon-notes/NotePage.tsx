@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useMemo, useState, lazy, Suspense, memo } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense, memo } from 'react';
 import { useNotes } from '../../contexts/NotesContext';
-import { aiService } from '../../services/aiService';
+// import { aiService } from '../../services/aiService'; // Unused
 import { useAudio } from '../../hooks/useAudio';
 import { TagManager } from '../common/TagManager';
 import LoadingFallback from '../common/LoadingFallback';
@@ -23,7 +23,7 @@ interface NotePageProps {
  * Requirements: 1.2 - Optimized with React.memo
  */
 const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
-  const { getNote, updateNote, searchQuery, allTags } = useNotes();
+  const { getNote, updateNote, allTags } = useNotes(); // Removed searchQuery
   const note = getNote(noteId);
   const contentRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -36,8 +36,8 @@ const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
   const [showFormatting, setShowFormatting] = useState(false);
   const [markdownViewMode, setMarkdownViewMode] = useState<'edit' | 'preview' | 'split'>('split');
 
-  const suggestionTimerRef = useRef<number | null>(null);
-  const { playGhostAppear, playGhostDisappear, playSuggestionAccept, playUIClick } = useAudio();
+  // const suggestionTimerRef = useRef<number | null>(null); // Unused
+  const { playGhostDisappear, playSuggestionAccept, playUIClick } = useAudio(); // Removed playGhostAppear
 
   // Focus on content when note changes
   useEffect(() => {
@@ -63,33 +63,33 @@ const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
     updateNote(noteId, { title: newTitle });
   };
 
-  const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-    const newContent = e.currentTarget.textContent || '';
-    updateNote(noteId, { content: newContent });
+  // const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
+  //   const newContent = e.currentTarget.textContent || '';
+  //   updateNote(noteId, { content: newContent });
 
-    // Generate AI suggestions if enabled
-    if (aiEnabled && newContent.length > 10) {
-      if (suggestionTimerRef.current) {
-        clearTimeout(suggestionTimerRef.current);
-      }
+  //   // Generate AI suggestions if enabled
+  //   if (aiEnabled && newContent.length > 10) {
+  //     if (suggestionTimerRef.current) {
+  //       clearTimeout(suggestionTimerRef.current);
+  //     }
 
-      suggestionTimerRef.current = setTimeout(async () => {
-        try {
-          const suggestionText = await aiService.getSuggestion(newContent);
-          const newSuggestion: GhostSuggestionType = {
-            id: crypto.randomUUID(),
-            text: suggestionText,
-            position: newContent.length,
-            confidence: 0.8,
-          };
-          playGhostAppear();
-          setSuggestions([newSuggestion]);
-        } catch (error) {
-          console.error('Failed to get AI suggestion:', error);
-        }
-      }, 1500);
-    }
-  };
+  //     suggestionTimerRef.current = setTimeout(async () => {
+  //       try {
+  //         const suggestionText = await aiService.getSuggestion(newContent);
+  //         const newSuggestion: GhostSuggestionType = {
+  //           id: crypto.randomUUID(),
+  //           text: suggestionText,
+  //           position: newContent.length,
+  //           confidence: 0.8,
+  //         };
+  //         playGhostAppear();
+  //         setSuggestions([newSuggestion]);
+  //       } catch (error) {
+  //         console.error('Failed to get AI suggestion:', error);
+  //       }
+  //     }, 1500);
+  //   }
+  // };
 
   const handleAcceptSuggestion = (suggestion: GhostSuggestionType) => {
     playSuggestionAccept();
@@ -125,23 +125,23 @@ const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
   };
 
   // Highlight search matches
-  const highlightedContent = useMemo(() => {
-    if (!searchQuery.trim() || !note?.content) {
-      return note?.content || '';
-    }
+  // const highlightedContent = useMemo(() => {
+  //   if (!searchQuery.trim() || !note?.content) {
+  //     return note?.content || '';
+  //   }
 
-    const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    const parts = note.content.split(regex);
+  //   const regex = new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  //   const parts = note.content.split(regex);
 
-    return parts
-      .map((part) => {
-        if (part.toLowerCase() === searchQuery.toLowerCase()) {
-          return `<mark class="${styles.highlight}">${part}</mark>`;
-        }
-        return part;
-      })
-      .join('');
-  }, [note?.content, searchQuery]);
+  //   return parts
+  //     .map((part) => {
+  //       if (part.toLowerCase() === searchQuery.toLowerCase()) {
+  //         return `<mark class="${styles.highlight}">${part}</mark>`;
+  //       }
+  //       return part;
+  //     })
+  //     .join('');
+  // }, [note?.content, searchQuery]);
 
   // Color palette for text formatting
   const colorPalette = [

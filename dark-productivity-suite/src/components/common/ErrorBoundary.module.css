@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   position: relative;
   overflow: hidden;
   padding: 2rem;
@@ -16,7 +16,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(220, 20, 60, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, var(--glow-red) 0%, transparent 70%);
   animation: pulse 3s ease-in-out infinite;
 }
 
@@ -28,40 +28,40 @@
   background: rgba(0, 0, 0, 0.5);
   padding: 3rem 2rem;
   border-radius: 12px;
-  border: 2px solid rgba(220, 20, 60, 0.3);
-  box-shadow: 0 0 30px rgba(220, 20, 60, 0.2),
-              0 0 60px rgba(138, 43, 226, 0.1);
+  border: 2px solid var(--warning-red);
+  box-shadow: 0 0 30px var(--glow-red),
+              0 0 60px var(--glow-purple);
 }
 
 .errorIcon {
   font-size: 4rem;
   margin-bottom: 1.5rem;
   animation: float 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 10px rgba(220, 20, 60, 0.5));
+  filter: drop-shadow(0 0 10px var(--glow-red));
 }
 
 .errorTitle {
   font-family: 'Creepster', cursive;
   font-size: 2.5rem;
-  color: #dc143c;
+  color: var(--warning-red);
   margin-bottom: 1rem;
-  text-shadow: 0 0 10px rgba(220, 20, 60, 0.5),
-               0 0 20px rgba(220, 20, 60, 0.3);
+  text-shadow: 0 0 10px var(--glow-red),
+               0 0 20px var(--glow-red);
 }
 
 .errorMessage {
   font-size: 1.25rem;
-  color: #e0e0e0;
+  color: var(--text-primary);
   margin-bottom: 2rem;
   line-height: 1.6;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px var(--shadow-medium);
 }
 
 .errorDetails {
   margin: 2rem 0;
   text-align: left;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(220, 20, 60, 0.2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   padding: 1rem;
 }
@@ -69,54 +69,38 @@
 .errorDetailsSummary {
   cursor: pointer;
   font-size: 0.9rem;
-  color: #ba55d3;
+  color: var(--accent-purple-light);
   margin-bottom: 0.5rem;
   user-select: none;
 }
 
 .errorDetailsSummary:hover {
-  color: #da70d6;
+  color: var(--text-primary);
 }
 
 .errorStack {
   font-family: 'Courier New', monospace;
   font-size: 0.85rem;
-  color: #ff6b6b;
+  color: var(--warning-red-light);
   overflow-x: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--bg-primary);
   border-radius: 4px;
 }
 
 .tryAgainButton {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-family: 'Creepster', cursive;
-  color: #e0e0e0;
-  background: linear-gradient(135deg, #8a2be2 0%, #9370db 100%);
-  border: 2px solid rgba(138, 43, 226, 0.5);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+  /* Inherits from global button styles and .button-primary */
 }
 
 .tryAgainButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.5),
-              0 0 30px rgba(138, 43, 226, 0.3);
-  border-color: rgba(138, 43, 226, 0.8);
+  /* Handled by global button:hover and .button-primary:hover */
 }
 
 .tryAgainButton:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 10px rgba(138, 43, 226, 0.4);
+  /* Handled by global button:active */
 }
 
 .buttonIcon {

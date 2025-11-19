@@ -65,6 +65,7 @@ const convertFirebaseUser = (firebaseUser: FirebaseUser): User => {
  * Register a new user with email and password
  */
 export const register = async (email: string, password: string): Promise<User> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   const validation = validatePassword(password);
   if (!validation.valid) {
     throw new Error(validation.message);
@@ -89,6 +90,7 @@ export const register = async (email: string, password: string): Promise<User> =
  * Login with email and password
  */
 export const login = async (email: string, password: string): Promise<User> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   try {
     const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
     return convertFirebaseUser(userCredential.user);
@@ -108,6 +110,7 @@ export const login = async (email: string, password: string): Promise<User> => {
  * Logout current user
  */
 export const logout = async (): Promise<void> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   try {
     await signOut(auth);
   } catch (error) {
@@ -119,6 +122,7 @@ export const logout = async (): Promise<void> => {
  * Send password reset email
  */
 export const sendPasswordReset = async (email: string): Promise<void> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   try {
     await sendPasswordResetEmail(auth, email);
   } catch (error: any) {
@@ -135,6 +139,7 @@ export const sendPasswordReset = async (email: string): Promise<void> => {
  * Confirm password reset with code
  */
 export const resetPassword = async (code: string, newPassword: string): Promise<void> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   const validation = validatePassword(newPassword);
   if (!validation.valid) {
     throw new Error(validation.message);
@@ -156,6 +161,7 @@ export const resetPassword = async (code: string, newPassword: string): Promise<
  * Sign in with Google
  */
 export const signInWithGoogle = async (): Promise<User> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   const provider = new GoogleAuthProvider();
   try {
     const userCredential: UserCredential = await signInWithPopup(auth, provider);
@@ -174,6 +180,7 @@ export const signInWithGoogle = async (): Promise<User> => {
  * Sign in with GitHub
  */
 export const signInWithGithub = async (): Promise<User> => {
+  if (!auth) throw new Error('Firebase is not initialized.');
   const provider = new GithubAuthProvider();
   try {
     const userCredential: UserCredential = await signInWithPopup(auth, provider);
@@ -194,6 +201,7 @@ export const signInWithGithub = async (): Promise<User> => {
  * Get current user
  */
 export const getCurrentUser = (): User | null => {
+  if (!auth) return null;
   const firebaseUser = auth.currentUser;
   return firebaseUser ? convertFirebaseUser(firebaseUser) : null;
 };
@@ -202,5 +210,6 @@ export const getCurrentUser = (): User | null => {
  * Check if user is authenticated
  */
 export const isAuthenticated = (): boolean => {
+  if (!auth) return false;
   return auth.currentUser !== null;
 };

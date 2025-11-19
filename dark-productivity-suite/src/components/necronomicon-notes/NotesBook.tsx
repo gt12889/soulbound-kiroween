@@ -11,19 +11,19 @@ import styles from './NotesBook.module.css';
 const NotesBook: React.FC = () => {
   const { currentNoteId } = useNotes();
   const { playPageTurn } = useAudio();
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedNoteId, setDisplayedNoteId] = useState<string | null>(currentNoteId);
 
   useEffect(() => {
     if (currentNoteId !== displayedNoteId) {
       // Start page turn animation
-      setIsTransitioning(true);
+      // setIsTransitioning(true);
       playPageTurn();
 
       // Wait for animation to complete (1 second midpoint)
       const timer = setTimeout(() => {
         setDisplayedNoteId(currentNoteId);
-        setIsTransitioning(false);
+        // setIsTransitioning(false);
       }, 500); // Half of the animation duration
 
       return () => clearTimeout(timer);

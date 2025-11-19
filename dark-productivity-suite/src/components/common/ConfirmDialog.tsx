@@ -116,14 +116,14 @@ export function ConfirmDialog({
 
         <div className={styles.actions}>
           <button
-            className={styles.cancelButton}
+            className={`${styles.cancelButton} button-secondary`}
             onClick={onCancel}
             autoFocus={!destructive}
           >
             {cancelLabel}
           </button>
           <button
-            className={`${styles.confirmButton} ${destructive ? styles.destructive : ''}`}
+            className={`${styles.confirmButton} ${destructive ? 'button-danger' : 'button-primary'}`}
             onClick={handleConfirm}
             autoFocus={destructive}
           >

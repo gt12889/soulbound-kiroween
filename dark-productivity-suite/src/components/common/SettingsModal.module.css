@@ -96,18 +96,15 @@
 }
 
 .closeButton {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  cursor: pointer;
+  /* Inherits from global button styles */
+  background: transparent; /* Override global background */
+  border: none; /* Override global border */
+  color: var(--text-secondary); /* Use thematic text color */
+  font-size: 1.5rem; /* Specific font size for close icon */
   padding: 0.5rem;
   width: 40px;
   height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  border-radius: 50%; /* Unique shape */
   transition: all var(--timing-hover) var(--ease-in-out);
 }
 
@@ -218,40 +215,20 @@
 }
 
 .actionButton {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-family: var(--font-header);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all var(--timing-hover) var(--ease-in-out);
+  /* Inherits from global button styles and .button-primary */
+  flex: 1; /* Keep layout-specific property */
 }
 
 .actionButton:hover {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple-light);
-  box-shadow: 0 0 15px var(--glow-purple);
-  transform: translateY(-2px);
+  /* Handled by global button:hover and .button-primary:hover */
 }
 
 .actionButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
+  /* Handled by global button:disabled */
 }
 
 .actionButton:disabled:hover {
-  background: var(--bg-tertiary);
-  border-color: var(--border-primary);
-  box-shadow: none;
-  transform: none;
+  /* Handled by global button:disabled */
 }
 
 .actionIcon {
@@ -318,18 +295,15 @@
 }
 
 .messageDismiss {
-  background: transparent;
-  border: none;
-  color: currentColor;
-  font-size: 1.25rem;
-  cursor: pointer;
+  /* Inherits from global button styles */
+  background: transparent; /* Override global background */
+  border: none; /* Override global border */
+  color: currentColor; /* Use thematic text color */
+  font-size: 1.25rem; /* Specific font size for dismiss icon */
   padding: 0.25rem;
   width: 28px;
   height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  border-radius: 50%; /* Unique shape */
   transition: all var(--timing-hover) var(--ease-in-out);
   flex-shrink: 0;
   opacity: 0.7;
@@ -445,27 +419,16 @@
 }
 
 .logoutButton {
-  padding: 0.875rem 1.5rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  color: var(--warning-red);
-  font-family: var(--font-header);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all var(--timing-hover) var(--ease-in-out);
-  align-self: flex-start;
+  /* Inherits from global button styles and .button-danger */
+  align-self: flex-start; /* Keep layout-specific property */
 }
 
 .logoutButton:hover {
-  background: rgba(211, 47, 47, 0.2);
-  border-color: var(--warning-red);
-  box-shadow: 0 0 15px rgba(211, 47, 47, 0.3);
+  /* Handled by global .button-danger:hover */
 }
 
 .logoutButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  /* Handled by global button:disabled */
 }
 
 .notLoggedIn {

@@ -11,11 +11,13 @@
 
 .toggleButton,
 .expandButton {
-  background: var(--bg-secondary);
-  border: 2px solid var(--accent-purple-light);
-  border-radius: 50%;
+  /* Inherits global button styles for font, transitions, etc. */
+  background: var(--bg-secondary); /* Specific background */
+  border: 2px solid var(--accent-purple-light); /* Specific border */
+  border-radius: 50%; /* Unique circular shape */
   width: 3rem;
   height: 3rem;
+  padding: 0; /* Override global button padding */
   display: flex;
   align-items: center;
   justify-content: center;

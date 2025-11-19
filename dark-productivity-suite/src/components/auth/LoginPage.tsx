@@ -107,7 +107,6 @@ const LoginPage: React.FC = () => {
             <input
               id="email"
               type="email"
-              className={styles.formInput}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="traveler@realm.com"
@@ -125,7 +124,6 @@ const LoginPage: React.FC = () => {
             <input
               id="password"
               type="password"
-              className={styles.formInput}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -144,7 +142,7 @@ const LoginPage: React.FC = () => {
           {/* Submit button */}
           <button
             type="submit"
-            className={styles.submitButton}
+            className={`${styles.submitButton} button-primary`}
             disabled={isLoading}
           >
             {isLoading ? (

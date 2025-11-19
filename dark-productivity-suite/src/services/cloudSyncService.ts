@@ -51,6 +51,7 @@ class CloudSyncService {
    * Sync a note to Firestore
    */
   async syncNote(userId: string, note: Note): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const noteRef = doc(db, 'users', userId, 'notes', note.id);
       await setDoc(noteRef, {
@@ -72,6 +73,7 @@ class CloudSyncService {
    * Sync a task to Firestore
    */
   async syncTask(userId: string, task: Task): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const taskRef = doc(db, 'users', userId, 'tasks', task.id);
       await setDoc(taskRef, {
@@ -93,6 +95,7 @@ class CloudSyncService {
    * Sync a tarot reading to Firestore
    */
   async syncTarotReading(userId: string, reading: TarotReading): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const readingRef = doc(db, 'users', userId, 'tarot_readings', reading.id);
       await setDoc(readingRef, {
@@ -113,6 +116,7 @@ class CloudSyncService {
    * Delete a note from Firestore
    */
   async deleteNote(userId: string, noteId: string): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const noteRef = doc(db, 'users', userId, 'notes', noteId);
       await deleteDoc(noteRef);
@@ -126,6 +130,7 @@ class CloudSyncService {
    * Delete a task from Firestore
    */
   async deleteTask(userId: string, taskId: string): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const taskRef = doc(db, 'users', userId, 'tasks', taskId);
       await deleteDoc(taskRef);
@@ -144,6 +149,7 @@ class CloudSyncService {
     mapper: (docId: string, data: any) => T,
     errorMessage: string
   ): Promise<T[]> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const collectionRef = collection(db, 'users', userId, collectionName);
       const snapshot = await getDocs(collectionRef);
@@ -234,6 +240,7 @@ class CloudSyncService {
     callback: (items: T[]) => void,
     onError?: (error: Error) => void
   ): Unsubscribe {
+    if (!db) throw new Error('Firebase is not initialized.');
     const collectionRef = collection(db, 'users', userId, collectionName);
     
     const unsubscribe = onSnapshot(
@@ -546,6 +553,7 @@ class CloudSyncService {
    * Requirements: 10.3, 17.3
    */
   async syncSettings(userId: string, settings: any): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const settingsRef = doc(db, 'users', userId, 'settings', 'preferences');
       await setDoc(settingsRef, {
@@ -564,6 +572,7 @@ class CloudSyncService {
    * Requirements: 10.3, 17.3
    */
   async fetchSettings(userId: string): Promise<any | null> {
+    if (!db) throw new Error('Firebase is not initialized.');
     try {
       const settingsDoc = await getDocs(collection(db, 'users', userId, 'settings'));
       
@@ -595,6 +604,7 @@ class CloudSyncService {
     callback: (settings: any) => void,
     onError?: (error: Error) => void
   ): Unsubscribe {
+    if (!db) throw new Error('Firebase is not initialized.');
     const settingsRef = doc(db, 'users', userId, 'settings', 'preferences');
     
     const unsubscribe = onSnapshot(

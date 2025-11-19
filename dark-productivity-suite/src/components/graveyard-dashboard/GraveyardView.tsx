@@ -31,7 +31,6 @@ export function GraveyardView() {
     setSelectedTags,
     tagFilterMode,
     setTagFilterMode,
-    updateTask,
     bulkDelete,
     bulkArchive,
     bulkTag
@@ -98,17 +97,14 @@ export function GraveyardView() {
     
     if (newTaskTitle.trim()) {
       playUIClick();
-      const task = createTask(newTaskTitle.trim(), newTaskDescription.trim(), newTaskPriority);
-      if (newTaskTags.length > 0) {
-        updateTask(task.id, { tags: newTaskTags });
-      }
+      createTask(newTaskTitle.trim(), newTaskDescription.trim(), newTaskPriority, newTaskTags);
       setNewTaskTitle('');
       setNewTaskDescription('');
       setNewTaskPriority('medium');
       setNewTaskTags([]);
       setShowCreateForm(false);
     }
-  }, [newTaskTitle, newTaskDescription, newTaskPriority, newTaskTags, playUIClick, createTask, updateTask]);
+  }, [newTaskTitle, newTaskDescription, newTaskPriority, newTaskTags, playUIClick, createTask]);
 
   const handleToggleForm = useCallback(() => {
     playUIClick();

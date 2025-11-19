@@ -95,62 +95,44 @@
 
 .cancelButton,
 .confirmButton {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid;
-  border-radius: 8px;
-  font-family: 'Cinzel', serif;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  min-width: 120px;
+  /* Inherits global button styles for font, transitions, etc. */
+  border: 2px solid; /* Keep specific border width */
+  min-width: 120px; /* Keep specific min-width */
 }
 
 .cancelButton {
-  background: rgba(74, 74, 74, 0.3);
-  border-color: #4a4a4a;
-  color: #e0e0e0;
+  /* This will get .button-secondary class */
+  background: var(--bg-tertiary); /* Override global secondary background to be darker */
+  border-color: var(--border-primary); /* Override global secondary border */
+  color: var(--text-primary); /* Override global secondary text color */
 }
 
 .cancelButton:hover {
-  background: rgba(74, 74, 74, 0.5);
-  box-shadow: 0 0 15px rgba(74, 74, 74, 0.5);
+  background: var(--bg-secondary); /* Darker hover for cancel */
+  box-shadow: 0 0 15px var(--shadow-medium);
 }
 
 .cancelButton:focus-visible {
-  outline: 2px solid #4a4a4a;
+  outline: 2px solid var(--accent-purple-light); /* Use consistent focus color */
   outline-offset: 2px;
 }
 
 .confirmButton {
-  background: rgba(74, 45, 110, 0.3);
-  border-color: #4a2d6e;
-  color: #e0e0e0;
-}
-
-.confirmButton:hover {
-  background: rgba(74, 45, 110, 0.5);
-  box-shadow: 0 0 20px rgba(74, 45, 110, 0.5);
-}
-
-.confirmButton:focus-visible {
-  outline: 2px solid #4a2d6e;
-  outline-offset: 2px;
+  /* This will get .button-primary or .button-danger class */
+  /* Remove explicit background, border, color, hover, focus as global classes handle these */
 }
 
 /* Destructive action styling - Requirement 11.4 */
 .confirmButton.destructive {
-  background: rgba(110, 45, 45, 0.3);
-  border-color: #6e2d2d;
+  /* Global .button-danger will handle most of this, but ensure specific overrides if any */
 }
 
 .confirmButton.destructive:hover {
-  background: rgba(110, 45, 45, 0.5);
-  box-shadow: 0 0 20px rgba(110, 45, 45, 0.5);
+  /* Handled by global .button-danger:hover */
 }
 
 .confirmButton.destructive:focus-visible {
-  outline: 2px solid #6e2d2d;
-  outline-offset: 2px;
+  /* Handled by global :focus-visible for danger buttons */
 }
 
 @media (max-width: 480px) {

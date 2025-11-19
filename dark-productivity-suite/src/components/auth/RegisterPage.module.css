@@ -263,16 +263,7 @@
 }
 
 .formInput {
-  width: 100%;
-  padding: 0.875rem 1rem;
-  font-size: 1rem;
-  font-family: var(--font-body);
-  color: var(--text-primary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  outline: none;
+  /* Styling is now handled by global input styles in App.css */
 }
 
 .formInput::placeholder {
@@ -281,9 +272,7 @@
 }
 
 .formInput:focus {
-  border-color: var(--accent-purple-light);
-  background: var(--bg-tertiary);
-  box-shadow: 0 0 15px var(--glow-purple);
+  /* Focus styles are handled by global :focus-visible in App.css */
 }
 
 .formInput:disabled {
@@ -314,22 +303,8 @@
 /* Submit Button */
 .submitButton {
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  font-size: 1.1rem;
-  font-family: var(--font-header);
-  font-weight: 600;
-  color: var(--text-primary);
-  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
-  border: 2px solid var(--accent-purple-light);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  letter-spacing: 0.05em;
   margin-bottom: 1.5rem;
+  /* Other styles are handled by global button and .button-primary classes */
 }
 
 .submitButton:hover:not(:disabled) {

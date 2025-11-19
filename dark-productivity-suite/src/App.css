@@ -57,6 +57,9 @@
   --timing-page-turn: 1000ms;   /* Page transitions (800-1200ms) */
   --timing-transition: 900ms;   /* Module transitions (800-1200ms) */
   
+  /* Layout Variables */
+  --nav-width: 250px;
+  
   /* Easing Functions */
   --ease-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
   --ease-in-out: ease-in-out;
@@ -109,7 +112,7 @@ body {
 }
 
 .main-content {
-  margin-left: 250px;
+  margin-left: var(--nav-width);
   flex: 1;
   padding: 2rem;
   min-height: 100vh;
@@ -149,6 +152,111 @@ h2 {
 h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
+}
+
+/* ===================================
+   Forms & Controls
+   =================================== */
+
+/* Base Button Style */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-header);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--timing-micro) var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+button:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Primary Button Style */
+.button-primary {
+  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
+  border-color: var(--accent-purple-light);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-purple-light) 0%, color-mix(in srgb, var(--accent-purple-light), #fff 20%) 100%);
+  box-shadow: 0 0 20px var(--glow-purple);
+}
+
+/* Secondary Button Style */
+.button-secondary {
+  background: transparent;
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.button-secondary:hover:not(:disabled) {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+  background: var(--shadow-light);
+}
+
+/* Danger Button Style */
+.button-danger {
+  background: linear-gradient(135deg, var(--warning-red-dark) 0%, var(--warning-red) 100%);
+  border-color: var(--warning-red-light);
+  color: var(--text-primary);
+}
+
+.button-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--warning-red) 0%, var(--warning-red-light) 100%);
+  border-color: var(--warning-red-light);
+  box-shadow: 0 0 15px var(--glow-red);
+}
+
+/* Base Input & Textarea Style */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  transition: all var(--timing-micro) var(--ease-standard);
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
 }
 
 p {
@@ -502,8 +610,11 @@ a:focus-visible {
 
 /* Tablet (1024px and below) */
 @media (max-width: 1024px) {
+  :root {
+    --nav-width: 200px;
+  }
   .main-content {
-    margin-left: 200px;
+    margin-left: var(--nav-width);
     padding: 1.5rem;
   }
   
@@ -523,8 +634,11 @@ a:focus-visible {
 
 /* Mobile (768px and below) */
 @media (max-width: 768px) {
+  :root {
+    --nav-width: 0;
+  }
   .main-content {
-    margin-left: 0;
+    margin-left: var(--nav-width);
     padding: 1rem;
     padding-top: 0;
   }

@@ -367,6 +367,118 @@ export function generateThreeCardSpread(stats: CommitStats): TarotCard[] {
 }
 
 /**
+ * Generates AI-powered funny commentary using Gemini
+ * @param commits - Array of git commits
+ * @param stats - Commit statistics
+ * @param cards - Selected tarot cards
+ * @returns AI-generated funny commentary
+ */
+async function generateAICommentary(commits: GitCommit[], stats: CommitStats, cards: TarotCard[]): Promise<string> {
+  try {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      console.warn('[Tarot] No Gemini API key found - skipping AI commentary');
+      return ''; // Silently fail if no API key
+    }
+    
+    console.log('[Tarot] Generating AI commentary with Gemini...');
+
+    // Prepare commit data for AI
+    const recentMessages = commits.slice(0, 10).map(c => c.message).join('\n');
+    const cardNames = cards.map(c => c.name).join(', ');
+
+    const prompt = `You are a sassy, hilarious mystical tarot reader with a sharp wit and perfect comedic timing. You're analyzing a developer's GitHub repository and you're about to ROAST them (lovingly) based on their commit history.
+
+📊 THE EVIDENCE:
+- Total commits: ${stats.totalCommits}
+- Commits per day: ${stats.averageCommitsPerDay}
+- Most active hour: ${stats.mostActiveHour}:00 ${stats.mostActiveHour >= 22 || stats.mostActiveHour <= 5 ? '(NIGHT OWL ALERT 🦉)' : ''}
+- Sentiment: ${stats.sentimentScore > 0 ? 'Positive (suspiciously optimistic)' : stats.sentimentScore < 0 ? 'Negative (we see those bug fixes)' : 'Neutral (playing it safe, eh?)'}
+- Top keywords: ${stats.topKeywords.join(', ')}
+
+🔍 THEIR ACTUAL COMMIT MESSAGES (oh boy):
+${recentMessages}
+
+🔮 TAROT CARDS DRAWN: ${cardNames}
+
+YOUR MISSION:
+Write a HILARIOUS 4-5 sentence roast that:
+1. Makes SPECIFIC jokes about their actual commit messages (quote them!)
+2. Roasts their coding schedule (especially if they code at weird hours)
+3. Makes witty observations about patterns (lots of "fix" commits? "update" spam? vague messages?)
+4. References the tarot cards in clever, unexpected ways
+5. Includes at least 2-3 emojis for comedic effect
+6. Makes pop culture references or programming jokes
+7. Calls out funny things like:
+   - Commit message quality ("fix bug" x10? Really?)
+   - Timing patterns (3 AM commits? Weekend warrior?)
+   - Keyword obsessions (why so many "updates"?)
+   - Any suspicious patterns
+
+TONE: Sarcastic friend who's roasting you at a party. Sharp, funny, but ultimately loving. Think stand-up comedy meets fortune telling.
+
+EXAMPLES OF THE VIBE:
+- "The Tower card appears, which tracks because your commit history looks like a controlled demolition. 'fix fix fix fix' - bestie, maybe test BEFORE pushing? 😅"
+- "I see you're a 2 AM coder. The Moon card makes perfect sense - you're literally nocturnal. Your sleep schedule is more broken than your code (and that's saying something) 🌙💀"
+- "The Fool card emerges... *looks at 'updated stuff' commit message*... yeah, that checks out. The spirits are asking: what stuff? WHAT. STUFF. 🤡"
+
+Now generate YOUR roast:`;
+
+    // Use model from environment or default to gemini-2.0-flash-exp
+    const model = import.meta.env.VITE_AI_MODEL || 'gemini-2.0-flash-exp';
+    
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.9,
+            maxOutputTokens: 300,
+            topP: 0.95,
+            topK: 40,
+            // Disable thinking for faster, more predictable responses
+            thinkingConfig: {
+              thinkingBudget: 0
+            }
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Tarot] Gemini API error:', response.status, errorText);
+      return '';
+    }
+
+    const data = await response.json();
+    console.log('[Tarot] Gemini response:', data);
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    if (!aiText) {
+      console.warn('[Tarot] No AI text generated from Gemini');
+      return '';
+    }
+    
+    console.log('[Tarot] AI commentary generated successfully:', aiText.substring(0, 100) + '...');
+    return aiText.trim();
+  } catch (error) {
+    console.error('[Tarot] Error generating AI commentary:', error);
+    return '';
+  }
+}
+
+/**
  * Creates interpretation text based on commit statistics
  * @param stats - Commit statistics
  * @param cards - Selected tarot cards
@@ -433,13 +545,29 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): 
 
 /**
  * Generates a complete tarot reading
- * @param _commits - Array of git commits (unused but kept for API consistency)
+ * @param commits - Array of git commits
  * @param stats - Commit statistics
  * @returns Complete tarot reading
  */
-export function generateTarotReading(_commits: GitCommit[], stats: CommitStats): TarotReading {
+export async function generateTarotReading(commits: GitCommit[], stats: CommitStats): Promise<TarotReading> {
+  console.log('[Tarot] Starting tarot reading generation...');
   const cards = generateThreeCardSpread(stats);
-  const interpretation = generateInterpretation(stats, cards);
+  
+  // Generate AI commentary
+  console.log('[Tarot] Requesting AI commentary...');
+  const aiCommentary = await generateAICommentary(commits, stats, cards);
+  console.log('[Tarot] AI commentary result:', aiCommentary ? 'SUCCESS' : 'EMPTY');
+  
+  // Generate base interpretation
+  let interpretation = generateInterpretation(stats, cards);
+  
+  // Prepend AI commentary if available
+  if (aiCommentary) {
+    console.log('[Tarot] Adding AI commentary to reading');
+    interpretation = `🔮 THE SPIRITS SPEAK:\n\n${aiCommentary}\n\n${'═'.repeat(50)}\n\n${interpretation}`;
+  } else {
+    console.log('[Tarot] No AI commentary - using traditional reading only');
+  }
 
   return {
     id: `reading-${Date.now()}`,

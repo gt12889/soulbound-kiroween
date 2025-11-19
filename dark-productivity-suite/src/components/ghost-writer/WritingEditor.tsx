@@ -125,21 +125,29 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
       }
 
       // Double-tab to accept suggestion (only when editor is focused)
-      if (e.key === 'Tab' && hasSuggestion && editorRef.current?.contains(document.activeElement)) {
-        const now = Date.now();
-        const timeSinceLastTab = now - lastTabTime.current;
+      if (e.key === 'Tab' && hasSuggestion) {
+        const isEditorFocused = editorRef.current?.contains(document.activeElement);
+        console.log('[Writing Editor] Tab pressed, hasSuggestion:', hasSuggestion, 'isEditorFocused:', isEditorFocused);
+        
+        if (isEditorFocused) {
+          const now = Date.now();
+          const timeSinceLastTab = now - lastTabTime.current;
+          console.log('[Writing Editor] Time since last tab:', timeSinceLastTab, 'ms');
 
-        if (timeSinceLastTab < DOUBLE_TAB_THRESHOLD) {
-          // Double-tab detected
-          e.preventDefault();
-          if (onAcceptSuggestion && onAcceptSuggestion()) {
-            console.log('[Writing Editor] Suggestion accepted via double-tab');
+          if (timeSinceLastTab < DOUBLE_TAB_THRESHOLD && timeSinceLastTab > 0) {
+            // Double-tab detected
+            e.preventDefault();
+            console.log('[Writing Editor] Double-tab detected! Accepting suggestion...');
+            if (onAcceptSuggestion && onAcceptSuggestion()) {
+              console.log('[Writing Editor] Suggestion accepted via double-tab');
+            }
+            lastTabTime.current = 0; // Reset
+          } else {
+            // First tab - prevent default and record time
+            e.preventDefault();
+            console.log('[Writing Editor] First tab recorded');
+            lastTabTime.current = now;
           }
-          lastTabTime.current = 0; // Reset
-        } else {
-          // First tab - prevent default and record time
-          e.preventDefault();
-          lastTabTime.current = now;
         }
       }
     };

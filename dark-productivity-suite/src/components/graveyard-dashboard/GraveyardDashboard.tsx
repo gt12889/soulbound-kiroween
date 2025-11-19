@@ -4,12 +4,14 @@ import { MoonPhaseCalendar } from './MoonPhaseCalendar';
 import { ArchiveView } from './ArchiveView';
 import { PomodoroTimer } from './PomodoroTimer';
 import { PomodoroStatistics } from './PomodoroStatistics';
+import { RecentNotesPanel } from './RecentNotesPanel'; // New import
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
 import { DEFAULT_SHORTCUTS } from '../../utils/keyboardShortcuts';
 import { useTasks } from '../../contexts/TasksContext';
+// import { useNotes } from '../../contexts/NotesContext'; // Removed useNotes import
 import styles from './GraveyardDashboard.module.css';
 
-type PanelType = 'tasks' | 'moon' | 'pomodoro' | 'archive';
+type PanelType = 'tasks' | 'moon' | 'pomodoro' | 'archive' | 'recent-notes'; // Added 'recent-notes'
 
 interface Panel {
   id: PanelType;
@@ -25,6 +27,7 @@ interface Panel {
 export function GraveyardDashboard() {
   const [selectedPanel, setSelectedPanel] = useState<PanelType>('tasks');
   const { createTask } = useTasks();
+  // const { notes } = useNotes(); // Removed notes usage
   
   const taskShortcuts = DEFAULT_SHORTCUTS.filter(s => s.action === 'create-task');
   useKeyboardShortcuts(taskShortcuts, {
@@ -48,7 +51,11 @@ export function GraveyardDashboard() {
       )
     },
     { id: 'archive', title: 'Archive', icon: '📦', component: <ArchiveView /> },
+    { id: 'recent-notes', title: 'Recent Notes', icon: '📜', component: <RecentNotesPanel /> }, // New Recent Notes Panel
   ];
+
+  // Logic to get recent notes (e.g., top 5) - removed here, now handled by RecentNotesPanel
+  // const recentNotes = notes.slice(0, 5);
 
   return (
     <div className={styles.dashboard}>
@@ -83,3 +90,4 @@ export function GraveyardDashboard() {
     </div>
   );
 }
+

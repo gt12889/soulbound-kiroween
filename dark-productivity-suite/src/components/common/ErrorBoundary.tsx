@@ -110,7 +110,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             )}
             
             <button 
-              className={styles.tryAgainButton}
+              className="button-primary"
               onClick={this.handleReset}
             >
               <span className={styles.buttonIcon}>🔄</span>

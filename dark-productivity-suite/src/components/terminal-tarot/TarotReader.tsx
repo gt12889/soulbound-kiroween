@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { TarotReading } from '../../types';
-import { getRecentCommits, analyzeCommits, isGitRepository, generateDemoCommits } from '../../services/gitService';
+import { analyzeCommits, generateDemoCommits } from '../../services/gitService';
 import { generateTarotReading } from '../../services/tarotService';
 import { useAudio } from '../../hooks/useAudio';
 import TarotCard from './TarotCard';
@@ -11,45 +11,30 @@ const TarotReader: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [githubUrl, setGithubUrl] = useState('');
   const { playUIClick, playUIHover } = useAudio();
 
-  const generateReading = async (useDemoData: boolean = false) => {
+  // Reset error when user starts typing
+  const handleGithubUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setGithubUrl(e.target.value);
+    if (error) setError(null);
+  }, [error]);
+
+  const generateDemoReading = async () => {
     setLoading(true);
     setError(null);
     setReading(null);
-    setIsDemoMode(useDemoData);
+    setIsDemoMode(true);
 
     try {
-      let commits;
-      
-      if (useDemoData) {
-        // Use demo data
-        commits = generateDemoCommits();
-      } else {
-        // Check if git repository exists
-        const hasGit = await isGitRepository();
-        
-        if (!hasGit) {
-          setError('No git repository found. Would you like to see a demo reading?');
-          setLoading(false);
-          return;
-        }
-
-        // Get real commits
-        commits = await getRecentCommits();
-        
-        if (commits.length === 0) {
-          setError('No commits found in the past 30 days. Try making some commits first!');
-          setLoading(false);
-          return;
-        }
-      }
+      // Use demo data
+      const commits = generateDemoCommits();
 
       // Analyze commits
       const stats = analyzeCommits(commits);
 
-      // Generate tarot reading
-      const newReading = generateTarotReading(commits, stats);
+      // Generate tarot reading (now async with AI)
+      const newReading = await generateTarotReading(commits, stats);
       
       // Simulate a brief delay for dramatic effect
       setTimeout(() => {
@@ -64,15 +49,68 @@ const TarotReader: React.FC = () => {
     }
   };
 
-  const handleGenerateReading = () => {
+  const handleDemoReading = useCallback(() => {
     playUIClick();
-    generateReading(false);
-  };
+    generateDemoReading();
+  }, [playUIClick]);
 
-  const handleDemoReading = () => {
+  const handleGitHubReading = useCallback(async () => {
     playUIClick();
-    generateReading(true);
-  };
+    
+    const trimmedUrl = githubUrl.trim();
+    if (!trimmedUrl) {
+      setError('Please enter a GitHub repository URL');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setReading(null);
+    setIsDemoMode(false);
+
+    try {
+      // Import the GitHub function dynamically
+      const { getGitHubCommits } = await import('../../services/gitService');
+      
+      // Fetch commits from GitHub
+      const commits = await getGitHubCommits(trimmedUrl);
+      
+      if (commits.length === 0) {
+        setError('No commits found in the past 30 days for this repository.');
+        setLoading(false);
+        return;
+      }
+
+      // Analyze commits
+      const stats = analyzeCommits(commits);
+
+      // Generate tarot reading (now async with AI)
+      const newReading = await generateTarotReading(commits, stats);
+      
+      // Simulate a brief delay for dramatic effect
+      setTimeout(() => {
+        setReading(newReading);
+        setLoading(false);
+      }, 1000);
+
+    } catch (err) {
+      console.error('Error generating GitHub tarot reading:', err);
+      setError(err instanceof Error ? err.message : 'Failed to analyze GitHub repository');
+      setLoading(false);
+    }
+  }, [githubUrl, playUIClick]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && githubUrl.trim()) {
+      handleGitHubReading();
+    }
+  }, [githubUrl, handleGitHubReading]);
+
+  const handleNewReading = useCallback(() => {
+    setReading(null);
+    setGithubUrl('');
+    setError(null);
+  }, []);
 
   return (
     <div className={styles.tarotReader}>
@@ -84,40 +122,56 @@ const TarotReader: React.FC = () => {
       </div>
 
       {!reading && !loading && (
-        <div className={styles.controls}>
-          <button 
-            className={styles.generateButton}
-            onClick={handleGenerateReading}
-            onMouseEnter={playUIHover}
-          >
-            <span className={styles.buttonIcon}>🔮</span>
-            Generate Reading
-          </button>
+        <>
+          <div className={styles.githubInput}>
+            <input
+              type="text"
+              className={styles.githubUrlInput}
+              placeholder="https://github.com/username/repository"
+              value={githubUrl}
+              onChange={handleGithubUrlChange}
+              onKeyDown={handleKeyDown}
+              aria-label="GitHub repository URL"
+              aria-invalid={!!error}
+              aria-describedby={error ? 'github-error' : undefined}
+            />
+            <button 
+              className={styles.githubSubmit}
+              onClick={handleGitHubReading}
+              onMouseEnter={playUIHover}
+              disabled={!githubUrl.trim()}
+              aria-label="Generate tarot reading from GitHub repository"
+            >
+              <span className={styles.buttonIcon} aria-hidden="true">🔮</span>
+              Generate Reading
+            </button>
+          </div>
           
-          {error && (
+          <div className={styles.controls}>
             <button 
               className={styles.demoButton}
               onClick={handleDemoReading}
               onMouseEnter={playUIHover}
+              aria-label="Try demo reading with sample data"
             >
-              <span className={styles.buttonIcon}>✨</span>
+              <span className={styles.buttonIcon} aria-hidden="true">✨</span>
               Try Demo Reading
             </button>
-          )}
-        </div>
+          </div>
+        </>
       )}
 
       {error && !loading && (
-        <div className={styles.error}>
-          <div className={styles.errorIcon}>⚠️</div>
+        <div className={styles.error} id="github-error" role="alert">
+          <div className={styles.errorIcon} aria-hidden="true">⚠️</div>
           <div className={styles.errorMessage}>{error}</div>
         </div>
       )}
 
       {loading && (
-        <div className={styles.loading}>
+        <div className={styles.loading} role="status" aria-live="polite">
           <div className={styles.loadingSpinner}>
-            <div className={styles.crystal}>🔮</div>
+            <div className={styles.crystal} aria-hidden="true">🔮</div>
           </div>
           <p className={styles.loadingText}>
             Consulting the spirits of your commits...
@@ -128,7 +182,7 @@ const TarotReader: React.FC = () => {
       {reading && (
         <div className={styles.readingContainer}>
           {isDemoMode && (
-            <div className={styles.demoNotice}>
+            <div className={styles.demoNotice} role="note">
               ✨ Demo Mode - Using sample commit data
             </div>
           )}
@@ -145,15 +199,16 @@ const TarotReader: React.FC = () => {
 
           <div className={styles.interpretation}>
             <h2 className={styles.interpretationTitle}>Your Reading</h2>
-            <pre className={styles.interpretationText}>
+            <div className={styles.interpretationText}>
               {reading.interpretation}
-            </pre>
+            </div>
           </div>
 
           <div className={styles.actions}>
             <button 
               className={styles.newReadingButton}
-              onClick={handleGenerateReading}
+              onClick={handleNewReading}
+              aria-label="Generate a new tarot reading"
             >
               Generate New Reading
             </button>

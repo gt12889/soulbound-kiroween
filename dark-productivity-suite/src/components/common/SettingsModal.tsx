@@ -159,7 +159,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
                 <button 
-                  className={styles.logoutButton} 
+                  className={`${styles.logoutButton} button-danger`} 
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                 >
@@ -188,7 +188,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
               Customize keyboard shortcuts to match your workflow. Click the button below to view and edit all shortcuts.
             </p>
             <button 
-              className={styles.actionButton}
+              className={`${styles.actionButton} button-primary`}
               onClick={() => {
                 setShowShortcutsPanel(true);
                 onClose();
@@ -318,11 +318,11 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
               <SyncStatusIndicator />
             </div>
             <div className={styles.dataActions}>
-              <button className={styles.actionButton} onClick={handleExport}>
+              <button className={`${styles.actionButton} button-primary`} onClick={handleExport}>
                 <span className={styles.actionIcon}>📥</span>
                 <span className={styles.actionText}>Export Data</span>
               </button>
-              <button className={styles.actionButton} onClick={() => setIsImportDialogOpen(true)}>
+              <button className={`${styles.actionButton} button-primary`} onClick={() => setIsImportDialogOpen(true)}>
                 <span className={styles.actionIcon}>📤</span>
                 <span className={styles.actionText}>Import Data</span>
               </button>

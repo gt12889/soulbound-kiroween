@@ -201,3 +201,117 @@
     font-size: 1.5rem;
   }
 }
+
+
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panelIcon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px var(--glow-purple));
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: 'Creepster', cursive;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+.panelContent {
+  flex: 1;
+  animation: fadeIn 0.5s ease-out;
+  overflow: auto;
+}
+
+.pomodoroContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes moonGlow {
+  0%, 100% {
+    box-shadow: 0 0 60px var(--glow-purple);
+  }
+  50% {
+    box-shadow: 0 0 80px var(--glow-purple);
+  }
+}
+
+@media (max-width: 1200px) {
+  .panelGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .panelActive {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    margin: 0;
+  }
+  
+  .graveyardScene {
+    height: 12vh;
+  }
+  
+  .fixedWidgets {
+    grid-template-columns: 1fr;
+    padding-top: calc(12vh + 1rem); /* Adjust for smaller scene */
+  }
+  
+  .panelGrid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    /* padding-top: calc(12vh + 1rem); NO LONGER NEEDED due to fixedWidgets */
+  }
+  
+  .panelActive {
+    grid-column: span 1;
+  }
+  
+  .moon {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .trees {
+    height: 150px;
+  }
+  
+  .tree {
+    width: 100px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panelTitle {
+    font-size: 1.2rem;
+  }
+  
+  .panelIcon {
+    font-size: 1.5rem;
+  }
+}
+

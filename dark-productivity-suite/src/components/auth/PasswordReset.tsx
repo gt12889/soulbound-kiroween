@@ -114,7 +114,6 @@ const PasswordReset: React.FC = () => {
         <input
           id="email"
           type="email"
-          className={styles.formInput}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="traveler@realm.com"
@@ -126,7 +125,7 @@ const PasswordReset: React.FC = () => {
 
       <button
         type="submit"
-        className={styles.submitButton}
+        className={`${styles.submitButton} button-primary`}
         disabled={isLoading}
       >
         {isLoading ? (
@@ -178,7 +177,7 @@ const PasswordReset: React.FC = () => {
           <input
             id="verificationCode"
             type="text"
-            className={`${styles.formInput} ${styles.runeInput}`}
+            className={styles.runeInput}
             value={verificationCode}
             onChange={(e) => setVerificationCode(e.target.value)}
             placeholder="Enter the sacred runes..."
@@ -203,7 +202,6 @@ const PasswordReset: React.FC = () => {
         <input
           id="newPassword"
           type="password"
-          className={styles.formInput}
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="••••••••"
@@ -221,7 +219,6 @@ const PasswordReset: React.FC = () => {
         <input
           id="confirmPassword"
           type="password"
-          className={styles.formInput}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="••••••••"
@@ -232,7 +229,7 @@ const PasswordReset: React.FC = () => {
 
       <button
         type="submit"
-        className={styles.submitButton}
+        className={`${styles.submitButton} button-primary`}
         disabled={isLoading}
       >
         {isLoading ? (
@@ -273,7 +270,7 @@ const PasswordReset: React.FC = () => {
         Your ancient words have been renewed. You may now enter the realm with your new passage.
       </p>
       <button
-        className={styles.submitButton}
+        className={`${styles.submitButton} button-primary`}
         onClick={() => {
           playUIClick();
           navigate('/login');
