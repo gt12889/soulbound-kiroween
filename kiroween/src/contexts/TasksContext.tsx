@@ -5,6 +5,7 @@ import type { Task } from '../types';
 import { useToast } from './ToastContext';
 import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
+import { useCompanion } from './CompanionContext';
 
 interface TasksContextType {
   // Tasks data
@@ -92,6 +93,9 @@ export function TasksProvider({ children }: TasksProviderProps) {
   // Screen reader announcements
   // Requirement: 6.2, 6.3 - Announce state changes to screen readers
   const { announce } = useScreenReaderAnnouncement();
+  
+  // Companion integration for task completion tracking
+  const { trackTaskCompletion } = useCompanion();
   
   // Sync undo/redo state with localStorage
   useEffect(() => {
@@ -189,9 +193,12 @@ export function TasksProvider({ children }: TasksProviderProps) {
   /**
    * Toggle task completion status
    * Requirements: 4.2, 4.3, 7.3, 6.2, 6.3, 8.1
+   * Spirit Companion Integration: 10.3 - Track task completion for companion
    */
   const toggleTaskCompletion = useCallback((id: string) => {
     const task = undoRedoTasks.find(t => t.id === id);
+    const wasCompleted = task?.completed || false;
+    
     const newTasks = undoRedoTasks.map(task => {
       if (task.id === id) {
         const completed = !task.completed;
@@ -209,14 +216,24 @@ export function TasksProvider({ children }: TasksProviderProps) {
     // Announce to screen readers
     if (task) {
       announce(task.completed ? `Task "${task.title}" marked as incomplete` : `Task "${task.title}" completed`);
+      
+      // Notify companion when task is completed (not when uncompleted)
+      if (!wasCompleted && !task.completed) {
+        const isTombstone = task.priority === 'high' || task.tags?.includes('tombstone') || false;
+        trackTaskCompletion(id, isTombstone);
+      }
     }
-  }, [undoRedoTasks, setUndoRedoTasks, announce]);
+  }, [undoRedoTasks, setUndoRedoTasks, announce, trackTaskCompletion]);
 
   /**
    * Mark task as complete
    * Requirements: 4.2, 4.3, 7.3, 8.1
+   * Spirit Companion Integration: 10.3 - Track task completion for companion
    */
   const completeTask = useCallback((id: string) => {
+    const task = undoRedoTasks.find(t => t.id === id);
+    const wasCompleted = task?.completed || false;
+    
     const newTasks = undoRedoTasks.map(task => {
       if (task.id === id && !task.completed) {
         return {
@@ -229,7 +246,13 @@ export function TasksProvider({ children }: TasksProviderProps) {
     });
     
     setUndoRedoTasks(newTasks);
-  }, [undoRedoTasks, setUndoRedoTasks]);
+    
+    // Notify companion when task is newly completed
+    if (task && !wasCompleted) {
+      const isTombstone = task.priority === 'high' || task.tags?.includes('tombstone') || false;
+      trackTaskCompletion(id, isTombstone);
+    }
+  }, [undoRedoTasks, setUndoRedoTasks, trackTaskCompletion]);
 
   /**
    * Mark task as incomplete

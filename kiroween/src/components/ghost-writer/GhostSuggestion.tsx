@@ -99,10 +99,12 @@ const GhostSuggestion: React.FC<GhostSuggestionProps> = ({
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      aria-label="Accept suggestion"
+      role="button"
+      aria-label={`Accept suggestion: ${suggestion.text.substring(0, 50)}${suggestion.text.length > 50 ? '...' : ''}`}
+      aria-live="polite"
     >
-      <span className={styles.suggestionText}>{suggestion.text}</span>
-      <span className={styles.ghostIcon}>👻</span>
+      <span className={styles.suggestionText} aria-hidden="false">{suggestion.text}</span>
+      <span className={styles.ghostIcon} aria-hidden="true">👻</span>
     </button>
   );
 };

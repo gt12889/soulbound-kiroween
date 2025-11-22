@@ -7,6 +7,7 @@ interface SuggestionActionsProps {
   onRegenerate: () => void;
   disabled?: boolean;
   showShortcuts?: boolean;
+  acceptButtonRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 /**
@@ -32,7 +33,33 @@ const SuggestionActions: React.FC<SuggestionActionsProps> = ({
   onRegenerate,
   disabled = false,
   showShortcuts = true,
+  acceptButtonRef,
 }) => {
+  // Handle button clicks - prevent action if disabled
+  const handleAccept = (e: React.MouseEvent) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
+    onAccept();
+  };
+
+  const handleRegenerate = (e: React.MouseEvent) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
+    onRegenerate();
+  };
+
+  const handleReject = (e: React.MouseEvent) => {
+    if (disabled) {
+      e.preventDefault();
+      return;
+    }
+    onReject();
+  };
+
   return (
     <div 
       className={styles.actionsContainer}
@@ -42,10 +69,12 @@ const SuggestionActions: React.FC<SuggestionActionsProps> = ({
       {/* Accept Button */}
       <div className={styles.buttonWrapper}>
         <button
-          className={`${styles.actionButton} ${styles.acceptButton}`}
-          onClick={onAccept}
-          disabled={disabled}
+          ref={acceptButtonRef}
+          className={`${styles.actionButton} ${styles.acceptButton} ${disabled ? styles.disabled : ''}`}
+          onClick={handleAccept}
+          aria-disabled={disabled}
           aria-label="Accept suggestion (Tab or Enter)"
+          tabIndex={0}
         >
           <span className={styles.buttonIcon} aria-hidden="true">✓</span>
           <span className={styles.buttonText}>Accept</span>
@@ -66,10 +95,11 @@ const SuggestionActions: React.FC<SuggestionActionsProps> = ({
       {/* Regenerate Button */}
       <div className={styles.buttonWrapper}>
         <button
-          className={`${styles.actionButton} ${styles.regenerateButton}`}
-          onClick={onRegenerate}
-          disabled={disabled}
+          className={`${styles.actionButton} ${styles.regenerateButton} ${disabled ? styles.disabled : ''}`}
+          onClick={handleRegenerate}
+          aria-disabled={disabled}
           aria-label="Regenerate suggestion (Ctrl+R)"
+          tabIndex={0}
         >
           <span className={styles.buttonIcon} aria-hidden="true">↻</span>
           <span className={styles.buttonText}>Regenerate</span>
@@ -90,10 +120,11 @@ const SuggestionActions: React.FC<SuggestionActionsProps> = ({
       {/* Reject Button */}
       <div className={styles.buttonWrapper}>
         <button
-          className={`${styles.actionButton} ${styles.rejectButton}`}
-          onClick={onReject}
-          disabled={disabled}
+          className={`${styles.actionButton} ${styles.rejectButton} ${disabled ? styles.disabled : ''}`}
+          onClick={handleReject}
+          aria-disabled={disabled}
           aria-label="Reject suggestion (Esc)"
+          tabIndex={0}
         >
           <span className={styles.buttonIcon} aria-hidden="true">✕</span>
           <span className={styles.buttonText}>Reject</span>

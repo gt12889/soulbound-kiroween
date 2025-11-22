@@ -19,6 +19,7 @@ export interface ComprehensiveSettings extends AppSettings {
   enableNotifications?: boolean;
   enableAutoSave?: boolean;
   autoSaveInterval?: number;
+  hapticsEnabled?: boolean;
 }
 
 const DEFAULT_COMPREHENSIVE_SETTINGS: ComprehensiveSettings = {
@@ -32,6 +33,7 @@ const DEFAULT_COMPREHENSIVE_SETTINGS: ComprehensiveSettings = {
   enableNotifications: true,
   enableAutoSave: true,
   autoSaveInterval: 1000,
+  hapticsEnabled: true,
 };
 
 class SettingsService {

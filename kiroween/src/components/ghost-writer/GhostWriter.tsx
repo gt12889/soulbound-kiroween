@@ -10,6 +10,8 @@ import { aiService } from '../../services/aiService';
 import { useDoubleTab } from '../../hooks/useDoubleTab';
 import { useGhostWriterState, createGhostWriterError } from '../../hooks/useGhostWriterState';
 import { useScreenReaderAnnouncement } from '../../hooks/useScreenReaderAnnouncement';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { hapticSuccess, hapticError } from '../../utils/haptics';
 import styles from './GhostWriter.module.css';
 
 // Constants
@@ -27,11 +29,16 @@ const GhostWriter: React.FC = () => {
   const [showHint, setShowHint] = useState(false);
   const [showUndo, setShowUndo] = useState(false);
   const [lastAcceptedSuggestion, setLastAcceptedSuggestion] = useState<string | null>(null);
+  const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
+  const [isOptimistic, setIsOptimistic] = useState(false); // Track if current suggestion is optimistic
   const editorRef = useRef<HTMLDivElement>(null);
   const suggestionIdCounter = useRef(0);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const loadingDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const acceptButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   
   // Error recovery state
   const retryCountRef = useRef(0);
@@ -64,6 +71,39 @@ const GhostWriter: React.FC = () => {
       }
     },
   });
+  
+  // Initialize focus trap for suggestion overlay (after ghostState is initialized)
+  const suggestionContainerRef = useFocusTrap({
+    isActive: ghostState.isReady,
+    onEscape: () => {
+      if (suggestions.length > 0) {
+        handleSuggestionDismiss(suggestions[0].id);
+      }
+    },
+    restoreFocus: false, // We handle focus restoration manually
+  });
+
+  // Generate optimistic suggestion based on context
+  const generateOptimisticSuggestion = useCallback((context: string): string => {
+    // Extract the last sentence or phrase
+    const lastSentence = context.split(/[.!?]/).filter(s => s.trim()).pop() || context;
+    const words = lastSentence.trim().split(/\s+/);
+    
+    // Generate a simple continuation based on common patterns
+    const optimisticPhrases = [
+      'The story continues to unfold in unexpected ways.',
+      'Each moment brings new possibilities and discoveries.',
+      'The journey ahead promises both challenges and rewards.',
+      'Time moves forward, carrying us toward new horizons.',
+      'The path ahead remains uncertain but full of potential.',
+    ];
+    
+    // Select a phrase based on the last word's length (pseudo-random but deterministic)
+    const lastWord = words[words.length - 1] || '';
+    const index = lastWord.length % optimisticPhrases.length;
+    
+    return optimisticPhrases[index];
+  }, []);
 
   // Initialize AI service with environment variables
   useEffect(() => {
@@ -176,14 +216,55 @@ const GhostWriter: React.FC = () => {
       // Start generating state
       ghostState.startGenerating();
       
+      // Show optimistic suggestion immediately for better perceived performance
+      const optimisticText = generateOptimisticSuggestion(context);
+      const optimisticSuggestion: GhostSuggestionType = {
+        id: `optimistic-${++suggestionIdCounter.current}`,
+        text: optimisticText,
+        position,
+        confidence: 0.5, // Lower confidence for optimistic suggestions
+      };
+      
+      // Get cursor position for suggestion placement
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        setCursorPosition({ x: rect.left, y: rect.bottom });
+      }
+      
+      // Show optimistic suggestion immediately
+      setSuggestions([optimisticSuggestion]);
+      setIsOptimistic(true);
+      setCurrentSuggestionIndex(0);
+      log('Showing optimistic suggestion:', optimisticText);
+      
+      // Delay showing loading indicator by 200ms to avoid flash for fast responses
+      loadingDelayTimeoutRef.current = setTimeout(() => {
+        setShowLoadingIndicator(true);
+      }, 200);
+      
       log('Requesting suggestion for context:', context.substring(0, 50) + '...');
       const suggestionText = await aiService.getSuggestion(context);
       
       // Check if this request was cancelled
       if (abortControllerRef.current?.signal.aborted) {
         log('Request was cancelled, ignoring result');
+        // Clear loading delay timeout
+        if (loadingDelayTimeoutRef.current) {
+          clearTimeout(loadingDelayTimeoutRef.current);
+          loadingDelayTimeoutRef.current = null;
+        }
+        setShowLoadingIndicator(false);
         return;
       }
+      
+      // Clear loading delay timeout and hide loading indicator
+      if (loadingDelayTimeoutRef.current) {
+        clearTimeout(loadingDelayTimeoutRef.current);
+        loadingDelayTimeoutRef.current = null;
+      }
+      setShowLoadingIndicator(false);
       
       log('Received suggestion:', suggestionText);
       
@@ -195,18 +276,10 @@ const GhostWriter: React.FC = () => {
         confidence: 0.8,
       };
 
-      // Get cursor position for suggestion placement
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        setCursorPosition({ x: rect.left, y: rect.bottom });
-        log('Cursor position:', { x: rect.left, y: rect.bottom });
-      }
-
-      // Replace existing suggestions with new one
-      log('Setting suggestion:', newSuggestion);
+      // Replace optimistic suggestion with real one
+      log('Replacing optimistic suggestion with real one:', newSuggestion);
       setSuggestions([newSuggestion]);
+      setIsOptimistic(false);
       
       // Reset suggestion index
       setCurrentSuggestionIndex(0);
@@ -219,17 +292,41 @@ const GhostWriter: React.FC = () => {
         ? suggestionText.substring(0, 50) + '...' 
         : suggestionText;
       announce(`Suggestion ready: ${preview}`);
+      
+      // Store current focus before moving to suggestion
+      previousFocusRef.current = document.activeElement as HTMLElement;
+      
+      // Focus on Accept button when suggestion appears (after a brief delay for rendering)
+      setTimeout(() => {
+        if (acceptButtonRef.current) {
+          acceptButtonRef.current.focus();
+        }
+      }, 100);
     } catch (error) {
       // Check if error is due to cancellation
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       if (errorMessage.includes('cancel') || errorMessage.includes('abort')) {
         log('Request was cancelled');
+        // Clear loading delay timeout and hide loading indicator
+        if (loadingDelayTimeoutRef.current) {
+          clearTimeout(loadingDelayTimeoutRef.current);
+          loadingDelayTimeoutRef.current = null;
+        }
+        setShowLoadingIndicator(false);
         // Don't set error state for user-initiated cancellations
         return;
       }
       
+      // Clear loading delay timeout and hide loading indicator
+      if (loadingDelayTimeoutRef.current) {
+        clearTimeout(loadingDelayTimeoutRef.current);
+        loadingDelayTimeoutRef.current = null;
+      }
+      setShowLoadingIndicator(false);
+      
       console.error('[Ghost Writer] Error generating suggestion:', error);
       setSuggestions([]);
+      setIsOptimistic(false); // Clear optimistic flag on error
       
       // Determine error type
       let errorObj;
@@ -252,11 +349,13 @@ const GhostWriter: React.FC = () => {
       if (retryCount === 0) {
         // First failure: Show immediate retry button
         log('First failure - showing immediate retry');
+        hapticError(); // Trigger error vibration
         ghostState.setError(errorObj);
         announce(`Error: ${errorObj.message}`);
       } else if (retryCount === 1) {
         // Second failure: Wait 5s before allowing retry
         log('Second failure - waiting 5s before retry');
+        hapticError(); // Trigger error vibration
         ghostState.setError({
           ...errorObj,
           message: `${errorObj.message}. Waiting 5 seconds before retry...`,
@@ -282,6 +381,7 @@ const GhostWriter: React.FC = () => {
       } else if (retryCount >= 2) {
         // Third+ failure: Suggest checking settings
         log('Third+ failure - suggesting settings check');
+        hapticError(); // Trigger error vibration
         const settingsMessage = errorObj.type === 'INVALID_KEY_ERROR'
           ? 'Please check your API key in settings'
           : errorObj.type === 'NETWORK_ERROR'
@@ -304,6 +404,9 @@ const GhostWriter: React.FC = () => {
   const handleSuggestionAccept = useCallback((suggestion: GhostSuggestionType) => {
     log('Accepting suggestion');
     
+    // Trigger haptic feedback on mobile devices
+    hapticSuccess();
+    
     // Start accepting animation
     ghostState.startAccepting();
     
@@ -313,28 +416,49 @@ const GhostWriter: React.FC = () => {
     // Store the suggestion for undo
     setLastAcceptedSuggestion(suggestion.text);
     
-    // Insert suggestion into editor after a brief delay for animation
+    // Insert suggestion into editor immediately
+    if (editorRef.current && (editorRef.current as any).insertSuggestion) {
+      (editorRef.current as any).insertSuggestion(suggestion.text);
+    }
+    
+    // Clear suggestions
+    setSuggestions([]);
+    setCurrentSuggestionIndex(0);
+    
+    // Show undo button briefly
+    setShowUndo(true);
+    
+    // Hide undo button after 3 seconds
+    if (undoTimeoutRef.current) {
+      clearTimeout(undoTimeoutRef.current);
+    }
+    undoTimeoutRef.current = setTimeout(() => {
+      setShowUndo(false);
+      setLastAcceptedSuggestion(null);
+    }, 3000);
+    
+    // Return focus to editor after a brief delay - find the contenteditable element
     setTimeout(() => {
-      if (editorRef.current && (editorRef.current as any).insertSuggestion) {
-        (editorRef.current as any).insertSuggestion(suggestion.text);
+      if (editorRef.current) {
+        const contentEditable = editorRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+        if (contentEditable) {
+          contentEditable.focus();
+          // Move cursor to end
+          const range = document.createRange();
+          const selection = window.getSelection();
+          if (selection && contentEditable.lastChild) {
+            range.selectNodeContents(contentEditable);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        } else {
+          editorRef.current.focus();
+        }
+      } else if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
       }
-      
-      // Clear suggestions
-      setSuggestions([]);
-      setCurrentSuggestionIndex(0);
-      
-      // Show undo button briefly
-      setShowUndo(true);
-      
-      // Hide undo button after 3 seconds
-      if (undoTimeoutRef.current) {
-        clearTimeout(undoTimeoutRef.current);
-      }
-      undoTimeoutRef.current = setTimeout(() => {
-        setShowUndo(false);
-        setLastAcceptedSuggestion(null);
-      }, 3000);
-    }, 200);
+    }, 100);
     
     // State will auto-reset to IDLE after animation completes (handled by state machine)
   }, [ghostState, announce]);
@@ -347,6 +471,29 @@ const GhostWriter: React.FC = () => {
     setSuggestions(prev => prev.filter(s => s.id !== suggestionId));
     setCurrentSuggestionIndex(0);
     ghostState.reset();
+    
+    // Return focus to editor after a brief delay - find the contenteditable element
+    setTimeout(() => {
+      if (editorRef.current) {
+        const contentEditable = editorRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
+        if (contentEditable) {
+          contentEditable.focus();
+          // Move cursor to end
+          const range = document.createRange();
+          const selection = window.getSelection();
+          if (selection && contentEditable.lastChild) {
+            range.selectNodeContents(contentEditable);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        } else {
+          editorRef.current.focus();
+        }
+      } else if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
+    }, 100);
   }, [ghostState, announce]);
 
   // Handle undo of last accepted suggestion
@@ -428,6 +575,13 @@ const GhostWriter: React.FC = () => {
     
     // Cancel any pending AI service requests
     aiService.cancelPending();
+    
+    // Clear loading delay timeout and hide loading indicator
+    if (loadingDelayTimeoutRef.current) {
+      clearTimeout(loadingDelayTimeoutRef.current);
+      loadingDelayTimeoutRef.current = null;
+    }
+    setShowLoadingIndicator(false);
     
     // Reset state
     ghostState.reset();
@@ -525,24 +679,27 @@ const GhostWriter: React.FC = () => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only handle shortcuts when suggestions are visible and ready
-      if (suggestions.length === 0 || ghostState.isGenerating) {
+      if (suggestions.length === 0 || !ghostState.isReady) {
         return;
       }
 
-      // Tab or Enter: Accept suggestion
-      if (event.key === 'Tab' || event.key === 'Enter') {
-        // Only handle if we're in the suggestion state (not during normal typing)
-        if (ghostState.isReady && suggestions.length > 0) {
+      // Check if focus is within the suggestion container
+      const suggestionContainer = suggestionContainerRef.current;
+      const focusInSuggestion = suggestionContainer && suggestionContainer.contains(document.activeElement);
+      
+      // Enter: Accept suggestion
+      if (event.key === 'Enter') {
+        if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
-          log('Keyboard shortcut: Accept (Tab/Enter)');
+          log('Keyboard shortcut: Accept (Enter)');
           handleSuggestionAccept(suggestions[currentSuggestionIndex]);
         }
       }
       
       // Escape: Reject suggestion
       else if (event.key === 'Escape') {
-        if ((ghostState.isReady || ghostState.isAccepting) && suggestions.length > 0) {
+        if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
           log('Keyboard shortcut: Reject (Esc)');
@@ -552,7 +709,7 @@ const GhostWriter: React.FC = () => {
       
       // Ctrl+R: Regenerate suggestion
       else if (event.ctrlKey && event.key === 'r') {
-        if (ghostState.isReady && suggestions.length > 0) {
+        if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
           log('Keyboard shortcut: Regenerate (Ctrl+R)');
@@ -562,7 +719,7 @@ const GhostWriter: React.FC = () => {
       
       // Alt+1/2/3: Select suggestion variant
       else if (event.altKey && ['1', '2', '3'].includes(event.key)) {
-        if (ghostState.isReady && suggestions.length > 1) {
+        if (suggestions.length > 1 && focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
           const index = parseInt(event.key, 10) - 1;
@@ -575,14 +732,14 @@ const GhostWriter: React.FC = () => {
       }
     };
 
-    // Add event listener with capture phase to intercept before other handlers
-    window.addEventListener('keydown', handleKeyDown, true);
+    // Don't use capture phase - let focus trap handle Tab navigation first
+    window.addEventListener('keydown', handleKeyDown);
 
     // Cleanup
     return () => {
-      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [suggestions, currentSuggestionIndex, ghostState.isReady, ghostState.isGenerating, ghostState.isAccepting, handleSuggestionAccept, handleSuggestionDismiss, handleSuggestionRegenerate, announce]);
+  }, [suggestions, currentSuggestionIndex, ghostState.isReady, handleSuggestionAccept, handleSuggestionDismiss, handleSuggestionRegenerate, announce]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -603,25 +760,28 @@ const GhostWriter: React.FC = () => {
       if (retryTimeoutRef.current) {
         clearTimeout(retryTimeoutRef.current);
       }
+      if (loadingDelayTimeoutRef.current) {
+        clearTimeout(loadingDelayTimeoutRef.current);
+      }
     };
   }, []);
 
   return (
-    <div className={styles.ghostWriter}>
+    <div className={styles.ghostWriter} role="main" aria-label="Ghost Writer application">
       {/* Ambient fog layers - Requirement 3.4 */}
-      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-slow`} />
-      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-medium`} />
-      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-fast`} />
+      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-slow`} aria-hidden="true" />
+      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-medium`} aria-hidden="true" />
+      <div className={`${styles.fogLayer} ambient-fog-layer ambient-fog-fast`} aria-hidden="true" />
       
-      <div className={styles.header}>
+      <div className={styles.header} role="banner">
         <h1 className={styles.title}>Ghost Writer</h1>
-        <p className={styles.subtitle}>Let spectral whispers guide your words...</p>
-        <div className={styles.shortcuts}>
-          <span className={styles.shortcutHint}>
+        <p className={styles.subtitle} aria-label="Application tagline">Let spectral whispers guide your words...</p>
+        <div className={styles.shortcuts} role="complementary" aria-label="Keyboard shortcuts">
+          <span className={styles.shortcutHint} aria-label="Primary shortcut">
             Press <kbd>Tab</kbd> <kbd>Tab</kbd> to summon Ghost Writer
           </span>
           {suggestions.length > 0 && ghostState.isReady && (
-            <span className={styles.shortcutHint}>
+            <span className={styles.shortcutHint} aria-label="Suggestion shortcuts">
               <kbd>Tab</kbd>/<kbd>Enter</kbd> Accept • <kbd>Esc</kbd> Reject • <kbd>Ctrl+R</kbd> Regenerate
               {suggestions.length > 1 && (
                 <> • <kbd>Alt+1/2/3</kbd> Switch variants</>
@@ -630,26 +790,26 @@ const GhostWriter: React.FC = () => {
           )}
         </div>
         {!isOnline && (
-          <div className={styles.offlineWarning}>
+          <div className={styles.offlineWarning} role="alert" aria-live="assertive">
             📡 You are currently offline. Ghost Writer requires an internet connection.
           </div>
         )}
         {showHint && (
-          <div className={styles.hint}>
+          <div className={styles.hint} role="status" aria-live="polite">
             💀 Write at least {MIN_CONTEXT_LENGTH} characters to summon suggestions...
           </div>
         )}
       </div>
       
-      <div className={styles.editorWrapper} ref={editorRef}>
+      <div className={styles.editorWrapper} ref={editorRef} role="region" aria-label="Writing area">
         <WritingEditor
           onTextChange={handleTextChange}
           onAcceptSuggestion={acceptFirstSuggestion}
           hasSuggestion={suggestions.length > 0}
         />
         
-        {/* Show loading indicator when generating */}
-        {ghostState.isGenerating && (
+        {/* Show loading indicator when generating (with 200ms delay) */}
+        {ghostState.isGenerating && showLoadingIndicator && (
           <GhostLoadingIndicator
             message="Summoning spirits from beyond..."
             onCancel={handleCancelGeneration}
@@ -671,15 +831,21 @@ const GhostWriter: React.FC = () => {
           />
         )}
         
-        {/* Show suggestion display when ready or accepting */}
-        {(ghostState.isReady || ghostState.isAccepting) && suggestions.length > 0 && (
-          <div className={styles.suggestionContainer}>
+        {/* Show suggestion display when ready */}
+        {ghostState.isReady && suggestions.length > 0 && (
+          <div 
+            ref={suggestionContainerRef}
+            className={styles.suggestionContainer} 
+            role="region" 
+            aria-label="AI suggestion panel"
+          >
             <SuggestionDisplay
               suggestion={suggestions[currentSuggestionIndex]}
-              isAccepting={ghostState.isAccepting}
+              isAccepting={false}
+              isOptimistic={isOptimistic}
             />
             {suggestions.length > 1 && (
-              <div className={styles.variantIndicator}>
+              <div className={styles.variantIndicator} role="status" aria-live="polite" aria-atomic="true">
                 Suggestion {currentSuggestionIndex + 1} of {suggestions.length}
               </div>
             )}
@@ -687,19 +853,31 @@ const GhostWriter: React.FC = () => {
               onAccept={() => handleSuggestionAccept(suggestions[currentSuggestionIndex])}
               onReject={() => handleSuggestionDismiss(suggestions[0].id)}
               onRegenerate={handleSuggestionRegenerate}
-              disabled={ghostState.isAccepting}
+              disabled={false}
               showShortcuts={true}
+              acceptButtonRef={acceptButtonRef}
+            />
+          </div>
+        )}
+        
+        {/* Show accepting animation overlay */}
+        {ghostState.isAccepting && suggestions.length > 0 && (
+          <div className={styles.acceptingOverlay} role="status" aria-live="polite">
+            <SuggestionDisplay
+              suggestion={suggestions[currentSuggestionIndex]}
+              isAccepting={true}
+              isOptimistic={false}
             />
           </div>
         )}
         
         {/* Show undo button briefly after accepting */}
         {showUndo && (
-          <div className={styles.undoContainer}>
+          <div className={styles.undoContainer} role="complementary" aria-label="Undo action">
             <button
               className={styles.undoButton}
               onClick={handleUndo}
-              aria-label="Undo last suggestion"
+              aria-label="Undo last accepted suggestion"
             >
               ↶ Undo
             </button>

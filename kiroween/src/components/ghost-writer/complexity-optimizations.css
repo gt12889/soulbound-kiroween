@@ -1,0 +1,341 @@
+/**
+ * Animation Complexity Optimizations
+ * Applied dynamically based on performance monitoring
+ * 
+ * Three levels:
+ * - complexity-full: All animations enabled (default)
+ * - complexity-reduced: Some effects disabled, animations simplified
+ * - complexity-minimal: Most effects disabled, essential animations only
+ */
+
+/* ============================================
+   REDUCED COMPLEXITY MODE
+   ============================================ */
+
+.complexity-reduced .particle {
+  display: none !important;
+}
+
+.complexity-reduced .glowEffect {
+  opacity: 0.3 !important;
+  animation: none !important;
+}
+
+.complexity-reduced .textShimmer::after {
+  display: none !important;
+}
+
+.complexity-reduced .acceptGlow {
+  opacity: 0.5 !important;
+}
+
+.complexity-reduced .radialGlowOverlay {
+  display: none !important;
+}
+
+/* Simplify spinner */
+.complexity-reduced .spinnerRing:nth-child(2),
+.complexity-reduced .spinnerRing:nth-child(3) {
+  display: none !important;
+}
+
+.complexity-reduced .spinnerRing:nth-child(1) {
+  animation-duration: 1.5s !important;
+}
+
+/* Reduce shadows */
+.complexity-reduced .suggestionDisplay {
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.2) !important;
+}
+
+.complexity-reduced .actionsContainer {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+.complexity-reduced .actionButton {
+  box-shadow: none !important;
+}
+
+.complexity-reduced .actionButton:hover {
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Simplify animations */
+.complexity-reduced .accepting {
+  animation-duration: 0.6s !important;
+}
+
+.complexity-reduced .suggestionDisplay.visible {
+  animation-duration: 0.3s !important;
+}
+
+.complexity-reduced .ghostIcon {
+  animation: none !important;
+}
+
+.complexity-reduced .message {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* Disable icon animations on hover */
+.complexity-reduced .acceptButton:hover .buttonIcon,
+.complexity-reduced .regenerateButton:hover .buttonIcon,
+.complexity-reduced .rejectButton:hover .buttonIcon {
+  animation: none !important;
+}
+
+/* ============================================
+   MINIMAL COMPLEXITY MODE
+   ============================================ */
+
+/* Disable all particles and effects */
+.complexity-minimal .particle,
+.complexity-minimal .glowEffect,
+.complexity-minimal .acceptGlow,
+.complexity-minimal .radialGlowOverlay,
+.complexity-minimal .textShimmer::after {
+  display: none !important;
+}
+
+/* Simplify spinner to single ring */
+.complexity-minimal .spinnerRing:nth-child(2),
+.complexity-minimal .spinnerRing:nth-child(3) {
+  display: none !important;
+}
+
+.complexity-minimal .spinnerRing:nth-child(1) {
+  animation-duration: 1s !important;
+}
+
+/* Remove all shadows */
+.complexity-minimal .suggestionDisplay,
+.complexity-minimal .actionsContainer,
+.complexity-minimal .actionButton,
+.complexity-minimal .container {
+  box-shadow: none !important;
+}
+
+/* Remove backdrop filters */
+.complexity-minimal .overlay,
+.complexity-minimal .actionsContainer {
+  backdrop-filter: none !important;
+}
+
+/* Simplify all animations to fade only */
+.complexity-minimal .suggestionDisplay.visible {
+  animation: minimalFadeIn 0.2s ease-out forwards !important;
+}
+
+@keyframes minimalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+.complexity-minimal .accepting {
+  animation: minimalAccept 0.4s ease-out forwards !important;
+}
+
+@keyframes minimalAccept {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Disable all hover animations */
+.complexity-minimal .actionButton:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.complexity-minimal .actionButton:active {
+  transform: scale(0.98) !important;
+}
+
+.complexity-minimal .acceptButton:hover .buttonIcon,
+.complexity-minimal .regenerateButton:hover .buttonIcon,
+.complexity-minimal .rejectButton:hover .buttonIcon {
+  animation: none !important;
+}
+
+/* Disable floating animations */
+.complexity-minimal .ghostIcon,
+.complexity-minimal .ghostIndicator,
+.complexity-minimal .message,
+.complexity-minimal .errorIcon,
+.complexity-minimal .warningIcon {
+  animation: none !important;
+}
+
+/* Simplify checkmark */
+.complexity-minimal .successCheckmark {
+  animation: minimalCheckmark 0.2s ease-out forwards !important;
+}
+
+@keyframes minimalCheckmark {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Simplify error shake */
+.complexity-minimal .overlay {
+  animation: fadeIn 0.2s ease-in-out !important;
+}
+
+/* Reduce gradient complexity */
+.complexity-minimal .suggestionDisplay {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+.complexity-minimal .progressBar {
+  background: rgba(139, 92, 246, 0.8) !important;
+}
+
+.complexity-minimal .progressBar::after {
+  display: none !important;
+}
+
+/* Simplify carousel transitions */
+.complexity-minimal .carouselContainer {
+  transition: transform 0.15s ease !important;
+}
+
+.complexity-minimal .carouselSlide {
+  transition: opacity 0.15s ease !important;
+}
+
+/* Remove text shadows */
+.complexity-minimal .message {
+  text-shadow: none !important;
+}
+
+/* Simplify borders */
+.complexity-minimal .suggestionDisplay {
+  border-left-width: 2px !important;
+}
+
+/* ============================================
+   FULL COMPLEXITY MODE (DEFAULT)
+   ============================================ */
+
+/* No overrides needed - all animations run at full quality */
+.complexity-full {
+  /* Placeholder for any full-complexity specific styles */
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Further reduce on mobile for reduced mode */
+  .complexity-reduced .suggestionDisplay.visible {
+    animation: minimalFadeIn 0.2s ease-out forwards !important;
+  }
+
+  .complexity-reduced .accepting {
+    animation: minimalAccept 0.3s ease-out forwards !important;
+  }
+
+  /* Minimal mode - disable almost everything on mobile */
+  .complexity-minimal .suggestionDisplay.visible,
+  .complexity-minimal .accepting,
+  .complexity-minimal .overlay {
+    animation: none !important;
+    opacity: 0.9 !important;
+    transform: none !important;
+  }
+
+  .complexity-minimal .actionButton:hover {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-color: transparent !important;
+  }
+}
+
+/* ============================================
+   PERFORMANCE HINTS
+   ============================================ */
+
+/* Remove will-change on reduced/minimal modes to save memory */
+.complexity-reduced .accepting,
+.complexity-reduced .acceptGlow,
+.complexity-reduced .successCheckmark,
+.complexity-reduced .spinner,
+.complexity-reduced .spinnerRing,
+.complexity-minimal .accepting,
+.complexity-minimal .acceptGlow,
+.complexity-minimal .successCheckmark,
+.complexity-minimal .spinner,
+.complexity-minimal .spinnerRing {
+  will-change: auto !important;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Ensure reduced motion preferences override complexity settings */
+@media (prefers-reduced-motion: reduce) {
+  .complexity-full .particle,
+  .complexity-full .glowEffect,
+  .complexity-full .acceptGlow,
+  .complexity-full .radialGlowOverlay {
+    display: none !important;
+  }
+
+  .complexity-full .suggestionDisplay.visible,
+  .complexity-full .accepting {
+    animation-duration: 0.2s !important;
+  }
+
+  .complexity-full .ghostIcon,
+  .complexity-full .ghostIndicator,
+  .complexity-full .message,
+  .complexity-full .errorIcon,
+  .complexity-full .warningIcon {
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   DEBUG MODE
+   ============================================ */
+
+/* Optional: Show complexity level indicator */
+.show-complexity-indicator::after {
+  content: attr(data-complexity-level);
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-family: monospace;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.complexity-full.show-complexity-indicator::after {
+  border: 2px solid #10b981;
+}
+
+.complexity-reduced.show-complexity-indicator::after {
+  border: 2px solid #f59e0b;
+}
+
+.complexity-minimal.show-complexity-indicator::after {
+  border: 2px solid #ef4444;
+}

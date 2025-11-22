@@ -157,47 +157,53 @@ const GhostWriterModal: React.FC<GhostWriterModalProps> = ({
 
         <div className={styles.content}>
           {/* Current text preview */}
-          <div className={styles.contextSection}>
+          <div className={styles.contextSection} role="region" aria-label="Current text context">
             <h3 className={styles.sectionTitle}>Your Text:</h3>
-            <div className={styles.contextPreview}>
+            <div className={styles.contextPreview} aria-label="Text preview">
               {currentText.slice(-200)}
               {currentText.length > 200 && '...'}
             </div>
           </div>
 
           {/* Suggestion */}
-          <div className={styles.suggestionSection}>
+          <div className={styles.suggestionSection} role="region" aria-label="AI suggestion">
             <h3 className={styles.sectionTitle}>Suggested Continuation:</h3>
             
             {isLoading && (
-              <div className={styles.loading}>
-                <div className={styles.ghostAnimation}>👻</div>
+              <div className={styles.loading} role="status" aria-live="polite" aria-label="Generating suggestion">
+                <div className={styles.ghostAnimation} aria-hidden="true">👻</div>
                 <p>Summoning spectral inspiration...</p>
               </div>
             )}
 
             {error && (
-              <div className={styles.error}>
+              <div className={styles.error} role="alert" aria-live="assertive">
                 <p>⚠️ {error}</p>
-                <button className={`${styles.retryButton} button-danger`} onClick={handleRegenerate}>
+                <button 
+                  className={`${styles.retryButton} button-danger`} 
+                  onClick={handleRegenerate}
+                  aria-label="Retry generating suggestion"
+                >
                   Try Again
                 </button>
               </div>
             )}
 
             {!isLoading && !error && suggestion && (
-              <div className={styles.suggestion}>
+              <div className={styles.suggestion} role="article" aria-label="Generated suggestion text">
                 <p className={styles.suggestionText}>{suggestion}</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className={styles.footer}>
+        <div className={styles.footer} role="group" aria-label="Suggestion actions">
           <button
             className={`${styles.secondaryButton} button-secondary`}
             onClick={handleRegenerate}
             disabled={isLoading}
+            aria-label="Regenerate suggestion"
+            aria-disabled={isLoading}
           >
             🔄 Regenerate
           </button>
@@ -205,6 +211,8 @@ const GhostWriterModal: React.FC<GhostWriterModalProps> = ({
             className={`${styles.primaryButton} button-primary`}
             onClick={handleAccept}
             disabled={isLoading || !suggestion}
+            aria-label="Accept and insert suggestion into text"
+            aria-disabled={isLoading || !suggestion}
           >
             ✓ Accept & Insert
           </button>

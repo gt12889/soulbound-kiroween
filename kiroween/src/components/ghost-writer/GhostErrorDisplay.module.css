@@ -59,6 +59,9 @@
   
   /* Entrance animation */
   animation: containerAppear 0.4s ease-out 0.3s backwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 @keyframes containerAppear {
@@ -88,16 +91,20 @@
   animation: pulse 2s ease-in-out infinite;
   filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
   position: absolute;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
+/* Optimized pulse animation - uses only transform and opacity */
 @keyframes pulse {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+    opacity: 0.9;
   }
   50% {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8));
+    opacity: 1;
   }
 }
 
@@ -109,14 +116,19 @@
   right: -5px;
   animation: blink 1.5s ease-in-out infinite;
   filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 
+/* Optimized blink animation - uses only opacity */
 @keyframes blink {
   0%, 100% {
     opacity: 1;
+    transform: scale(1);
   }
   50% {
     opacity: 0.3;
+    transform: scale(1);
   }
 }
 

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Writer - High Contrast Mode Test</title>
+  <style>
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #8b5cf6;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(26, 26, 26, 0.6);
+      border: 1px solid rgba(77, 45, 110, 0.3);
+      border-radius: 8px;
+    }
+
+    .toggle-button {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.3));
+      border: 2px solid rgba(139, 92, 246, 0.5);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-button:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.4));
+      border-color: rgba(139, 92, 246, 0.7);
+      transform: translateY(-2px);
+    }
+
+    .demo-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(26, 26, 26, 0.4);
+      border: 1px solid rgba(77, 45, 110, 0.3);
+      border-radius: 8px;
+    }
+
+    .demo-section h2 {
+      color: #a78bfa;
+      margin-top: 0;
+    }
+
+    /* Import actual Ghost Writer styles */
+    .suggestion-display {
+      position: relative;
+      max-width: 600px;
+      background: rgba(139, 92, 246, 0.1);
+      border-left: 3px solid #8b5cf6;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .suggestion-text {
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.95);
+      line-height: 1.6;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .action-button {
+      padding: 0.625rem 1rem;
+      font-size: 0.9375rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      color: rgba(224, 224, 224, 0.95);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .accept-button {
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .accept-button:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      transform: scale(1.05);
+    }
+
+    .reject-button {
+      border-color: rgba(239, 68, 68, 0.5);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .reject-button:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      transform: scale(1.05);
+    }
+
+    .loading-indicator {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 3px solid transparent;
+      border-top-color: rgba(139, 92, 246, 0.8);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-message {
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.9);
+    }
+
+    .error-display {
+      padding: 2rem;
+      background: rgba(45, 27, 30, 0.8);
+      border: 2px solid rgba(239, 68, 68, 0.4);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .error-message {
+      color: rgba(254, 202, 202, 0.95);
+      font-style: italic;
+      margin: 1rem 0;
+    }
+
+    /* High Contrast Mode Styles */
+    @media (prefers-contrast: high) {
+      .suggestion-display {
+        border-left-width: 4px;
+        background: rgba(139, 92, 246, 0.2);
+      }
+
+      .suggestion-text {
+        color: #ffffff;
+      }
+
+      .action-button {
+        border-width: 3px;
+      }
+
+      .accept-button {
+        border-color: #10b981;
+      }
+
+      .reject-button {
+        border-color: #ef4444;
+      }
+
+      .spinner {
+        border-width: 4px;
+        border-top-color: #8b5cf6;
+      }
+
+      .loading-message {
+        color: #ffffff;
+      }
+
+      .error-display {
+        border-width: 3px;
+        background: rgba(45, 27, 30, 0.95);
+      }
+
+      .error-message {
+        color: #ffffff;
+      }
+    }
+
+    /* Simulated high contrast class for testing */
+    body.high-contrast .suggestion-display {
+      border-left-width: 4px;
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    body.high-contrast .suggestion-text {
+      color: #ffffff;
+    }
+
+    body.high-contrast .action-button {
+      border-width: 3px;
+    }
+
+    body.high-contrast .accept-button {
+      border-color: #10b981;
+    }
+
+    body.high-contrast .reject-button {
+      border-color: #ef4444;
+    }
+
+    body.high-contrast .spinner {
+      border-width: 4px;
+      border-top-color: #8b5cf6;
+    }
+
+    body.high-contrast .loading-message {
+      color: #ffffff;
+    }
+
+    body.high-contrast .error-display {
+      border-width: 3px;
+      background: rgba(45, 27, 30, 0.95);
+    }
+
+    body.high-contrast .error-message {
+      color: #ffffff;
+    }
+
+    .status {
+      padding: 0.5rem 1rem;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 6px;
+      margin-left: 1rem;
+      display: inline-block;
+    }
+
+    .status.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #10b981;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎃 Ghost Writer - High Contrast Mode Test</h1>
+
+    <div class="controls">
+      <button class="toggle-button" onclick="toggleHighContrast()">
+        Toggle High Contrast Mode
+      </button>
+      <span class="status" id="status">Normal Mode</span>
+      <p style="margin-top: 1rem; color: rgba(224, 224, 224, 0.7); font-size: 0.9rem;">
+        Note: This simulates high contrast mode. To test the real CSS media query, enable high contrast mode in your operating system settings.
+      </p>
+    </div>
+
+    <div class="demo-section">
+      <h2>Suggestion Display</h2>
+      <div class="suggestion-display">
+        <p class="suggestion-text">
+          The spirits whisper ancient wisdom through the veil of time, 
+          revealing secrets that have been hidden for centuries in the 
+          depths of forgotten libraries.
+        </p>
+      </div>
+      <div class="action-buttons">
+        <button class="action-button accept-button">✓ Accept</button>
+        <button class="action-button reject-button">✕ Reject</button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Loading State</h2>
+      <div class="loading-indicator">
+        <div class="spinner"></div>
+        <p class="loading-message">Summoning spirits from beyond...</p>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Error State</h2>
+      <div class="error-display">
+        <p class="error-message">
+          💀 The spirits are silent... Try again?
+        </p>
+        <button class="action-button accept-button">🔄 Retry</button>
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>Testing Instructions</h2>
+      <ol style="line-height: 1.8;">
+        <li><strong>Simulated Mode:</strong> Click the "Toggle High Contrast Mode" button above to see the simulated high contrast styles.</li>
+        <li><strong>Real System Mode (Windows):</strong> Go to Settings → Accessibility → Contrast themes → Select a high contrast theme</li>
+        <li><strong>Real System Mode (macOS):</strong> System Preferences → Accessibility → Display → Check "Increase contrast"</li>
+        <li><strong>Browser DevTools:</strong> Open DevTools → Rendering → Emulate CSS media feature prefers-contrast → Select "high"</li>
+      </ol>
+      <h3>What to Look For:</h3>
+      <ul style="line-height: 1.8;">
+        <li>Text should be pure white (#ffffff) for maximum readability</li>
+        <li>Borders should be thicker (3-4px) and more visible</li>
+        <li>Background colors should have higher opacity</li>
+        <li>All interactive elements should be clearly distinguishable</li>
+        <li>Decorative effects (shadows, glows) should be reduced or removed</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function toggleHighContrast() {
+      document.body.classList.toggle('high-contrast');
+      const status = document.getElementById('status');
+      if (document.body.classList.contains('high-contrast')) {
+        status.textContent = 'High Contrast Mode';
+        status.classList.add('active');
+      } else {
+        status.textContent = 'Normal Mode';
+        status.classList.remove('active');
+      }
+    }
+  </script>
+</body>
+</html>

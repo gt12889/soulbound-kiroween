@@ -6,6 +6,8 @@ import { AppProvider } from '../contexts/AppContext';
 import { NotesProvider } from '../contexts/NotesContext';
 import { TasksProvider } from '../contexts/TasksContext';
 import { ToastProvider } from '../contexts/ToastContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
+import { CompanionProvider } from '../contexts/CompanionContext';
 
 /**
  * Test utilities for integration tests
@@ -13,17 +15,22 @@ import { ToastProvider } from '../contexts/ToastContext';
  */
 
 // Wrapper with all providers
+// Note: CompanionProvider must be before TasksProvider since TasksProvider depends on CompanionContext
 export const AllProviders = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
     <AuthProvider>
       <ToastProvider>
-        <AppProvider>
-          <NotesProvider>
-            <TasksProvider>
-              {children}
-            </TasksProvider>
-          </NotesProvider>
-        </AppProvider>
+        <ThemeProvider>
+          <AppProvider>
+            <NotesProvider>
+              <CompanionProvider>
+                <TasksProvider>
+                  {children}
+                </TasksProvider>
+              </CompanionProvider>
+            </NotesProvider>
+          </AppProvider>
+        </ThemeProvider>
       </ToastProvider>
     </AuthProvider>
   </BrowserRouter>

@@ -134,12 +134,14 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
 
   return (
     <div className={styles.editorContainer}>
-      <div className={styles.toolbar}>
+      <div className={styles.toolbar} role="toolbar" aria-label="Writing tools">
         <button
           className={`${styles.ghostButton} button-primary`}
           onClick={handleOpenModal}
           disabled={currentText.trim().length === 0}
           title="Summon Ghost Writer (Ctrl+G)"
+          aria-label="Summon Ghost Writer assistant (Ctrl+G)"
+          aria-disabled={currentText.trim().length === 0}
         >
           👻 Summon Ghost Writer
         </button>
@@ -151,6 +153,10 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
         onInput={handleInput}
         suppressContentEditableWarning
         data-placeholder="Begin writing your dark tales..."
+        role="textbox"
+        aria-label="Writing editor"
+        aria-multiline="true"
+        aria-placeholder="Begin writing your dark tales..."
       />
       
       <GhostWriterModal

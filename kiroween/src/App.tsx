@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavig
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider, useApp } from './contexts/AppContext';
+import { CompanionProvider } from './contexts/CompanionContext';
 import { KeyboardProvider } from './contexts/KeyboardContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { NotesProvider } from './contexts/NotesContext';
@@ -252,9 +253,11 @@ const App: React.FC = () => {
             <ToastProvider>
               <KeyboardProvider>
                 <NotesProvider>
-                  <TasksProvider>
-                    <AppContent />
-                  </TasksProvider>
+                  <CompanionProvider>
+                    <TasksProvider>
+                      <AppContent />
+                    </TasksProvider>
+                  </CompanionProvider>
                 </NotesProvider>
               </KeyboardProvider>
             </ToastProvider>

@@ -659,3 +659,89 @@
   width: 100%;
   justify-content: center;
 }
+
+/* Settings Group */
+.settingGroup {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-secondary);
+}
+
+/* Toggle Styles */
+.toggleLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  transition: all var(--timing-hover) var(--ease-in-out);
+}
+
+.toggleLabel:hover {
+  border-color: var(--accent-purple);
+  background: rgba(77, 45, 110, 0.1);
+}
+
+.toggleInput {
+  appearance: none;
+  width: 48px;
+  height: 24px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--timing-normal) var(--ease-in-out);
+  flex-shrink: 0;
+}
+
+.toggleInput::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: var(--text-secondary);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: all var(--timing-normal) var(--ease-in-out);
+}
+
+.toggleInput:checked {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple-light);
+}
+
+.toggleInput:checked::before {
+  background: var(--text-primary);
+  transform: translateX(24px);
+}
+
+.toggleInput:focus {
+  outline: 2px solid var(--accent-purple);
+  outline-offset: 2px;
+}
+
+.toggleText {
+  color: var(--text-primary);
+  font-size: 1rem;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .settingGroup {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .toggleLabel {
+    padding: 0.875rem;
+  }
+  
+  .toggleText {
+    font-size: 0.95rem;
+  }
+}

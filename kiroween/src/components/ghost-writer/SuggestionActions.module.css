@@ -76,6 +76,8 @@
   font-size: 1.125rem;
   line-height: 1;
   transition: transform 0.2s ease;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Button text */
@@ -342,18 +344,27 @@
     0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Disabled state */
-.actionButton:disabled {
+/* Disabled state - using aria-disabled to keep in tab order */
+.actionButton:disabled,
+.actionButton[aria-disabled="true"],
+.actionButton.disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
 }
 
-.actionButton:disabled:hover {
+.actionButton:disabled:hover,
+.actionButton[aria-disabled="true"]:hover,
+.actionButton.disabled:hover {
   background: rgba(0, 0, 0, 0.5);
   border-color: transparent;
   box-shadow: none;
   transform: none;
+}
+
+.actionButton[aria-disabled="true"] .buttonIcon,
+.actionButton.disabled .buttonIcon {
+  animation: none !important;
 }
 
 /* Focus styles for keyboard navigation */

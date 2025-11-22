@@ -47,6 +47,9 @@
   transform: translateY(0);
   pointer-events: auto;
   animation: ghostAppear 0.5s ease-out forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 /* Ghost appearance animation - combines fade-in and slide-up */
@@ -65,11 +68,60 @@
   }
 }
 
+/* Optimistic state - placeholder suggestion while loading */
+.suggestionDisplay.optimistic {
+  /* Reduced opacity to indicate it's a placeholder */
+  opacity: 0.6;
+  
+  /* Subtle pulsing animation */
+  animation: optimisticPulse 2s ease-in-out infinite;
+  
+  /* Slightly muted colors */
+  background: rgba(139, 92, 246, 0.05);
+  border-left-color: rgba(139, 92, 246, 0.5);
+  
+  /* Reduced shadow */
+  box-shadow: 
+    0 0 15px rgba(139, 92, 246, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.suggestionDisplay.optimistic .suggestionText {
+  /* Slightly faded text */
+  color: rgba(224, 224, 224, 0.7);
+}
+
+.suggestionDisplay.optimistic .ghostIndicator {
+  /* Animated loading indicator */
+  animation: floatGhost 3s ease-in-out infinite, spin 2s linear infinite;
+}
+
+@keyframes optimisticPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Accepting state - transition to normal text */
 /* Uses animations from animations.css */
 .suggestionDisplay.accepting {
   /* Animation is defined in animations.css as acceptSuggestion */
   animation: acceptSuggestion 1s ease-out forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 /* Glow effect layer */
@@ -87,6 +139,8 @@
   opacity: 0;
   animation: pulseGlow 3s ease-in-out infinite;
   pointer-events: none;
+  will-change: opacity, transform;
+  backface-visibility: hidden;
 }
 
 @keyframes pulseGlow {
@@ -165,6 +219,61 @@
   animation: textNormalize 1s ease-out forwards;
 }
 
+/* Optimistic loading label */
+.optimisticLabel {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  
+  /* Styling */
+  background: rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  border-radius: 12px;
+  padding: 4px 12px;
+  
+  /* Typography */
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(224, 224, 224, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  
+  /* Shadow */
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  
+  /* Animation */
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+.loadingDots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* Ghost indicator */
 .ghostIndicator {
   position: absolute;
@@ -193,6 +302,8 @@
   
   /* Animation */
   animation: floatGhost 3s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 @keyframes floatGhost {

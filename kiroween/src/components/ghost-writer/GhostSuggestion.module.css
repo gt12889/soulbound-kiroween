@@ -122,3 +122,41 @@
     padding: 0.4rem 0.8rem;
   }
 }
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ghostSuggestion {
+    border-width: 2px;
+    box-shadow: 0 4px 12px rgba(77, 45, 110, 0.4);
+  }
+  
+  .ghostSuggestion.visible {
+    opacity: 1;
+  }
+  
+  .ghostSuggestion.hovered {
+    color: #ffffff;
+    background: rgba(77, 45, 110, 0.8);
+    border-color: #4d2d6e;
+    box-shadow: 
+      0 6px 20px rgba(77, 45, 110, 0.6),
+      0 0 40px rgba(77, 45, 110, 0.4);
+  }
+  
+  .ghostIcon {
+    opacity: 0.9;
+  }
+  
+  .ghostSuggestion.hovered .ghostIcon {
+    opacity: 1;
+  }
+  
+  .ghostSuggestion.hovered::before {
+    background: linear-gradient(
+      45deg,
+      rgba(77, 45, 110, 0.5),
+      rgba(61, 90, 128, 0.5),
+      rgba(77, 45, 110, 0.5)
+    );
+  }
+}

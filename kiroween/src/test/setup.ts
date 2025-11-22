@@ -43,6 +43,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock Firebase
 vi.mock('../services/firebaseService', () => ({
+  isFirebaseConfigured: true,
   auth: {
     currentUser: null,
     onAuthStateChanged: vi.fn((callback) => {

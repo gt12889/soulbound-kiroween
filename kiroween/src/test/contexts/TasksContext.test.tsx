@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { TasksProvider, useTasks } from '../../contexts/TasksContext';
-import type { ReactNode } from 'react';
+import { useTasks } from '../../contexts/TasksContext';
+import { AllProviders } from '../test-utils';
 
-// Wrapper component for testing
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <TasksProvider>{children}</TasksProvider>
-);
+// Use AllProviders wrapper which includes all necessary contexts
+const wrapper = AllProviders;
 
 describe('TasksContext - Tags and Archiving', () => {
   describe('Tag Filtering', () => {

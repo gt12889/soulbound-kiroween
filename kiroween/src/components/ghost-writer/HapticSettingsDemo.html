@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haptic Settings Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a0b2e 0%, #2d1b4e 100%);
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(30, 20, 50, 0.8);
+      border: 2px solid #8b5cf6;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #c4b5fd;
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+
+    .description {
+      text-align: center;
+      color: #a78bfa;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .setting-group {
+      background: rgba(77, 45, 110, 0.3);
+      border: 1px solid #6d28d9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .setting-title {
+      font-size: 1.25rem;
+      color: #e0e0e0;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .setting-description {
+      color: #a78bfa;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      padding: 1rem;
+      background: rgba(30, 20, 50, 0.5);
+      border: 1px solid #6d28d9;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-label:hover {
+      border-color: #8b5cf6;
+      background: rgba(77, 45, 110, 0.3);
+    }
+
+    .toggle-input {
+      appearance: none;
+      width: 48px;
+      height: 24px;
+      background: rgba(30, 20, 50, 0.8);
+      border: 2px solid #6d28d9;
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .toggle-input::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background: #a78bfa;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-input:checked {
+      background: #8b5cf6;
+      border-color: #a78bfa;
+    }
+
+    .toggle-input:checked::before {
+      background: #e0e0e0;
+      transform: translateX(24px);
+    }
+
+    .toggle-input:focus {
+      outline: 2px solid #8b5cf6;
+      outline-offset: 2px;
+    }
+
+    .toggle-text {
+      color: #e0e0e0;
+      font-size: 1rem;
+      user-select: none;
+    }
+
+    .test-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .test-button {
+      padding: 1rem 1.5rem;
+      border: 2px solid;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(30, 20, 50, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .test-button.success {
+      border-color: #10b981;
+      color: #10b981;
+    }
+
+    .test-button.success:hover {
+      background: rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .test-button.error {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .test-button.error:hover {
+      background: rgba(239, 68, 68, 0.2);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .test-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(77, 45, 110, 0.3);
+      border: 1px solid #6d28d9;
+      border-radius: 8px;
+      text-align: center;
+      color: #a78bfa;
+      font-size: 0.9rem;
+    }
+
+    .support-warning {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #ef4444;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 Haptic Settings Demo</h1>
+    <p class="description">
+      Test the haptic feedback settings feature. Toggle the setting and try the test buttons to feel the difference.
+    </p>
+
+    <div id="supportWarning" class="support-warning" style="display: none;">
+      ⚠️ Vibration API is not supported on this device/browser
+    </div>
+
+    <div class="setting-group">
+      <h3 class="setting-title">Haptic Feedback</h3>
+      <p class="setting-description">
+        Enable vibration feedback on mobile devices for actions like accepting suggestions or errors.
+      </p>
+      <label class="toggle-label">
+        <input 
+          type="checkbox" 
+          id="hapticsToggle"
+          class="toggle-input"
+          checked
+        />
+        <span class="toggle-text">Enable haptic feedback</span>
+      </label>
+    </div>
+
+    <div class="test-buttons">
+      <button class="test-button success" id="successBtn">
+        ✓ Test Success Haptic
+      </button>
+      <button class="test-button error" id="errorBtn">
+        ✕ Test Error Haptic
+      </button>
+    </div>
+
+    <div class="status" id="status">
+      Ready to test. Try toggling the setting and pressing the buttons.
+    </div>
+  </div>
+
+  <script>
+    // Haptic patterns
+    const HAPTIC_PATTERNS = {
+      success: [50, 50, 50],
+      error: [30, 30, 30, 30, 30],
+    };
+
+    // Check if haptics are supported
+    const isHapticSupported = () => {
+      return 'vibrate' in navigator;
+    };
+
+    // Get haptics enabled state
+    let hapticsEnabled = true;
+
+    // Trigger haptic feedback
+    const triggerHaptic = (pattern) => {
+      if (!isHapticSupported()) {
+        return false;
+      }
+
+      if (!hapticsEnabled) {
+        return false;
+      }
+
+      try {
+        const vibrationPattern = HAPTIC_PATTERNS[pattern];
+        navigator.vibrate(vibrationPattern);
+        return true;
+      } catch (error) {
+        console.warn('Haptic feedback failed:', error);
+        return false;
+      }
+    };
+
+    // Update status message
+    const updateStatus = (message, type = 'info') => {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.style.borderColor = type === 'success' ? '#10b981' : 
+                                 type === 'error' ? '#ef4444' : '#6d28d9';
+      status.style.color = type === 'success' ? '#10b981' : 
+                          type === 'error' ? '#ef4444' : '#a78bfa';
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('hapticsToggle');
+      const successBtn = document.getElementById('successBtn');
+      const errorBtn = document.getElementById('errorBtn');
+      const supportWarning = document.getElementById('supportWarning');
+
+      // Show warning if not supported
+      if (!isHapticSupported()) {
+        supportWarning.style.display = 'block';
+        successBtn.disabled = true;
+        errorBtn.disabled = true;
+        updateStatus('Vibration API not supported on this device', 'error');
+      }
+
+      // Toggle handler
+      toggle.addEventListener('change', (e) => {
+        hapticsEnabled = e.target.checked;
+        const status = hapticsEnabled ? 'enabled' : 'disabled';
+        updateStatus(`Haptic feedback ${status}. Try the test buttons!`, 'info');
+      });
+
+      // Success button
+      successBtn.addEventListener('click', () => {
+        const triggered = triggerHaptic('success');
+        if (triggered) {
+          updateStatus('✓ Success haptic triggered!', 'success');
+        } else if (!hapticsEnabled) {
+          updateStatus('Haptic feedback is disabled in settings', 'error');
+        } else {
+          updateStatus('Haptic feedback not supported', 'error');
+        }
+      });
+
+      // Error button
+      errorBtn.addEventListener('click', () => {
+        const triggered = triggerHaptic('error');
+        if (triggered) {
+          updateStatus('✕ Error haptic triggered!', 'error');
+        } else if (!hapticsEnabled) {
+          updateStatus('Haptic feedback is disabled in settings', 'error');
+        } else {
+          updateStatus('Haptic feedback not supported', 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

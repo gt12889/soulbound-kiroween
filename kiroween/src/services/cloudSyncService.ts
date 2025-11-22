@@ -549,6 +549,84 @@ class CloudSyncService {
   }
 
   /**
+   * Sync companion data to Firestore
+   * Requirements: Spirit Companion Interactions - Task 2.1
+   */
+  async syncCompanionData(userId: string, companionData: any): Promise<void> {
+    if (!db) throw new Error('Firebase is not initialized.');
+    try {
+      const companionRef = doc(db, 'users', userId, 'companion', 'data');
+      await setDoc(companionRef, {
+        ...companionData,
+        syncedAt: serverTimestamp(),
+      }, { merge: true });
+      this.clearRetryState('companion', 'data');
+    } catch (error) {
+      this.handleSyncError(error, 'companion', 'data');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch companion data from Firestore
+   * Requirements: Spirit Companion Interactions - Task 2.1
+   */
+  async fetchCompanionData(userId: string): Promise<any | null> {
+    if (!db) throw new Error('Firebase is not initialized.');
+    try {
+      const companionDoc = await getDocs(collection(db, 'users', userId, 'companion'));
+      
+      if (companionDoc.empty) {
+        return null;
+      }
+
+      const dataDoc = companionDoc.docs.find(doc => doc.id === 'data');
+      if (!dataDoc) {
+        return null;
+      }
+
+      return dataDoc.data();
+    } catch (error) {
+      console.error('Failed to fetch companion data from cloud:', error);
+      throw new CloudSyncError(
+        'Failed to fetch companion data from cloud',
+        this.getErrorCode(error)
+      );
+    }
+  }
+
+  /**
+   * Subscribe to real-time companion data updates
+   * Requirements: Spirit Companion Interactions - Task 2.1
+   */
+  subscribeToCompanionData(
+    userId: string,
+    callback: (companionData: any) => void,
+    onError?: (error: Error) => void
+  ): Unsubscribe {
+    if (!db) throw new Error('Firebase is not initialized.');
+    const companionRef = doc(db, 'users', userId, 'companion', 'data');
+    
+    const unsubscribe = onSnapshot(
+      companionRef,
+      (snapshot) => {
+        if (snapshot.exists()) {
+          callback(snapshot.data());
+        }
+      },
+      (error) => {
+        console.error('Error in companion data subscription:', error);
+        if (onError) {
+          onError(error);
+        }
+      }
+    );
+
+    this.syncListeners.set(`companion_${userId}`, unsubscribe);
+    return unsubscribe;
+  }
+
+  /**
    * Sync app settings to Firestore
    * Requirements: 10.3, 17.3
    */

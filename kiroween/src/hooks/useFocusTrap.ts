@@ -54,11 +54,12 @@ export function useFocusTrap({ isActive, onEscape, restoreFocus = true }: UseFoc
       focusableElements[0].focus();
     }
 
-    // Handle Tab key to trap focus
+    // Handle Tab key to trap focus - use capture phase to intercept before other handlers
     const handleKeyDown = (e: KeyboardEvent) => {
       // Handle Escape key
       if (e.key === 'Escape' && onEscape) {
         e.preventDefault();
+        e.stopPropagation();
         onEscape();
         return;
       }
@@ -70,29 +71,46 @@ export function useFocusTrap({ isActive, onEscape, restoreFocus = true }: UseFoc
 
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
+        const currentElement = document.activeElement;
 
+        // Check if focus is currently within the container
+        const focusIsInContainer = container.contains(currentElement);
+
+        // Only trap focus at the boundaries
         if (e.shiftKey) {
-          // Shift + Tab: move focus backwards
-          if (document.activeElement === firstElement) {
+          // Shift + Tab: wrap to last element if at first element
+          if (focusIsInContainer && currentElement === firstElement) {
             e.preventDefault();
+            e.stopPropagation();
+            lastElement.focus();
+          } else if (!focusIsInContainer) {
+            // If focus escaped, bring it back to last element
+            e.preventDefault();
+            e.stopPropagation();
             lastElement.focus();
           }
         } else {
-          // Tab: move focus forwards
-          if (document.activeElement === lastElement) {
+          // Tab: wrap to first element if at last element
+          if (focusIsInContainer && currentElement === lastElement) {
             e.preventDefault();
+            e.stopPropagation();
+            firstElement.focus();
+          } else if (!focusIsInContainer) {
+            // If focus escaped, bring it back to first element
+            e.preventDefault();
+            e.stopPropagation();
             firstElement.focus();
           }
         }
       }
     };
 
-    // Add event listener
-    container.addEventListener('keydown', handleKeyDown);
+    // Add event listener with capture phase to intercept Tab before it bubbles
+    document.addEventListener('keydown', handleKeyDown, true);
 
     // Cleanup
     return () => {
-      container.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
 
       // Restore focus to the element that had focus before the modal opened
       if (restoreFocus && previousActiveElement.current) {

@@ -29,7 +29,7 @@ type TabId = 'account' | 'appearance' | 'keyboard' | 'audio' | 'data';
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { notes, importNotes } = useNotes();
   const { tasks, importTasks } = useTasks();
-  const { settings } = useApp();
+  const { settings, updateSettings } = useApp();
   const { user, logout } = useAuth();
   const { setShowShortcutsPanel } = useKeyboard();
   const [activeTab, setActiveTab] = useState<TabId>('account');
@@ -177,6 +177,26 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Appearance</h3>
             <ThemeSelector />
+            
+            <div className={styles.settingGroup}>
+              <h4 className={styles.subsectionTitle}>Haptic Feedback</h4>
+              <p className={styles.sectionDescription}>
+                Enable vibration feedback on mobile devices for actions like accepting suggestions or errors.
+              </p>
+              <label className={styles.toggleLabel}>
+                <input
+                  type="checkbox"
+                  checked={settings.hapticsEnabled !== false}
+                  onChange={(e) => {
+                    updateSettings({ hapticsEnabled: e.target.checked });
+                  }}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleText}>
+                  Enable haptic feedback
+                </span>
+              </label>
+            </div>
           </section>
         );
 

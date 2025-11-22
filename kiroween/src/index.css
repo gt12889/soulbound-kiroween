@@ -4,6 +4,9 @@
 /* Import Ambient Animations */
 @import './styles/ambient-animations.css';
 
+/* Import Animation Complexity Optimizations */
+@import './components/ghost-writer/complexity-optimizations.css';
+
 :root {
   font-family: 'Lora', 'Merriweather', serif;
   line-height: 1.6;

@@ -234,3 +234,54 @@
     font-size: 0.85rem;
   }
 }
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .backdrop {
+    background: rgba(0, 0, 0, 0.95);
+  }
+  
+  .modal {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-top-width: 3px;
+    border-top-color: #9d4edd;
+  }
+  
+  .title {
+    color: #ffffff;
+    text-shadow: none;
+  }
+  
+  .closeButton {
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .closeButton:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .loading p {
+    color: #ffffff;
+  }
+  
+  .error p {
+    color: #ffffff;
+  }
+  
+  .retryButton {
+    border-width: 2px;
+    color: #ffffff;
+  }
+  
+  .suggestionText {
+    color: #ffffff;
+  }
+  
+  .primaryButton, .secondaryButton {
+    border-width: 2px;
+    color: #ffffff;
+  }
+}

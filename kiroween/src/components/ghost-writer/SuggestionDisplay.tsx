@@ -6,6 +6,7 @@ import './animations.css';
 interface SuggestionDisplayProps {
   suggestion: GhostSuggestionType;
   isAccepting?: boolean;
+  isOptimistic?: boolean; // Indicates if this is a placeholder/optimistic suggestion
 }
 
 /**
@@ -28,6 +29,7 @@ interface SuggestionDisplayProps {
 const SuggestionDisplay: React.FC<SuggestionDisplayProps> = ({
   suggestion,
   isAccepting = false,
+  isOptimistic = false,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
@@ -68,9 +70,9 @@ const SuggestionDisplay: React.FC<SuggestionDisplayProps> = ({
       ref={containerRef}
       className={`${styles.suggestionDisplay} ${isVisible ? styles.visible : ''} ${
         isAccepting ? styles.accepting : ''
-      }`}
+      } ${isOptimistic ? styles.optimistic : ''}`}
       role="region"
-      aria-label="AI writing suggestion"
+      aria-label={isOptimistic ? "Generating AI suggestion..." : "AI writing suggestion"}
       aria-live="polite"
     >
       {/* Ghostly glow effect */}
@@ -82,6 +84,13 @@ const SuggestionDisplay: React.FC<SuggestionDisplayProps> = ({
           <div className="acceptGlow" aria-hidden="true" />
           <div className="radialGlowOverlay" aria-hidden="true" />
         </>
+      )}
+      
+      {/* Optimistic loading indicator */}
+      {isOptimistic && (
+        <div className={styles.optimisticLabel} aria-hidden="true">
+          <span className={styles.loadingDots}>Generating</span>
+        </div>
       )}
       
       {/* Suggestion text with shimmer effect during acceptance */}

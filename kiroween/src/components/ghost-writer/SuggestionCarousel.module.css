@@ -20,8 +20,9 @@
   
   /* Performance optimizations */
   will-change: contents;
-  contain: layout style;
+  contain: layout style paint;
   overflow: hidden; /* Prevent content from showing during slide transitions */
+  backface-visibility: hidden;
 }
 
 /* Navigation Buttons */
@@ -245,15 +246,21 @@
 /* Default animation - simple fade in */
 .suggestionWrapper > * {
   animation: fadeIn 0.3s ease-out;
+  will-change: opacity;
+  backface-visibility: hidden;
 }
 
 /* Transition animations based on direction */
 .transitionLeft > * {
   animation: slideInFromRight 0.3s ease-out;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .transitionRight > * {
   animation: slideInFromLeft 0.3s ease-out;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 /* Ghostly glow effect on navigation buttons */
@@ -316,5 +323,41 @@
     to {
       opacity: 1;
     }
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .navButton {
+    background: rgba(139, 92, 246, 0.3);
+    border-width: 2px;
+    border-color: rgba(139, 92, 246, 0.9);
+  }
+  
+  .navButton:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.5);
+    border-color: #8b5cf6;
+  }
+  
+  .indicator {
+    border-width: 2px;
+    border-color: rgba(139, 92, 246, 0.9);
+  }
+  
+  .indicatorActive {
+    background: #8b5cf6;
+    border-color: #8b5cf6;
+  }
+  
+  .counter,
+  .navigationHint {
+    color: #ffffff;
+    opacity: 1;
+  }
+  
+  .navigationHint kbd {
+    color: #ffffff;
+    border-width: 2px;
+    background: var(--bg-primary);
   }
 }
