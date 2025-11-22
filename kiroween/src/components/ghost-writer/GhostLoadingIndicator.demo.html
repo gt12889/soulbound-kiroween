@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostLoadingIndicator Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #e0e0e0;
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+
+    .demo-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1rem;
+      color: #e0e0e0;
+      background: rgba(139, 92, 246, 0.3);
+      border: 1px solid rgba(139, 92, 246, 0.6);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(139, 92, 246, 0.5);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Loading Indicator Styles */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .particles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      bottom: -20px;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.8) 0%, rgba(139, 92, 246, 0.4) 50%, transparent 100%);
+      border-radius: 50%;
+      animation: floatUp 4s ease-in infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+      10% { opacity: 0.8; }
+      50% { opacity: 0.6; }
+      90% { opacity: 0.2; }
+      100% { transform: translateY(-500px) translateX(var(--drift, 0)) scale(0.5); opacity: 0; }
+    }
+
+    .spinner-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 40px rgba(139, 92, 246, 0.4)); }
+      50% { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.8)) drop-shadow(0 0 60px rgba(139, 92, 246, 0.6)); }
+    }
+
+    .spinner-ring {
+      position: absolute;
+      border: 2px solid transparent;
+      border-top-color: rgba(139, 92, 246, 0.8);
+      border-right-color: rgba(139, 92, 246, 0.6);
+      border-radius: 50%;
+      animation: rotate 2s linear infinite;
+    }
+
+    .spinner-ring:nth-child(1) {
+      width: 100%;
+      height: 100%;
+      animation-duration: 2s;
+    }
+
+    .spinner-ring:nth-child(2) {
+      width: 80%;
+      height: 80%;
+      animation-duration: 1.5s;
+      animation-direction: reverse;
+      border-top-color: rgba(61, 90, 128, 0.8);
+      border-right-color: rgba(61, 90, 128, 0.6);
+    }
+
+    .spinner-ring:nth-child(3) {
+      width: 60%;
+      height: 60%;
+      animation-duration: 1s;
+      border-top-color: rgba(139, 92, 246, 0.6);
+      border-right-color: rgba(139, 92, 246, 0.4);
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .ghost-icon {
+      font-size: 2.5rem;
+      animation: float 2s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .message {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.125rem;
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.9);
+      text-align: center;
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    .cancel-button {
+      padding: 0.5rem 1.5rem;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 0.875rem;
+      color: rgba(224, 224, 224, 0.8);
+      background: rgba(45, 27, 78, 0.3);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .cancel-button:hover {
+      color: rgba(224, 224, 224, 1);
+      background: rgba(45, 27, 78, 0.5);
+      border-color: rgba(139, 92, 246, 0.6);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .info {
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.6;
+      color: rgba(224, 224, 224, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <h1>👻 GhostLoadingIndicator Demo</h1>
+  
+  <div class="demo-container" id="demoContainer">
+    <!-- Loading indicator will be inserted here -->
+  </div>
+
+  <div class="controls">
+    <button onclick="showLoading()">Show Loading</button>
+    <button onclick="hideLoading()">Hide Loading</button>
+    <button onclick="toggleLoading()">Toggle Loading</button>
+  </div>
+
+  <div class="info">
+    <p>This is a standalone demo of the GhostLoadingIndicator component.</p>
+    <p>Features: 12 floating particles, pulsing glow, rotating rings, and a floating ghost icon.</p>
+  </div>
+
+  <script>
+    let isShowing = false;
+
+    function createLoadingIndicator() {
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay';
+      overlay.id = 'loadingOverlay';
+
+      const container = document.createElement('div');
+      container.className = 'container';
+
+      // Create particles
+      const particlesContainer = document.createElement('div');
+      particlesContainer.className = 'particles-container';
+      for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.animationDelay = `${Math.random() * 3}s`;
+        particle.style.animationDuration = `${3 + Math.random() * 2}s`;
+        particle.style.setProperty('--drift', `${(Math.random() - 0.5) * 100}px`);
+        particlesContainer.appendChild(particle);
+      }
+
+      // Create spinner
+      const spinnerContainer = document.createElement('div');
+      spinnerContainer.className = 'spinner-container';
+      
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      
+      for (let i = 0; i < 3; i++) {
+        const ring = document.createElement('div');
+        ring.className = 'spinner-ring';
+        spinner.appendChild(ring);
+      }
+      
+      const ghostIcon = document.createElement('div');
+      ghostIcon.className = 'ghost-icon';
+      ghostIcon.textContent = '👻';
+      spinner.appendChild(ghostIcon);
+      
+      spinnerContainer.appendChild(spinner);
+
+      // Create message
+      const message = document.createElement('div');
+      message.className = 'message';
+      message.textContent = 'Summoning spirits...';
+
+      // Create cancel button
+      const cancelButton = document.createElement('button');
+      cancelButton.className = 'cancel-button';
+      cancelButton.textContent = 'Cancel';
+      cancelButton.onclick = hideLoading;
+
+      // Assemble
+      container.appendChild(particlesContainer);
+      container.appendChild(spinnerContainer);
+      container.appendChild(message);
+      container.appendChild(cancelButton);
+      overlay.appendChild(container);
+
+      return overlay;
+    }
+
+    function showLoading() {
+      if (isShowing) return;
+      const demoContainer = document.getElementById('demoContainer');
+      const overlay = createLoadingIndicator();
+      demoContainer.appendChild(overlay);
+      isShowing = true;
+    }
+
+    function hideLoading() {
+      if (!isShowing) return;
+      const overlay = document.getElementById('loadingOverlay');
+      if (overlay) {
+        overlay.remove();
+      }
+      isShowing = false;
+    }
+
+    function toggleLoading() {
+      if (isShowing) {
+        hideLoading();
+      } else {
+        showLoading();
+      }
+    }
+
+    // Show loading by default
+    showLoading();
+  </script>
+</body>
+</html>

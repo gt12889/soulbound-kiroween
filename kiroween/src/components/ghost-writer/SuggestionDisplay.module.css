@@ -1,0 +1,303 @@
+/* SuggestionDisplay - Mystical AI suggestion styling */
+
+.suggestionDisplay {
+  /* Positioning */
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  min-width: 300px;
+  width: 100%;
+  
+  /* Ghostly styling - purple tint */
+  background: rgba(139, 92, 246, 0.1);
+  border-left: 3px solid var(--accent-purple, #8b5cf6);
+  border-radius: 8px;
+  
+  /* Spacing */
+  padding: 1rem 1.5rem;
+  margin: 0.5rem 0;
+  
+  /* Shadow with purple glow */
+  box-shadow: 
+    0 0 20px rgba(139, 92, 246, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  
+  /* Glassmorphism effect */
+  backdrop-filter: blur(10px);
+  
+  /* Initial state - hidden */
+  opacity: 0;
+  transform: translateY(10px);
+  
+  /* Smooth transitions */
+  transition: 
+    opacity 0.3s ease-in-out,
+    transform 0.5s ease-in-out,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  
+  /* Prevent interaction until visible */
+  pointer-events: none;
+}
+
+/* Visible state - fade-in and slide-up animation */
+.suggestionDisplay.visible {
+  opacity: 0.9;
+  transform: translateY(0);
+  pointer-events: auto;
+  animation: ghostAppear 0.5s ease-out forwards;
+}
+
+/* Ghost appearance animation - combines fade-in and slide-up */
+@keyframes ghostAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  60% {
+    opacity: 0.95;
+    transform: translateY(-2px) scale(1.01);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Accepting state - transition to normal text */
+/* Uses animations from animations.css */
+.suggestionDisplay.accepting {
+  /* Animation is defined in animations.css as acceptSuggestion */
+  animation: acceptSuggestion 1s ease-out forwards;
+}
+
+/* Glow effect layer */
+.glowEffect {
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.2),
+    rgba(139, 92, 246, 0.05),
+    rgba(139, 92, 246, 0.2)
+  );
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0;
+  animation: pulseGlow 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+/* Text container - handles scrolling for long suggestions */
+.textContainer {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* Custom scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.5) rgba(0, 0, 0, 0.2);
+}
+
+/* Webkit scrollbar styling */
+.textContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.textContainer::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.textContainer::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 3px;
+}
+
+.textContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* Suggestion text - italic styling */
+.suggestionText {
+  margin: 0;
+  padding: 0;
+  
+  /* Typography */
+  font-family: var(--font-body, 'Lora', 'Merriweather', Georgia, serif);
+  font-size: 1rem;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  
+  /* Italic for distinction */
+  font-style: italic;
+  
+  /* Color */
+  color: rgba(224, 224, 224, 0.95);
+  
+  /* Text rendering */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Word wrapping */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  
+  /* Smooth transitions for acceptance */
+  transition: font-style 0.3s ease, color 0.3s ease, letter-spacing 0.3s ease;
+}
+
+/* Text normalization during acceptance */
+.suggestionDisplay.accepting .suggestionText {
+  animation: textNormalize 1s ease-out forwards;
+}
+
+/* Ghost indicator */
+.ghostIndicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  
+  /* Size */
+  width: 32px;
+  height: 32px;
+  
+  /* Styling */
+  background: rgba(139, 92, 246, 0.3);
+  border: 2px solid var(--accent-purple, #8b5cf6);
+  border-radius: 50%;
+  
+  /* Center emoji */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* Typography */
+  font-size: 1.2rem;
+  
+  /* Shadow */
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+  
+  /* Animation */
+  animation: floatGhost 3s ease-in-out infinite;
+}
+
+@keyframes floatGhost {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(5deg);
+  }
+}
+
+/* Hover state - enhanced glow */
+.suggestionDisplay:hover {
+  background: rgba(139, 92, 246, 0.15);
+  box-shadow: 
+    0 0 30px rgba(139, 92, 246, 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.suggestionDisplay:hover .glowEffect {
+  opacity: 0.8;
+}
+
+.suggestionDisplay:hover .ghostIndicator {
+  background: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.6);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .suggestionDisplay {
+    max-width: 90vw;
+    min-width: 250px;
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .suggestionText {
+    font-size: 0.9375rem;
+  }
+  
+  .textContainer {
+    max-height: 200px;
+  }
+  
+  .ghostIndicator {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .suggestionDisplay {
+    max-width: 95vw;
+    min-width: 200px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .suggestionText {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .textContainer {
+    max-height: 150px;
+  }
+  
+  .ghostIndicator {
+    width: 24px;
+    height: 24px;
+    font-size: 0.875rem;
+    top: -6px;
+    right: -6px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .suggestionDisplay {
+    border-left-width: 4px;
+    background: rgba(139, 92, 246, 0.2);
+  }
+  
+  .suggestionText {
+    color: #ffffff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .suggestionDisplay,
+  .glowEffect,
+  .ghostIndicator {
+    animation: none;
+    transition: none;
+  }
+  
+  .suggestionDisplay.visible {
+    opacity: 0.9;
+    transform: none;
+  }
+}

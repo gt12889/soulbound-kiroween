@@ -1,0 +1,471 @@
+/* GhostErrorDisplay - Error state styling with mystical theme */
+
+/* Overlay - semi-transparent red-tinted background */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002; /* Higher than loading indicator */
+  animation: fadeIn 0.3s ease-in-out, shake 0.4s ease-in-out 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Shake animation for error emphasis */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-8px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(8px);
+  }
+}
+
+/* Main container */
+.container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 450px;
+  width: 90%;
+  
+  /* Red-tinted glassmorphism */
+  background: rgba(45, 27, 30, 0.8);
+  border: 2px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  box-shadow: 
+    0 0 30px rgba(239, 68, 68, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  
+  /* Entrance animation */
+  animation: containerAppear 0.4s ease-out 0.3s backwards;
+}
+
+@keyframes containerAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Icon container with dual icons */
+.iconContainer {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Error icon (skull) */
+.errorIcon {
+  font-size: 3.5rem;
+  animation: pulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+  position: absolute;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8));
+  }
+}
+
+/* Warning icon (overlaid) */
+.warningIcon {
+  font-size: 2rem;
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  animation: blink 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Error message */
+.message {
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: rgba(254, 202, 202, 0.95);
+  text-align: center;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  line-height: 1.5;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+
+/* Context/help message */
+.contextMessage {
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 0.95rem;
+  color: rgba(224, 224, 224, 0.75);
+  text-align: center;
+  line-height: 1.4;
+  max-width: 100%;
+  word-wrap: break-word;
+  margin-top: -0.5rem;
+}
+
+/* Technical details (collapsible) */
+.technicalDetails {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.detailsSummary {
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 0.875rem;
+  color: rgba(224, 224, 224, 0.6);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.detailsSummary:hover {
+  color: rgba(224, 224, 224, 0.8);
+  background: rgba(45, 27, 30, 0.5);
+}
+
+.detailsSummary:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.6);
+  outline-offset: 2px;
+}
+
+.detailsContent {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: rgba(254, 202, 202, 0.8);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-height: 150px;
+  overflow-y: auto;
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 68, 68, 0.5) rgba(0, 0, 0, 0.2);
+}
+
+.detailsContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detailsContent::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.detailsContent::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.5);
+  border-radius: 3px;
+}
+
+.detailsContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.7);
+}
+
+/* Settings link */
+.settingsLink {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.link {
+  color: var(--accent-purple, #8b5cf6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+}
+
+.link:hover {
+  color: var(--accent-purple-light, #a78bfa);
+  background: rgba(139, 92, 246, 0.1);
+  text-decoration: underline;
+}
+
+.link:focus {
+  outline: 2px solid var(--accent-purple, #8b5cf6);
+  outline-offset: 2px;
+}
+
+/* Action buttons container */
+.actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Base button styling */
+.button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Lora', 'Merriweather', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.buttonIcon {
+  font-size: 1.2rem;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+/* Retry button - prominent with red glow */
+.retryButton {
+  color: rgba(254, 202, 202, 1);
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.retryButton:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+}
+
+.retryButton:hover .buttonIcon {
+  transform: rotate(180deg);
+}
+
+.retryButton:active {
+  transform: translateY(0);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.retryButton:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.8);
+  outline-offset: 2px;
+}
+
+.retryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: none;
+}
+
+.retryButton:disabled:hover {
+  transform: none;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: none;
+}
+
+/* Dismiss button - subtle */
+.dismissButton {
+  color: rgba(224, 224, 224, 0.8);
+  background: rgba(45, 27, 30, 0.3);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.dismissButton:hover {
+  color: rgba(224, 224, 224, 1);
+  background: rgba(45, 27, 30, 0.5);
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
+}
+
+.dismissButton:hover .buttonIcon {
+  transform: scale(1.2);
+}
+
+.dismissButton:active {
+  transform: translateY(0);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+}
+
+.dismissButton:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.8);
+  outline-offset: 2px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
+    gap: 1.25rem;
+    max-width: 90vw;
+  }
+
+  .iconContainer {
+    width: 70px;
+    height: 70px;
+  }
+
+  .errorIcon {
+    font-size: 3rem;
+  }
+
+  .warningIcon {
+    font-size: 1.75rem;
+  }
+
+  .message {
+    font-size: 1.125rem;
+  }
+
+  .button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9375rem;
+    min-width: 110px;
+  }
+
+  .buttonIcon {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.25rem;
+    gap: 1rem;
+    max-width: 95vw;
+  }
+
+  .iconContainer {
+    width: 60px;
+    height: 60px;
+  }
+
+  .errorIcon {
+    font-size: 2.5rem;
+  }
+
+  .warningIcon {
+    font-size: 1.5rem;
+  }
+
+  .message {
+    font-size: 1rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .button {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    min-width: unset;
+  }
+
+  .buttonIcon {
+    font-size: 1rem;
+  }
+
+  .detailsContent {
+    font-size: 0.75rem;
+    max-height: 100px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .container {
+    border-width: 3px;
+    background: rgba(45, 27, 30, 0.95);
+  }
+
+  .message {
+    color: #ffffff;
+  }
+
+  .button {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .container,
+  .errorIcon,
+  .warningIcon,
+  .button,
+  .buttonIcon {
+    animation: none;
+    transition: none;
+  }
+
+  .overlay {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .errorIcon {
+    filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+  }
+
+  .warningIcon {
+    filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+    opacity: 1;
+  }
+}

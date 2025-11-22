@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shake Animation Demo - Ghost Writer Error</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    h1 {
+      color: #ef4444;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+      margin-bottom: 2rem;
+    }
+
+    .demo-container {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      background: rgba(20, 20, 20, 0.8);
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Overlay - semi-transparent red-tinted background */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(20, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1002;
+      animation: fadeIn 0.3s ease-in-out, shake 0.4s ease-in-out 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Shake animation for error emphasis */
+    @keyframes shake {
+      0%, 100% {
+        transform: translateX(0);
+      }
+      10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-8px);
+      }
+      20%, 40%, 60%, 80% {
+        transform: translateX(8px);
+      }
+    }
+
+    /* Main container */
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 450px;
+      width: 90%;
+      
+      /* Red-tinted glassmorphism */
+      background: rgba(45, 27, 30, 0.8);
+      border: 2px solid rgba(239, 68, 68, 0.4);
+      border-radius: 12px;
+      box-shadow: 
+        0 0 30px rgba(239, 68, 68, 0.3),
+        0 8px 24px rgba(0, 0, 0, 0.4);
+      
+      /* Entrance animation */
+      animation: containerAppear 0.4s ease-out 0.3s backwards;
+    }
+
+    @keyframes containerAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Icon container */
+    .iconContainer {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Error icon (skull) */
+    .errorIcon {
+      font-size: 3.5rem;
+      animation: pulse 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+      position: absolute;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.6));
+      }
+      50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 30px rgba(239, 68, 68, 0.8));
+      }
+    }
+
+    /* Warning icon */
+    .warningIcon {
+      font-size: 2rem;
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      animation: blink 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.8));
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    /* Error message */
+    .message {
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      font-size: 1.25rem;
+      font-style: italic;
+      color: rgba(254, 202, 202, 0.95);
+      text-align: center;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      font-size: 1rem;
+      background: rgba(239, 68, 68, 0.2);
+      border: 2px solid rgba(239, 68, 68, 0.6);
+      border-radius: 8px;
+      color: rgba(254, 202, 202, 1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.8);
+      box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .info {
+      text-align: center;
+      max-width: 600px;
+      padding: 1rem;
+      background: rgba(45, 27, 30, 0.5);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 8px;
+      line-height: 1.6;
+    }
+
+    .info strong {
+      color: #ef4444;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎃 Shake Animation Demo</h1>
+  
+  <div class="info">
+    <p>
+      <strong>Shake Animation:</strong> The error overlay shakes horizontally to emphasize the error state.
+      The animation triggers 0.3s after the fade-in completes, creating a dramatic entrance effect.
+    </p>
+    <p>
+      <strong>Timing:</strong> 0.4s duration with 5 shake cycles (left-right-left-right-left)
+    </p>
+  </div>
+
+  <div class="demo-container">
+    <div class="overlay" id="errorOverlay">
+      <div class="container">
+        <div class="iconContainer">
+          <div class="errorIcon">💀</div>
+          <div class="warningIcon">⚠️</div>
+        </div>
+        <div class="message">
+          The spirits are silent... Try again?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="replayAnimation()">🔄 Replay Animation</button>
+    <button onclick="toggleAnimation()">⏸️ Toggle Animation</button>
+  </div>
+
+  <script>
+    let animationEnabled = true;
+
+    function replayAnimation() {
+      const overlay = document.getElementById('errorOverlay');
+      
+      // Remove and re-add to restart animation
+      overlay.style.animation = 'none';
+      overlay.offsetHeight; // Trigger reflow
+      overlay.style.animation = 'fadeIn 0.3s ease-in-out, shake 0.4s ease-in-out 0.3s';
+    }
+
+    function toggleAnimation() {
+      const overlay = document.getElementById('errorOverlay');
+      const button = event.target;
+      
+      animationEnabled = !animationEnabled;
+      
+      if (animationEnabled) {
+        overlay.style.animation = 'fadeIn 0.3s ease-in-out, shake 0.4s ease-in-out 0.3s';
+        button.textContent = '⏸️ Toggle Animation';
+      } else {
+        overlay.style.animation = 'none';
+        button.textContent = '▶️ Toggle Animation';
+      }
+    }
+
+    // Auto-replay every 5 seconds for demo purposes
+    setInterval(() => {
+      if (animationEnabled) {
+        replayAnimation();
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

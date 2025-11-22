@@ -1,0 +1,566 @@
+.navigation {
+  width: var(--nav-width-expanded);
+  height: 100vh;
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-right: 2px solid var(--border-primary);
+  padding: 2rem 1rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 5px 0 20px var(--shadow-heavy);
+  z-index: var(--z-dropdown);
+  transition: width var(--timing-normal) var(--ease-standard), padding var(--timing-normal) var(--ease-standard);
+}
+
+.navigation.collapsed {
+  width: var(--nav-width-collapsed);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.navigation.collapsed .navLabel,
+.navigation.collapsed .navDescription,
+.navigation.collapsed .quickCaptureLabel,
+.navigation.collapsed .settingsLabel,
+.navigation.collapsed .exportLabel,
+.navigation.collapsed .logoutLabel {
+  display: none;
+}
+
+.toggleButton {
+  position: absolute;
+  top: 1.5rem;
+  right: -1rem; /* Adjust to be partially outside the nav */
+  width: 2rem;
+  height: 2rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 50%;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 2px 8px var(--shadow-medium);
+  transition: transform var(--timing-micro) var(--ease-standard), background var(--timing-micro) var(--ease-standard);
+}
+
+.toggleButton:hover {
+  background: var(--accent-purple);
+  transform: scale(1.1);
+}
+
+.navigation.collapsed .toggleButton {
+  right: -0.5rem; /* Adjust position when collapsed */
+}
+/* Header Section - Forest Entrance */
+.navHeader {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-primary);
+  text-align: center;
+  position: relative;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  display: block;
+}
+
+.navigation.collapsed .navHeader {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+.navHeader:hover {
+  transform: translateY(-2px);
+}
+
+.navHeader:hover .title {
+  text-shadow: 0 0 15px var(--glow-purple), 0 0 25px var(--glow-purple);
+}
+
+.navHeader:hover .subtitle {
+  color: var(--text-primary);
+}
+
+.navHeader:hover .forestIcon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 15px var(--glow-purple));
+}
+
+.forestIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  filter: drop-shadow(0 0 8px var(--shadow-light));
+  animation: sway 4s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.navHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-purple-light), transparent);
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.title {
+  font-family: var(--font-header);
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+.navigation.collapsed .title {
+  display: none;
+}
+
+.subtitle {
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+  letter-spacing: 0.15em;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.navigation.collapsed .subtitle {
+  display: none;
+}
+
+/* Navigation List - Forest Paths */
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  position: relative;
+}
+
+.navList::before {
+  content: '🌿';
+  position: absolute;
+  top: -1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  opacity: 0.5;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+.navItem {
+  margin-bottom: 0.75rem;
+  transition: transform var(--timing-hover) var(--ease-in-out);
+  position: relative;
+}
+
+.navigation.collapsed .navItem {
+  justify-content: center;
+}
+
+.navItem::before {
+  content: '→';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: all var(--timing-hover) var(--ease-in-out);
+  color: var(--accent-purple-light);
+}
+
+.navItem:hover::before {
+  opacity: 1;
+  left: -10px;
+}
+
+.navItem:hover {
+  transform: translateX(5px);
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: var(--bg-secondary);
+  transition: all var(--timing-micro) var(--ease-in-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.navigation.collapsed .navLink {
+  padding: 0.75rem 0.5rem;
+  justify-content: center;
+}
+
+.navLink::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--shadow-light), transparent);
+  transition: left var(--timing-normal) var(--ease-in-out);
+}
+
+.navLink:hover::before {
+  left: 100%;
+}
+
+.navLink:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+}
+
+.navItem.active .navLink {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  color: var(--text-primary);
+  box-shadow: 0 0 20px var(--glow-purple), inset 0 0 10px var(--shadow-medium);
+}
+
+.navItem.active .navLink::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent-purple-light);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+/* Icon Styling */
+.navIcon {
+  font-size: 2rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  transition: transform var(--timing-hover) var(--ease-in-out);
+  filter: drop-shadow(0 0 5px var(--shadow-light));
+}
+
+.navigation.collapsed .navIcon {
+  margin-right: 0;
+}
+
+.navLink:hover .navIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.navItem.active .navIcon {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Content Section */
+.navContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navigation.collapsed .navContent {
+  display: none;
+}
+
+.navLabel {
+  font-family: var(--font-header);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.navDescription {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  transition: color var(--timing-hover) var(--ease-in-out);
+}
+
+.navLink:hover .navDescription,
+.navItem.active .navDescription {
+  color: var(--text-secondary);
+}
+
+/* Footer Section */
+.navFooter {
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-primary);
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.navigation.collapsed .navFooter {
+  padding-top: 1rem;
+}
+
+.navFooter::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-purple-light), transparent);
+}
+
+/* Quick Capture, Settings, Export and Logout Buttons */
+.quickCaptureButton,
+.settingsButton,
+.exportButton,
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-header);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all var(--timing-micro) var(--ease-in-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.navigation.collapsed .quickCaptureButton,
+.navigation.collapsed .settingsButton,
+.navigation.collapsed .exportButton,
+.navigation.collapsed .logoutButton {
+  padding: 0.5rem;
+}
+
+/* Quick Capture Button - Special styling for prominence */
+.quickCaptureButton {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  color: var(--text-primary);
+  box-shadow: 0 0 10px var(--glow-purple);
+}
+
+.quickCaptureButton::before,
+.settingsButton::before,
+.exportButton::before,
+.logoutButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--shadow-light), transparent);
+  transition: left var(--timing-normal) var(--ease-in-out);
+}
+
+.quickCaptureButton:hover::before,
+.settingsButton:hover::before,
+.exportButton:hover::before,
+.logoutButton:hover::before {
+  left: 100%;
+}
+
+.quickCaptureButton:hover,
+.settingsButton:hover,
+.exportButton:hover,
+.logoutButton:hover {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow-medium), 0 0 15px var(--glow-purple);
+  transform: translateY(-2px);
+}
+
+.quickCaptureButton:active,
+.settingsButton:active,
+.exportButton:active,
+.logoutButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px var(--shadow-medium);
+}
+
+.quickCaptureIcon,
+.settingsIcon,
+.exportIcon,
+.logoutIcon {
+  font-size: 1.25rem;
+  filter: drop-shadow(0 0 5px var(--shadow-light));
+  transition: transform var(--timing-hover) var(--ease-in-out);
+}
+
+.navigation.collapsed .quickCaptureIcon,
+.navigation.collapsed .settingsIcon,
+.navigation.collapsed .exportIcon,
+.navigation.collapsed .logoutIcon {
+  margin-right: 0;
+}
+
+.quickCaptureButton:hover .quickCaptureIcon,
+.settingsButton:hover .settingsIcon,
+.exportButton:hover .exportIcon,
+.logoutButton:hover .logoutIcon {
+  transform: scale(1.1);
+  animation: pulseGlow 1s ease-in-out infinite;
+}
+
+.quickCaptureIcon {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { 
+    filter: drop-shadow(0 0 5px var(--glow-purple));
+    transform: scale(1);
+  }
+  50% { 
+    filter: drop-shadow(0 0 10px var(--glow-purple));
+    transform: scale(1.05);
+  }
+}
+
+.quickCaptureLabel,
+.settingsLabel,
+.exportLabel,
+.logoutLabel {
+  font-weight: 600;
+}
+
+.navigation.collapsed .quickCaptureLabel,
+.navigation.collapsed .settingsLabel,
+.navigation.collapsed .exportLabel,
+.navigation.collapsed .logoutLabel {
+  display: none;
+}
+
+.ornament {
+  font-size: 1.5rem;
+  color: var(--accent-purple-light);
+  animation: pulse 3s ease-in-out infinite;
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .navigation {
+    padding: 1.5rem 0.75rem;
+  }
+  
+  .navIcon {
+    font-size: 1.75rem;
+    margin-right: 0.75rem;
+  }
+  
+  .navLabel {
+    font-size: 0.85rem;
+  }
+  
+  .navDescription {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navigation {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 2px solid var(--border-primary);
+    padding: 1rem;
+  }
+  
+  .navList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .navItem {
+    flex: 1 1 calc(50% - 0.5rem);
+    margin-bottom: 0;
+  }
+  
+  .navLink {
+    padding: 0.75rem;
+  }
+  
+  .navContent {
+    display: none;
+  }
+  
+  .navIcon {
+    margin-right: 0;
+    font-size: 2rem;
+  }
+  
+  .navFooter {
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .exportButton {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .exportLabel {
+    display: none;
+  }
+  
+  .exportIcon {
+    font-size: 1.5rem;
+  }
+  
+  .ornament {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .navItem {
+    flex: 1 1 100%;
+  }
+  
+  .navLink {
+    justify-content: center;
+  }
+  
+  .exportButton {
+    width: 100%;
+  }
+}

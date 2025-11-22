@@ -1,0 +1,124 @@
+.calendarContainer {
+  padding: 2rem;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-family: 'Creepster', cursive;
+  font-size: 3rem;
+  color: var(--accent-purple-light);
+  text-shadow: 0 0 15px var(--glow-purple);
+  margin: 0;
+}
+
+.subtitle {
+  font-family: 'Lora', serif;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.weekday {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: var(--bg-tertiary);
+}
+
+.emptyCell {
+  min-height: 120px;
+}
+
+.dayCell {
+  min-height: 120px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 4px;
+  padding: 0.5rem;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.dayCell:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-purple);
+}
+
+.dayNumber {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.tasksForDay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.taskItem {
+  background: var(--accent-purple-dark);
+  color: var(--text-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Moon Phase Calendar Section */
+.moonSection {
+  margin: 2rem auto;
+  max-width: 800px;
+  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+}
+
+.divider {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-primary) 50%,
+    transparent 100%
+  );
+  margin: 2rem 0;
+}
+
+.sectionTitle {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  text-align: center;
+  margin: 1.5rem 0;
+  text-shadow: 0 0 10px var(--glow-purple);
+}

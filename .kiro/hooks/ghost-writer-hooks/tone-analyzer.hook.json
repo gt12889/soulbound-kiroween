@@ -1,0 +1,52 @@
+{
+  "id": "ghost-writer-tone-analyzer",
+  "name": "Tone Analyzer",
+  "version": "1.0.0",
+  "description": "Analyzes writing tone, style, and provides improvement suggestions",
+  "enabled": true,
+  "trigger": {
+    "type": "multi",
+    "triggers": [
+      {
+        "type": "button-click",
+        "buttonId": "summon-ghost-writer"
+      },
+      {
+        "type": "keyboard-shortcut",
+        "keys": ["Tab", "Tab"],
+        "timeWindow": 500
+      }
+    ],
+    "conditions": {
+      "minTextLength": 100,
+      "activeComponents": ["GhostWriter", "WritingEditor"]
+    }
+  },
+  "agent": {
+    "type": "ghost-writer",
+    "mode": "analysis",
+    "model": "gemini-pro",
+    "temperature": 0.5,
+    "maxTokens": 500
+  },
+  "behavior": {
+    "action": "analyze-and-suggest",
+    "displayMode": "modal-dialog",
+    "analysisCategories": [
+      "tone",
+      "style",
+      "pacing",
+      "voice",
+      "clarity",
+      "engagement"
+    ],
+    "provideSuggestions": true,
+    "showExamples": true
+  },
+  "ui": {
+    "modalTitle": "Ghost Writer Analysis",
+    "showLoadingState": true,
+    "animateResults": true,
+    "keyboardShortcutHint": "Press Tab Tab to summon"
+  }
+}
