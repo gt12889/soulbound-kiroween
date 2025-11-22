@@ -1,7 +1,7 @@
 import { useTasks } from '../../contexts/TasksContext';
 import { useNotes } from '../../contexts/NotesContext';
 import { achievements } from '../../utils/achievements';
-import { SpiritCompanion } from '../spirit-companion/SpiritCompanion';
+import { InteractiveCompanion } from '../spirit-companion/InteractiveCompanion';
 import { useSpiritCompanion } from '../../hooks/useSpiritCompanion';
 import { useToast } from '../../contexts/ToastContext';
 import styles from './AchievementsPage.module.css';
@@ -37,7 +37,7 @@ export function AchievementsPage() {
 
       {/* Spirit Companion Section */}
       <div className={styles.companionSection}>
-        <SpiritCompanion
+        <InteractiveCompanion
           achievementCount={companionStats.achievementCount}
           taskCompletionCount={companionStats.taskCompletionCount}
           onInteract={handleCompanionInteract}

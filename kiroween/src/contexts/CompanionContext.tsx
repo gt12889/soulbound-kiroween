@@ -122,6 +122,9 @@ export interface CompanionContextType {
   // Context
   currentContext: UserContext;
   
+  // Dialogue
+  themeChangeDialogue: string | null;
+  
   // Statistics
   stats: CompanionStats;
   
@@ -133,6 +136,9 @@ export interface CompanionContextType {
   addExperience: (amount: number) => void;
   updateContext: (context: Partial<UserContext>) => void;
   trackTaskCompletion: (taskId: string, isTombstone: boolean) => void;
+  trackNoteActivity: (noteId: string, noteLength: number) => void;
+  startNoteTaking: () => void;
+  endNoteTaking: () => void;
   
   // Settings
   audioEnabled: boolean;
@@ -256,13 +262,31 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     }));
   }, [currentModule]);
   
-  // Update context when theme changes
+  // Track previous theme for change detection
+  const [previousTheme, setPreviousTheme] = useState<string>(themeId);
+  const [themeChangeDialogue, setThemeChangeDialogue] = useState<string | null>(null);
+  
+  // Update context when theme changes and trigger dialogue
   useEffect(() => {
     setUserContext(prev => ({
       ...prev,
       currentTheme: themeId,
     }));
-  }, [themeId]);
+    
+    // Trigger theme change dialogue if theme actually changed
+    if (previousTheme !== themeId && previousTheme !== '') {
+      // Import dialogue service dynamically to avoid circular dependencies
+      import('../services/companionDialogueService').then(({ getThemeDialogue }) => {
+        const dialogue = getThemeDialogue(activeCompanion, themeId as any);
+        setThemeChangeDialogue(dialogue);
+        
+        // Clear dialogue after 5 seconds
+        setTimeout(() => setThemeChangeDialogue(null), 5000);
+      });
+    }
+    
+    setPreviousTheme(themeId);
+  }, [themeId, previousTheme, activeCompanion]);
   
   // Update moon phase periodically
   useEffect(() => {
@@ -536,6 +560,47 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     }));
   }, [addExperience, setStats, lastTaskDate, setTasksCompletedToday, setLastTaskDate]);
   
+  /**
+   * Track note-taking activity for rituals and context awareness
+   * Requirements: 10.2
+   */
+  const trackNoteActivity = useCallback((_noteId: string, noteLength: number) => {
+    // Award small XP for note-taking activity
+    if (noteLength > 100) {
+      addExperience(5);
+    }
+    
+    // Check for long note encouragement (500+ characters)
+    if (noteLength >= 500) {
+      // This could trigger companion dialogue in the UI
+      console.log('Long note detected - companion should show encouragement');
+    }
+  }, [addExperience]);
+  
+  /**
+   * Start note-taking activity tracking
+   * Requirements: 10.2
+   */
+  const startNoteTaking = useCallback(() => {
+    setUserContext(prev => ({
+      ...prev,
+      currentActivity: 'note-taking',
+      timeInCurrentActivity: 0,
+    }));
+  }, []);
+  
+  /**
+   * End note-taking activity tracking
+   * Requirements: 10.2
+   */
+  const endNoteTaking = useCallback(() => {
+    setUserContext(prev => ({
+      ...prev,
+      currentActivity: 'idle',
+      timeInCurrentActivity: 0,
+    }));
+  }, []);
+  
   const value: CompanionContextType = {
     // Core state
     activeCompanion,
@@ -560,6 +625,9 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     // Context
     currentContext: userContext,
     
+    // Dialogue
+    themeChangeDialogue,
+    
     // Statistics
     stats,
     
@@ -571,6 +639,9 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     addExperience,
     updateContext,
     trackTaskCompletion,
+    trackNoteActivity,
+    startNoteTaking,
+    endNoteTaking,
     
     // Settings
     audioEnabled,

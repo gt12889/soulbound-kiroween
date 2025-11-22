@@ -215,10 +215,11 @@ export function TasksProvider({ children }: TasksProviderProps) {
     
     // Announce to screen readers
     if (task) {
+      const isNowCompleted = !task.completed; // Task is being toggled, so new state is opposite
       announce(task.completed ? `Task "${task.title}" marked as incomplete` : `Task "${task.title}" completed`);
       
       // Notify companion when task is completed (not when uncompleted)
-      if (!wasCompleted && !task.completed) {
+      if (!wasCompleted && isNowCompleted) {
         const isTombstone = task.priority === 'high' || task.tags?.includes('tombstone') || false;
         trackTaskCompletion(id, isTombstone);
       }

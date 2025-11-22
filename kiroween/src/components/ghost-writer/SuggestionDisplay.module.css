@@ -6,7 +6,7 @@
   z-index: 1;
   max-width: 600px;
   min-width: 300px;
-  width: 100%;
+  width: max-content; /* Dynamic sizing for content */
   
   /* Ghostly styling - purple tint */
   background: rgba(139, 92, 246, 0.1);
@@ -156,9 +156,11 @@
 
 /* Text container - handles scrolling for long suggestions */
 .textContainer {
-  max-height: 300px;
+  max-height: 400px; /* Increased from 300px */
   overflow-y: auto;
   overflow-x: hidden;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   
   /* Custom scrollbar styling */
   scrollbar-width: thin;
@@ -192,7 +194,7 @@
   /* Typography */
   font-family: var(--font-body, 'Lora', 'Merriweather', Georgia, serif);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.7; /* Improved from 1.6 */
   letter-spacing: 0.01em;
   
   /* Italic for distinction */
@@ -206,9 +208,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   
-  /* Word wrapping */
+  /* Word wrapping - enhanced */
   word-wrap: break-word;
   overflow-wrap: break-word;
+  hyphens: auto;
+  max-height: none; /* Remove height constraint */
   
   /* Smooth transitions for acceptance */
   transition: font-style 0.3s ease, color 0.3s ease, letter-spacing 0.3s ease;

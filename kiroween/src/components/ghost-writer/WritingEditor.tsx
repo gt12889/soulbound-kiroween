@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import GhostWriterModal from './GhostWriterModal';
 import styles from './WritingEditor.module.css';
 
@@ -8,12 +8,27 @@ interface WritingEditorProps {
   hasSuggestion?: boolean;
 }
 
-const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSuggestion, hasSuggestion }) => {
+export interface WritingEditorHandle {
+  insertSuggestion: (text: string) => void;
+  insertText: (text: string) => void;
+  focus: () => void;
+  getElement: () => HTMLDivElement | null;
+  getText: () => string;
+  setText: (text: string) => void;
+  getCurrentContext: () => string;
+  getCursorPosition: () => number;
+}
+
+const STORAGE_KEY = 'ghostwriter_content';
+const AUTOSAVE_DELAY = 1000; // Save after 1 second of inactivity
+
+const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onTextChange, onAcceptSuggestion, hasSuggestion }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentText, setCurrentText] = useState('');
   const lastTabTime = useRef<number>(0);
   const DOUBLE_TAB_THRESHOLD = 500; // milliseconds
+  const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Extract current sentence or paragraph context
   const extractContext = useCallback((text: string, position: number): string => {
@@ -63,6 +78,16 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
     return preCaretRange.toString().length;
   }, []);
 
+  // Save to localStorage
+  const saveToLocalStorage = useCallback((text: string) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, text);
+      console.log('[WritingEditor] Content saved to localStorage');
+    } catch (error) {
+      console.error('[WritingEditor] Failed to save to localStorage:', error);
+    }
+  }, []);
+
   // Handle text input
   const handleInput = useCallback(() => {
     if (!editorRef.current) return;
@@ -75,7 +100,15 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
     if (onTextChange) {
       onTextChange(text, context, position);
     }
-  }, [getCursorPosition, extractContext, onTextChange]);
+
+    // Debounced autosave to localStorage
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+    autosaveTimerRef.current = setTimeout(() => {
+      saveToLocalStorage(text);
+    }, AUTOSAVE_DELAY);
+  }, [getCursorPosition, extractContext, onTextChange, saveToLocalStorage]);
 
   // Insert suggestion at cursor
   const insertSuggestion = useCallback((suggestion: string) => {
@@ -100,12 +133,62 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
     handleInput();
   }, [handleInput]);
 
-  // Expose insertSuggestion method to parent
+  // Load saved content from localStorage on mount
   useEffect(() => {
-    if (editorRef.current) {
-      (editorRef.current as any).insertSuggestion = insertSuggestion;
+    try {
+      const savedContent = localStorage.getItem(STORAGE_KEY);
+      if (savedContent && editorRef.current) {
+        editorRef.current.innerText = savedContent;
+        setCurrentText(savedContent);
+        console.log('[WritingEditor] Loaded saved content from localStorage');
+      }
+    } catch (error) {
+      console.error('[WritingEditor] Failed to load from localStorage:', error);
     }
-  }, [insertSuggestion]);
+  }, []);
+
+  // Expose methods to parent via ref
+  useImperativeHandle(ref, () => ({
+    insertSuggestion,
+    insertText: insertSuggestion, // Alias for compatibility
+    focus: () => {
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    },
+    getElement: () => editorRef.current,
+    getText: () => currentText,
+    setText: (text: string) => {
+      if (editorRef.current) {
+        editorRef.current.innerText = text;
+        setCurrentText(text);
+        handleInput();
+      }
+    },
+    getCurrentContext: () => {
+      const position = getCursorPosition();
+      return extractContext(currentText, position);
+    },
+    getCursorPosition,
+  }), [insertSuggestion, currentText, handleInput, getCursorPosition, extractContext]);
+
+  // Save on unmount and cleanup autosave timer
+  useEffect(() => {
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+      // Save immediately on unmount
+      if (currentText) {
+        try {
+          localStorage.setItem(STORAGE_KEY, currentText);
+          console.log('[WritingEditor] Content saved on unmount');
+        } catch (error) {
+          console.error('[WritingEditor] Failed to save on unmount:', error);
+        }
+      }
+    };
+  }, [currentText]);
 
   // Open Ghost Writer modal
   const handleOpenModal = () => {
@@ -167,6 +250,8 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ onTextChange, onAcceptSug
       />
     </div>
   );
-};
+});
+
+WritingEditor.displayName = 'WritingEditor';
 
 export default WritingEditor;

@@ -1,0 +1,362 @@
+/**
+ * CompanionDialogue Styles
+ * 
+ * Speech bubble system with companion-specific colored styling.
+ * Each companion type (shadow, forest, ember) has unique color schemes.
+ */
+
+/* Container positioning */
+.dialogueContainer {
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  animation: dialogueEnter 0.3s ease-out;
+}
+
+.dialogueContainer.dismissing {
+  animation: dialogueExit 0.3s ease-out forwards;
+}
+
+@keyframes dialogueEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dialogueExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* Position variants */
+.dialogueContainer.top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 1rem;
+}
+
+.dialogueContainer.bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 1rem;
+}
+
+.dialogueContainer.left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 1rem;
+}
+
+.dialogueContainer.right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 1rem;
+}
+
+/* Speech bubble */
+.bubble {
+  position: relative;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  min-width: 150px;
+  max-width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+/* Companion-specific colors - Shadow Spirit (Purple) */
+.dialogueContainer.shadow .bubble {
+  border-color: #9d4edd;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(157, 78, 221, 0.3),
+    inset 0 0 20px rgba(157, 78, 221, 0.1);
+}
+
+.dialogueContainer.shadow .bubble:hover {
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(157, 78, 221, 0.5),
+    inset 0 0 30px rgba(157, 78, 221, 0.15);
+}
+
+.dialogueContainer.shadow .tail {
+  border-color: #9d4edd;
+  filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.5));
+}
+
+/* Companion-specific colors - Forest Familiar (Green) */
+.dialogueContainer.forest .bubble {
+  border-color: #10b981;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(16, 185, 129, 0.3),
+    inset 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.dialogueContainer.forest .bubble:hover {
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(16, 185, 129, 0.5),
+    inset 0 0 30px rgba(16, 185, 129, 0.15);
+}
+
+.dialogueContainer.forest .tail {
+  border-color: #10b981;
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
+}
+
+/* Companion-specific colors - Ember Phoenix (Orange) */
+.dialogueContainer.ember .bubble {
+  border-color: #f97316;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(249, 115, 22, 0.3),
+    inset 0 0 20px rgba(249, 115, 22, 0.1);
+}
+
+.dialogueContainer.ember .bubble:hover {
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(249, 115, 22, 0.5),
+    inset 0 0 30px rgba(249, 115, 22, 0.15);
+}
+
+.dialogueContainer.ember .tail {
+  border-color: #f97316;
+  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.5));
+}
+
+/* Bubble content */
+.bubbleContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.message {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-body, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-primary, #e0e0e0);
+  word-wrap: break-word;
+}
+
+/* Dismiss button */
+.dismissButton {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, #a0a0a0);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin-top: -4px;
+}
+
+.dismissButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #ffffff);
+}
+
+.dismissButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Speech bubble tail */
+.tail {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px;
+}
+
+/* Tail positioning for different positions */
+.dialogueContainer.top .tail {
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: transparent;
+  border-top-color: inherit;
+  border-bottom-width: 0;
+}
+
+.dialogueContainer.bottom .tail {
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: transparent;
+  border-bottom-color: inherit;
+  border-top-width: 0;
+}
+
+.dialogueContainer.left .tail {
+  right: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-color: transparent;
+  border-left-color: inherit;
+  border-right-width: 0;
+}
+
+.dialogueContainer.right .tail {
+  left: -18px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-color: transparent;
+  border-right-color: inherit;
+  border-left-width: 0;
+}
+
+/* Glow animation for companion colors */
+.dialogueContainer.shadow .bubble {
+  animation: shadowGlow 2s ease-in-out infinite;
+}
+
+@keyframes shadowGlow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(157, 78, 221, 0.3),
+      inset 0 0 20px rgba(157, 78, 221, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(157, 78, 221, 0.5),
+      inset 0 0 30px rgba(157, 78, 221, 0.15);
+  }
+}
+
+.dialogueContainer.forest .bubble {
+  animation: forestGlow 2s ease-in-out infinite;
+}
+
+@keyframes forestGlow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(16, 185, 129, 0.3),
+      inset 0 0 20px rgba(16, 185, 129, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(16, 185, 129, 0.5),
+      inset 0 0 30px rgba(16, 185, 129, 0.15);
+  }
+}
+
+.dialogueContainer.ember .bubble {
+  animation: emberGlow 2s ease-in-out infinite;
+}
+
+@keyframes emberGlow {
+  0%, 100% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(249, 115, 22, 0.3),
+      inset 0 0 20px rgba(249, 115, 22, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(249, 115, 22, 0.5),
+      inset 0 0 30px rgba(249, 115, 22, 0.15);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .dialogueContainer {
+    animation: dialogueEnterSimple 0.2s ease-out;
+  }
+
+  .dialogueContainer.dismissing {
+    animation: dialogueExitSimple 0.2s ease-out forwards;
+  }
+
+  @keyframes dialogueEnterSimple {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dialogueExitSimple {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  .dialogueContainer.shadow .bubble,
+  .dialogueContainer.forest .bubble,
+  .dialogueContainer.ember .bubble {
+    animation: none;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bubble {
+    max-width: 250px;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .message {
+    font-size: 0.85rem;
+  }
+
+  .dismissButton {
+    width: 20px;
+    height: 20px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bubble {
+    max-width: 200px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .message {
+    font-size: 0.8rem;
+  }
+}

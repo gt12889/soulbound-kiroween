@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import WritingEditor from './WritingEditor';
+import WritingEditor, { type WritingEditorHandle } from './WritingEditor';
 import GhostSuggestion from './GhostSuggestion';
 import GhostLoadingIndicator from './GhostLoadingIndicator';
 import GhostErrorDisplay from './GhostErrorDisplay';
@@ -31,7 +31,8 @@ const GhostWriter: React.FC = () => {
   const [lastAcceptedSuggestion, setLastAcceptedSuggestion] = useState<string | null>(null);
   const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
   const [isOptimistic, setIsOptimistic] = useState(false); // Track if current suggestion is optimistic
-  const editorRef = useRef<HTMLDivElement>(null);
+  const [autoAcceptNext, setAutoAcceptNext] = useState(false); // Track if next suggestion should auto-accept
+  const editorRef = useRef<WritingEditorHandle>(null);
   const suggestionIdCounter = useRef(0);
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const undoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,25 +85,44 @@ const GhostWriter: React.FC = () => {
   });
 
   // Generate optimistic suggestion based on context
-  const generateOptimisticSuggestion = useCallback((context: string): string => {
+  const generateOptimisticSuggestion = useCallback((context: string, isManual: boolean = false): string => {
     // Extract the last sentence or phrase
     const lastSentence = context.split(/[.!?]/).filter(s => s.trim()).pop() || context;
     const words = lastSentence.trim().split(/\s+/);
     
-    // Generate a simple continuation based on common patterns
-    const optimisticPhrases = [
-      'The story continues to unfold in unexpected ways.',
-      'Each moment brings new possibilities and discoveries.',
-      'The journey ahead promises both challenges and rewards.',
-      'Time moves forward, carrying us toward new horizons.',
-      'The path ahead remains uncertain but full of potential.',
+    // Different patterns for manual vs automatic
+    const autoPatterns = [
+      'The story continues to unfold...',
+      'Each moment brings new possibilities...',
+      'The journey ahead promises...',
+      'Time moves forward...',
+      'The path ahead remains...',
     ];
+    
+    const manualPatterns = [
+      'The story continues to unfold in unexpected ways, revealing deeper truths with each passing moment.',
+      'Each moment brings new possibilities and discoveries, transforming the landscape of what seemed certain.',
+      'The journey ahead promises both challenges and rewards, testing resolve while offering growth.',
+      'Time moves forward relentlessly, carrying us toward new horizons we can barely imagine.',
+      'The path ahead remains uncertain but full of potential, waiting for those brave enough to explore.',
+    ];
+    
+    const patterns = isManual ? manualPatterns : autoPatterns;
     
     // Select a phrase based on the last word's length (pseudo-random but deterministic)
     const lastWord = words[words.length - 1] || '';
-    const index = lastWord.length % optimisticPhrases.length;
+    const index = lastWord.length % patterns.length;
     
-    return optimisticPhrases[index];
+    // Check if context ends mid-sentence (no punctuation)
+    const needsPunctuation = !context.match(/[.!?]\s*$/);
+    const selectedPattern = patterns[index];
+    
+    if (needsPunctuation && isManual) {
+      // For manual generation, complete the sentence first
+      return '. ' + selectedPattern;
+    }
+    
+    return ' ' + selectedPattern;
   }, []);
 
   // Initialize AI service with environment variables
@@ -169,8 +189,8 @@ const GhostWriter: React.FC = () => {
   }, [ghostState, announce]);
 
   // Handle text changes and generate suggestions
-  const handleTextChange = useCallback(async (_text: string, context: string, position: number) => {
-    log('Text changed, context length:', context.trim().length);
+  const handleTextChange = useCallback(async (_text: string, context: string, position: number, isManual: boolean = false) => {
+    log('Text changed, context length:', context.trim().length, 'manual:', isManual);
     
     // Store context for retry
     lastContextRef.current = { context, position };
@@ -217,7 +237,7 @@ const GhostWriter: React.FC = () => {
       ghostState.startGenerating();
       
       // Show optimistic suggestion immediately for better perceived performance
-      const optimisticText = generateOptimisticSuggestion(context);
+      const optimisticText = generateOptimisticSuggestion(context, isManual);
       const optimisticSuggestion: GhostSuggestionType = {
         id: `optimistic-${++suggestionIdCounter.current}`,
         text: optimisticText,
@@ -239,13 +259,16 @@ const GhostWriter: React.FC = () => {
       setCurrentSuggestionIndex(0);
       log('Showing optimistic suggestion:', optimisticText);
       
+      // Only show loading indicator for manual generation (not automatic background suggestions)
       // Delay showing loading indicator by 200ms to avoid flash for fast responses
-      loadingDelayTimeoutRef.current = setTimeout(() => {
-        setShowLoadingIndicator(true);
-      }, 200);
+      if (isManual) {
+        loadingDelayTimeoutRef.current = setTimeout(() => {
+          setShowLoadingIndicator(true);
+        }, 200);
+      }
       
-      log('Requesting suggestion for context:', context.substring(0, 50) + '...');
-      const suggestionText = await aiService.getSuggestion(context);
+      log('Requesting suggestion for context:', context.substring(0, 50) + '...', 'isManual:', isManual);
+      const suggestionText = await aiService.getSuggestion(context, 1, isManual);
       
       // Check if this request was cancelled
       if (abortControllerRef.current?.signal.aborted) {
@@ -292,6 +315,17 @@ const GhostWriter: React.FC = () => {
         ? suggestionText.substring(0, 50) + '...' 
         : suggestionText;
       announce(`Suggestion ready: ${preview}`);
+      
+      // Auto-accept if this was triggered by double-Tab
+      if (autoAcceptNext && isManual) {
+        log('Auto-accepting suggestion from double-Tab');
+        setAutoAcceptNext(false);
+        // Accept the suggestion immediately
+        setTimeout(() => {
+          handleSuggestionAccept(newSuggestion);
+        }, 100); // Small delay to ensure state is updated
+        return;
+      }
       
       // Store current focus before moving to suggestion
       previousFocusRef.current = document.activeElement as HTMLElement;
@@ -417,8 +451,8 @@ const GhostWriter: React.FC = () => {
     setLastAcceptedSuggestion(suggestion.text);
     
     // Insert suggestion into editor immediately
-    if (editorRef.current && (editorRef.current as any).insertSuggestion) {
-      (editorRef.current as any).insertSuggestion(suggestion.text);
+    if (editorRef.current) {
+      editorRef.current.insertSuggestion(suggestion.text);
     }
     
     // Clear suggestions
@@ -437,24 +471,10 @@ const GhostWriter: React.FC = () => {
       setLastAcceptedSuggestion(null);
     }, 3000);
     
-    // Return focus to editor after a brief delay - find the contenteditable element
+    // Return focus to editor after a brief delay
     setTimeout(() => {
       if (editorRef.current) {
-        const contentEditable = editorRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
-        if (contentEditable) {
-          contentEditable.focus();
-          // Move cursor to end
-          const range = document.createRange();
-          const selection = window.getSelection();
-          if (selection && contentEditable.lastChild) {
-            range.selectNodeContents(contentEditable);
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-          }
-        } else {
-          editorRef.current.focus();
-        }
+        editorRef.current.focus();
       } else if (previousFocusRef.current) {
         previousFocusRef.current.focus();
       }
@@ -472,24 +492,10 @@ const GhostWriter: React.FC = () => {
     setCurrentSuggestionIndex(0);
     ghostState.reset();
     
-    // Return focus to editor after a brief delay - find the contenteditable element
+    // Return focus to editor after a brief delay
     setTimeout(() => {
       if (editorRef.current) {
-        const contentEditable = editorRef.current.querySelector('[contenteditable="true"]') as HTMLElement;
-        if (contentEditable) {
-          contentEditable.focus();
-          // Move cursor to end
-          const range = document.createRange();
-          const selection = window.getSelection();
-          if (selection && contentEditable.lastChild) {
-            range.selectNodeContents(contentEditable);
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-          }
-        } else {
-          editorRef.current.focus();
-        }
+        editorRef.current.focus();
       } else if (previousFocusRef.current) {
         previousFocusRef.current.focus();
       }
@@ -504,27 +510,13 @@ const GhostWriter: React.FC = () => {
     
     // Get current text from editor
     if (editorRef.current) {
-      const currentText = editorRef.current.innerText || '';
+      const currentText = editorRef.current.getText();
       
       // Remove the last accepted suggestion from the end of the text
       if (currentText.endsWith(lastAcceptedSuggestion)) {
         const newText = currentText.slice(0, -lastAcceptedSuggestion.length);
-        editorRef.current.innerText = newText;
-        
-        // Move cursor to end
-        const range = document.createRange();
-        const selection = window.getSelection();
-        if (selection && editorRef.current.lastChild) {
-          range.selectNodeContents(editorRef.current);
-          range.collapse(false);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-        
-        // Trigger input event to update state
-        if ((editorRef.current as any).handleInput) {
-          (editorRef.current as any).handleInput();
-        }
+        editorRef.current.setText(newText);
+        editorRef.current.focus();
       }
     }
     
@@ -550,15 +542,15 @@ const GhostWriter: React.FC = () => {
     announce('Regenerating suggestion');
     
     // Get current context and regenerate
-    if (editorRef.current && (editorRef.current as any).getCurrentContext) {
-      const context = (editorRef.current as any).getCurrentContext();
-      const position = (editorRef.current as any).getCursorPosition?.() || 0;
+    if (editorRef.current) {
+      const context = editorRef.current.getCurrentContext();
+      const position = editorRef.current.getCursorPosition();
       
       if (context && context.trim().length >= MIN_CONTEXT_LENGTH) {
         // Clear current suggestions
         setSuggestions([]);
-        // Trigger new generation
-        handleTextChange('', context, position);
+        // Trigger new generation (manual request)
+        handleTextChange('', context, position, true);
       }
     }
   }, [handleTextChange, announce]);
@@ -609,16 +601,16 @@ const GhostWriter: React.FC = () => {
     let context = lastContextRef.current?.context || '';
     let position = lastContextRef.current?.position || 0;
     
-    if (!context && editorRef.current && (editorRef.current as any).getCurrentContext) {
-      context = (editorRef.current as any).getCurrentContext();
-      position = (editorRef.current as any).getCursorPosition?.() || 0;
+    if (!context && editorRef.current) {
+      context = editorRef.current.getCurrentContext();
+      position = editorRef.current.getCursorPosition();
     }
     
     if (context && context.trim().length >= MIN_CONTEXT_LENGTH) {
       // Reset error state
       ghostState.reset();
-      // Trigger new generation
-      handleTextChange('', context, position);
+      // Trigger new generation (manual retry)
+      handleTextChange('', context, position, true);
     }
   }, [ghostState, handleTextChange, announce]);
 
@@ -648,14 +640,15 @@ const GhostWriter: React.FC = () => {
         return;
       }
       
-      // Otherwise, trigger a new suggestion generation
-      if (editorRef.current && (editorRef.current as any).getCurrentContext) {
-        const context = (editorRef.current as any).getCurrentContext();
-        const position = (editorRef.current as any).getCursorPosition?.() || 0;
+      // Otherwise, trigger a new suggestion generation and auto-accept it
+      if (editorRef.current) {
+        const context = editorRef.current.getCurrentContext();
+        const position = editorRef.current.getCursorPosition();
         
         if (context && context.trim().length >= MIN_CONTEXT_LENGTH) {
-          log('Generating new suggestion via double-Tab');
-          handleTextChange('', context, position);
+          log('Generating new suggestion via double-Tab (manual) - will auto-accept');
+          setAutoAcceptNext(true); // Flag to auto-accept when suggestion arrives
+          handleTextChange('', context, position, true); // Manual generation
         } else {
           log('Context too short for suggestion');
           setShowHint(true);
@@ -801,8 +794,9 @@ const GhostWriter: React.FC = () => {
         )}
       </div>
       
-      <div className={styles.editorWrapper} ref={editorRef} role="region" aria-label="Writing area">
+      <div className={styles.editorWrapper} role="region" aria-label="Writing area">
         <WritingEditor
+          ref={editorRef}
           onTextChange={handleTextChange}
           onAcceptSuggestion={acceptFirstSuggestion}
           hasSuggestion={suggestions.length > 0}

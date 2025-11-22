@@ -126,10 +126,11 @@ class AIService {
    * 
    * @param context - The text context to generate suggestions from
    * @param count - Number of alternative suggestions to generate (1-3, default: 1)
+   * @param isManual - Whether this is a manual generation (double-Tab) vs automatic (while typing)
    * @returns Promise resolving to the suggestion text
    * @throws Error if context is invalid or API fails after retries
    */
-  async getSuggestion(context: string, count: number = 1): Promise<string> {
+  async getSuggestion(context: string, count: number = 1, isManual: boolean = false): Promise<string> {
     // Validate input
     if (!context || typeof context !== 'string') {
       throw new Error('Invalid context: must be a non-empty string');
@@ -141,16 +142,21 @@ class AIService {
     // Truncate context if too long to prevent excessive API costs
     const truncatedContext = context.slice(-MAX_CONTEXT_LENGTH);
 
+    // Include generation type in cache key
+    const cacheKey = `${truncatedContext}:${isManual ? 'manual' : 'auto'}`;
+
     // Check cache first (synchronous)
-    const cached = this.getCachedSuggestion(truncatedContext);
+    const cached = this.getCachedSuggestion(cacheKey);
     if (cached) {
+      // Clean the cached suggestion to avoid repetition
+      const cleaned = this.cleanSuggestion(cached, truncatedContext);
       // Emit ready state immediately for cached results
       this.emitStateChange('ready');
-      return cached;
+      return cleaned;
     }
 
     // Check if there's already a pending request for this context (deduplication)
-    const pending = this.pendingRequests.get(truncatedContext);
+    const pending = this.pendingRequests.get(cacheKey);
     if (pending) {
       return pending;
     }
@@ -168,16 +174,18 @@ class AIService {
           // Emit loading state when request starts
           this.emitStateChange('loading');
           
-          const suggestion = await this.fetchSuggestion(truncatedContext, requestCount);
-          this.cacheSuggestion(truncatedContext, suggestion);
-          this.pendingRequests.delete(truncatedContext);
+          const suggestion = await this.fetchSuggestion(truncatedContext, requestCount, 0, isManual);
+          // Clean the suggestion to avoid repetition
+          const cleaned = this.cleanSuggestion(suggestion, truncatedContext);
+          this.cacheSuggestion(cacheKey, cleaned);
+          this.pendingRequests.delete(cacheKey);
           
           // Emit ready state when response received
           this.emitStateChange('ready');
           
-          resolve(suggestion);
+          resolve(cleaned);
         } catch (error) {
-          this.pendingRequests.delete(truncatedContext);
+          this.pendingRequests.delete(cacheKey);
           
           // Emit error state on failures
           this.emitStateChange('error', error instanceof Error ? error : new Error(String(error)));
@@ -188,9 +196,46 @@ class AIService {
     });
 
     // Store pending request for deduplication
-    this.pendingRequests.set(truncatedContext, requestPromise);
+    this.pendingRequests.set(cacheKey, requestPromise);
     
     return requestPromise;
+  }
+
+  /**
+   * Clean suggestion to remove repetition of original context
+   * @private
+   */
+  private cleanSuggestion(suggestion: string, originalContext: string): string {
+    // Remove any repetition of the original context from the beginning of the suggestion
+    const contextWords = originalContext.toLowerCase().split(/\s+/).slice(-10); // Last 10 words
+    const suggestionWords = suggestion.split(/\s+/);
+    
+    // Find where the suggestion actually starts (after any repeated content)
+    let startIndex = 0;
+    for (let i = 0; i < suggestionWords.length - contextWords.length + 1; i++) {
+      const suggestionSlice = suggestionWords.slice(i, i + contextWords.length)
+        .join(' ').toLowerCase();
+      const contextSlice = contextWords.join(' ');
+      
+      if (suggestionSlice.includes(contextSlice) || contextSlice.includes(suggestionSlice)) {
+        startIndex = i + contextWords.length;
+        break;
+      }
+    }
+    
+    // Return the cleaned suggestion
+    const cleanedSuggestion = suggestionWords.slice(startIndex).join(' ').trim();
+    
+    // If the original context doesn't end with punctuation and the suggestion doesn't start with punctuation,
+    // and the context seems to end mid-sentence, add appropriate spacing
+    if (cleanedSuggestion && !originalContext.match(/[.!?]\s*$/) && !cleanedSuggestion.match(/^[.!?,;]/)) {
+      // Check if we need to add a space
+      if (!originalContext.endsWith(' ') && !cleanedSuggestion.startsWith(' ')) {
+        return ' ' + cleanedSuggestion;
+      }
+    }
+    
+    return cleanedSuggestion;
   }
 
   /**
@@ -272,14 +317,14 @@ class AIService {
    * Fetch suggestion from API with retry logic
    * @private
    */
-  private async fetchSuggestion(context: string, count: number = 1, retryCount = 0): Promise<string> {
+  private async fetchSuggestion(context: string, count: number = 1, retryCount = 0, isManual: boolean = false): Promise<string> {
     // If no API key configured, use local fallback
     if (!this.config.apiKey) {
       return this.generateLocalSuggestion(context);
     }
 
     try {
-      const suggestion = await this.makeAPIRequest(context, count);
+      const suggestion = await this.makeAPIRequest(context, count, isManual);
       
       if (!suggestion || suggestion.trim().length === 0) {
         throw new Error('Empty suggestion received from API');
@@ -291,7 +336,7 @@ class AIService {
       if (retryCount < this.config.maxRetries) {
         const delay = Math.pow(2, retryCount) * 1000;
         await this.delay(delay);
-        return this.fetchSuggestion(context, count, retryCount + 1);
+        return this.fetchSuggestion(context, count, retryCount + 1, isManual);
       }
 
       console.error('AI Service error after retries:', error);
@@ -300,7 +345,7 @@ class AIService {
       this.emitStateChange('error', error instanceof Error ? error : new Error(String(error)));
       
       // Fall back to local suggestions on error
-      return this.generateLocalSuggestion(context);
+      return this.generateLocalSuggestion(context, isManual);
     }
   }
 
@@ -345,9 +390,9 @@ class AIService {
    * Separated for better testability and maintainability
    * @private
    */
-  private async makeAPIRequest(context: string, count: number = 1): Promise<string> {
+  private async makeAPIRequest(context: string, count: number = 1, isManual: boolean = false): Promise<string> {
     const headers = this.buildRequestHeaders();
-    const body = this.buildRequestBody(context, count);
+    const body = this.buildRequestBody(context, count, isManual);
 
     // Create new AbortController for this request
     this.abortController = new AbortController();
@@ -532,13 +577,19 @@ class AIService {
    * Build request body for API call
    * @private
    */
-  private buildRequestBody(context: string, count: number = 1): Record<string, unknown> {
+  private buildRequestBody(context: string, count: number = 1, isManual: boolean = false): Record<string, unknown> {
     // Gemini uses a different request format
     if (this.config.provider === 'gemini') {
-      const prompt = `Analyze the tone of this text and continue it with exactly 5 sentences that match PERFECTLY.
+      // Different prompts for manual vs automatic generation
+      let prompt: string;
+      let maxTokens: number;
+      
+      if (isManual) {
+        // For manual generation (double-Tab), generate more content and ensure continuation
+        prompt = `Continue this text naturally and creatively. The text may be incomplete (ending mid-sentence). Complete any incomplete sentence first, then continue with additional content. Only provide the continuation, not the original text. If the text ends mid-sentence, complete it properly with appropriate punctuation before continuing.
 
 TONE MATCHING (critical):
-- Funny/Sarcastic → Keep the humor, wit, and sarcasm going, use natural vocabular
+- Funny/Sarcastic → Keep the humor, wit, and sarcasm going
 - Dark/Intense → Stay dark and intense
 - Professional → Stay professional
 - Casual → Stay casual and conversational
@@ -547,17 +598,31 @@ TONE MATCHING (critical):
 
 RULES:
 - Match the exact voice, tense, and vocabulary
-- If there's humor, be funny
-- If there's sarcasm, be sarcastic
-- Continue naturally - don't repeat or restart
+- Continue naturally - don't repeat the original text
+- If the sentence is incomplete, complete it first with proper punctuation
+- Then add 3-5 more sentences continuing the narrative
 - No explanations, just the continuation
-- continue on top of the text, don't repeat it, if needed add punctuation to incomplete text
-- to the best of ability, sound natural in tone, imitating a human with teh given context
 
 Text:
 ${context}
 
-Your continuation (5 sentences matching the tone):`;
+Your continuation (complete any incomplete sentence, then add 3-5 more sentences):`;
+        maxTokens = 300; // More tokens for manual generation
+      } else {
+        // For automatic generation (while typing), shorter suggestions
+        prompt = `Continue this text naturally and creatively with 2-3 sentences. Only provide the continuation, not the original text.
+
+TONE MATCHING (critical):
+- Match the exact voice, tense, and vocabulary of the original
+- Continue naturally - don't repeat or restart
+- Keep it brief (2-3 sentences)
+
+Text:
+${context}
+
+Your continuation (2-3 sentences):`;
+        maxTokens = 150; // Fewer tokens for automatic
+      }
       
       return {
         contents: [{
@@ -567,7 +632,7 @@ Your continuation (5 sentences matching the tone):`;
         }],
         generationConfig: {
           temperature: SUGGESTION_TEMPERATURE,
-          maxOutputTokens: MAX_SUGGESTION_TOKENS,
+          maxOutputTokens: maxTokens,
           topP: 0.8,
           topK: 40,
           candidateCount: count, // Request multiple candidates for Gemini
@@ -620,7 +685,7 @@ Your continuation (5 sentences matching the tone):`;
    * Generate local suggestion when API is unavailable
    * Uses pattern-based suggestions with ghostly wit and humor
    */
-  private generateLocalSuggestion(context: string): string {
+  private generateLocalSuggestion(context: string, _isManual: boolean = false): string {
     const contextLower = context.toLowerCase();
     
     // Pattern-based 5-sentence continuations with ghostly humor

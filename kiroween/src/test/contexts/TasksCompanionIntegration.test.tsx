@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTasks } from '../../contexts/TasksContext';
 import { useCompanion } from '../../contexts/CompanionContext';
 import { AllProviders } from '../test-utils';
@@ -9,7 +9,7 @@ import { AllProviders } from '../test-utils';
  * Verifies that task completion tracking integrates with companion experience system
  */
 describe('TasksContext - CompanionContext Integration', () => {
-  it('should award companion experience when a task is completed', () => {
+  it('should award companion experience when a task is completed', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -27,12 +27,16 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.completeTask(task.id);
     });
 
+    // Wait for state updates
+    await waitFor(() => {
+      expect(result.current.companion.experience).toBeGreaterThan(initialExperience);
+    });
+
     // Companion should have gained experience (10 XP for regular task)
-    expect(result.current.companion.experience).toBeGreaterThan(initialExperience);
     expect(result.current.companion.experience).toBe(initialExperience + 10);
   });
 
-  it('should award more experience for tombstone tasks', () => {
+  it('should award more experience for tombstone tasks', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -50,11 +54,16 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.completeTask(task.id);
     });
 
+    // Wait for state updates
+    await waitFor(() => {
+      expect(result.current.companion.experience).toBeGreaterThan(initialExperience);
+    });
+
     // Companion should have gained more experience (20 XP for tombstone task)
     expect(result.current.companion.experience).toBe(initialExperience + 20);
   });
 
-  it('should increment companion task stats when tasks are completed', () => {
+  it('should increment companion task stats when tasks are completed', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -72,11 +81,16 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.completeTask(task.id);
     });
 
+    // Wait for state updates
+    await waitFor(() => {
+      expect(result.current.companion.stats.totalTasks).toBeGreaterThan(initialTotalTasks);
+    });
+
     // Companion stats should be updated
     expect(result.current.companion.stats.totalTasks).toBe(initialTotalTasks + 1);
   });
 
-  it('should track task completion when toggling task status', () => {
+  it('should track task completion when toggling task status', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -94,11 +108,16 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.toggleTaskCompletion(task.id);
     });
 
+    // Wait for state updates
+    await waitFor(() => {
+      expect(result.current.companion.experience).toBeGreaterThan(initialExperience);
+    });
+
     // Companion should have gained experience
     expect(result.current.companion.experience).toBe(initialExperience + 10);
   });
 
-  it('should not award experience when uncompleting a task', () => {
+  it('should not award experience when uncompleting a task', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -115,6 +134,11 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.completeTask(taskId);
     });
 
+    // Wait for completion
+    await waitFor(() => {
+      expect(result.current.companion.experience).toBeGreaterThan(0);
+    });
+
     // Get experience after completion
     const experienceAfterCompletion = result.current.companion.experience;
 
@@ -127,7 +151,7 @@ describe('TasksContext - CompanionContext Integration', () => {
     expect(result.current.companion.experience).toBe(experienceAfterCompletion);
   });
 
-  it('should add completed task to companion recent tasks', () => {
+  it('should add completed task to companion recent tasks', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -147,13 +171,18 @@ describe('TasksContext - CompanionContext Integration', () => {
       result.current.tasks.completeTask(taskId);
     });
 
+    // Wait for state updates
+    await waitFor(() => {
+      expect(result.current.companion.currentContext.recentTasks.length).toBeGreaterThan(initialRecentTasksCount);
+    });
+
     // Recent tasks should include the new task
     expect(result.current.companion.currentContext.recentTasks.length).toBe(initialRecentTasksCount + 1);
     expect(result.current.companion.currentContext.recentTasks[initialRecentTasksCount].id).toBe(taskId);
     expect(result.current.companion.currentContext.recentTasks[initialRecentTasksCount].type).toBe('regular');
   });
 
-  it('should track tombstone tasks correctly in recent tasks', () => {
+  it('should track tombstone tasks correctly in recent tasks', async () => {
     const { result } = renderHook(
       () => ({
         tasks: useTasks(),
@@ -168,6 +197,12 @@ describe('TasksContext - CompanionContext Integration', () => {
       const task = result.current.tasks.createTask('Important Task', 'Description', 'high');
       taskId = task.id;
       result.current.tasks.completeTask(taskId);
+    });
+
+    // Wait for state updates
+    await waitFor(() => {
+      const recentTask = result.current.companion.currentContext.recentTasks.find(t => t.id === taskId);
+      expect(recentTask).toBeDefined();
     });
 
     // Recent tasks should mark it as tombstone

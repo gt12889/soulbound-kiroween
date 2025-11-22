@@ -5,6 +5,7 @@ import type { Note } from '../types';
 import { useToast } from './ToastContext';
 import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
+import { useCompanion } from './CompanionContext';
 
 interface NotesContextType {
   // Notes data
@@ -73,7 +74,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
   } = useUndoRedo<Note[]>(notes, 10);
   
   // Current note state
-  const [currentNoteId, setCurrentNoteId] = useState<string | null>(null);
+  const [currentNoteId, setCurrentNoteIdState] = useState<string | null>(null);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -94,10 +95,38 @@ export function NotesProvider({ children }: NotesProviderProps) {
   useEffect(() => {
     setNotes(undoRedoNotes);
   }, [undoRedoNotes, setNotes]);
+  
+  // Companion integration for note-taking tracking (optional)
+  // Requirement: 10.2 - Track note-taking activity
+  let trackNoteActivity: ((noteId: string, noteLength: number) => void) | undefined;
+  let startNoteTaking: (() => void) | undefined;
+  let endNoteTaking: (() => void) | undefined;
+  
+  try {
+    const companion = useCompanion();
+    trackNoteActivity = companion.trackNoteActivity;
+    startNoteTaking = companion.startNoteTaking;
+    endNoteTaking = companion.endNoteTaking;
+  } catch (error) {
+    // CompanionProvider not available - companion integration is optional
+    console.debug('CompanionContext not available - note tracking disabled');
+  }
+  
+  // Wrapper to track note-taking activity when switching notes
+  const setCurrentNoteId = useCallback((id: string | null) => {
+    if (id !== null) {
+      // User is opening a note - start tracking note-taking activity
+      startNoteTaking?.();
+    } else {
+      // User is closing the note - end tracking
+      endNoteTaking?.();
+    }
+    setCurrentNoteIdState(id);
+  }, [startNoteTaking, endNoteTaking]);
 
   /**
    * Create a new note
-   * Requirements: 3.1, 7.2, 8.1
+   * Requirements: 3.1, 7.2, 8.1, 10.2
    */
   const createNote = useCallback((title: string, content: string = ''): Note => {
     const newNote: Note = {
@@ -120,21 +149,32 @@ export function NotesProvider({ children }: NotesProviderProps) {
       message: `Note "${title}" created`,
     });
     
+    // Track note creation with companion (if available)
+    startNoteTaking?.();
+    
     return newNote;
-  }, [undoRedoNotes, setUndoRedoNotes, showToast]);
+  }, [undoRedoNotes, setUndoRedoNotes, showToast, startNoteTaking]);
 
   /**
    * Update an existing note
-   * Requirements: 3.1, 7.2, 6.2, 6.3, 8.1
+   * Requirements: 3.1, 7.2, 6.2, 6.3, 8.1, 10.2
    */
   const updateNote = useCallback((id: string, updates: Partial<Omit<Note, 'id' | 'createdAt'>>) => {
     const newNotes = undoRedoNotes.map(note => {
       if (note.id === id) {
-        return {
+        const updatedNote = {
           ...note,
           ...updates,
           updatedAt: new Date(),
         };
+        
+        // Track note activity with companion if content was updated (if available)
+        if (updates.content !== undefined && trackNoteActivity) {
+          const noteLength = updatedNote.content.length;
+          trackNoteActivity(id, noteLength);
+        }
+        
+        return updatedNote;
       }
       return note;
     });
@@ -143,7 +183,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
     
     // Note: Removed intrusive "Note saved" toast that spammed on every keystroke
     // Auto-save happens silently in the background for better UX
-  }, [undoRedoNotes, setUndoRedoNotes]);
+  }, [undoRedoNotes, setUndoRedoNotes, trackNoteActivity]);
 
   /**
    * Delete a note
@@ -170,7 +210,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
         },
       });
     }
-  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, showToast, undoHistory]);
+  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, setCurrentNoteId, showToast, undoHistory]);
 
   /**
    * Get a specific note by ID
@@ -300,7 +340,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
         onClick: undoHistory,
       },
     });
-  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, showToast, undoHistory]);
+  }, [undoRedoNotes, setUndoRedoNotes, currentNoteId, setCurrentNoteId, showToast, undoHistory]);
 
   /**
    * Bulk add tags to multiple notes
