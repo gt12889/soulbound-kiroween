@@ -4,8 +4,8 @@
   /* Positioning */
   position: relative;
   z-index: 1;
-  max-width: 600px;
-  min-width: 300px;
+  max-width: 900px; /* Increased from 600px */
+  min-width: 400px; /* Increased from 300px */
   width: max-content; /* Dynamic sizing for content */
   
   /* Ghostly styling - purple tint */
@@ -14,7 +14,7 @@
   border-radius: 8px;
   
   /* Spacing */
-  padding: 1rem 1.5rem;
+  padding: 1.5rem 2rem; /* Increased from 1rem 1.5rem */
   margin: 0.5rem 0;
   
   /* Shadow with purple glow */

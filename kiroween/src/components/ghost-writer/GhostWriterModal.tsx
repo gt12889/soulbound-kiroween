@@ -105,7 +105,7 @@ const GhostWriterModal: React.FC<GhostWriterModalProps> = ({
         model,
       });
 
-      const result = await aiService.getSuggestion(currentText);
+      const result = await aiService.getSuggestion(currentText, 1, true); // isManual=true for user-initiated generation
       setSuggestion(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate suggestion');

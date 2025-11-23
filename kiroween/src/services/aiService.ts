@@ -585,28 +585,33 @@ class AIService {
       let maxTokens: number;
       
       if (isManual) {
-        // For manual generation (double-Tab), generate more content and ensure continuation
-        prompt = `Continue this text naturally and creatively. The text may be incomplete (ending mid-sentence). Complete any incomplete sentence first, then continue with additional content. Only provide the continuation, not the original text. If the text ends mid-sentence, complete it properly with appropriate punctuation before continuing.
+        // For manual generation (double-Tab), use the same guideline as OpenAI/OpenRouter
+        prompt = `You are a writing continuation assistant. Your job: analyze the text and continue it with exactly 5 sentences
+         that match the EXACT tone, style, and intensity. If it's dark and intense, be dark and intense. 
+If academic, use precise academic diction and structured, formal reasoning.
 
-TONE MATCHING (critical):
-- Funny/Sarcastic → Keep the humor, wit, and sarcasm going
-- Dark/Intense → Stay dark and intense
-- Professional → Stay professional
-- Casual → Stay casual and conversational
-- Dramatic → Stay dramatic
-- Technical → Stay technical
+If funny, be witty, playful, and surprising with small jokes or absurd twists.
 
-RULES:
-- Match the exact voice, tense, and vocabulary
-- Continue naturally - don't repeat the original text
-- If the sentence is incomplete, complete it first with proper punctuation
-- Then add 3-5 more sentences continuing the narrative
-- No explanations, just the continuation
+If casual, keep it natural, relaxed, and conversational.
 
-Text:
+If poetic, match imagery, rhythm, and metaphor density.
+
+If dark, keep it intense, brooding, or unsettling.
+
+If professional, use clean, direct, polished language.
+
+If dramatic, heighten emotion and tension without exaggerating beyond the style.
+
+If chaotic or unhinged, mirror the unpredictability and energy while staying coherent.
+
+Continue the text directly without shifting topics or weakening the style.
+
+DO NOT REPEAT THE TEXT INPUT< CONTINUE AS FIT TO ADD TO THE GIVEN TEXT> IF IT IS MISSING PUNCTUATION O RGRAMMAR< ADD IT THEN CONTINUE WITH YOUR OWN SENTENCES.
+Continue this text with 5 sentences (match tone and intensity exactly):
+
 ${context}
 
-Your continuation (complete any incomplete sentence, then add 3-5 more sentences):`;
+Your continuation (5 sentences only):`;
         maxTokens = 300; // More tokens for manual generation
       } else {
         // For automatic generation (while typing), shorter suggestions
@@ -650,7 +655,12 @@ Your continuation (2-3 sentences):`;
       messages: [
         {
           role: 'system',
-          content: `You are a writing continuation assistant. Your job: analyze the text and continue it with exactly 5 sentences that match the EXACT tone, style, and intensity. If it's dark and intense, be dark and intense. If it's professional, be professional. Mirror the voice, tense, vocabulary, and pacing perfectly. Never tone down or change the style.`,
+          content: `Continue this text naturally and creatively with 2-3 sentences. Only provide the continuation, not the original text.
+
+TONE MATCHING (critical):
+- Match the exact voice, tense, and vocabulary of the original
+- Continue naturally - don't repeat or restart
+- Keep it brief (2-3 sentences)`,
         },
         {
           role: 'user',
