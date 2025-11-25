@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { CompanionProvider } from './contexts/CompanionContext';
 import { KeyboardProvider } from './contexts/KeyboardContext';
@@ -37,9 +37,24 @@ const TerminalTarot = lazy(() => import('./components/terminal-tarot/TerminalTar
 const GhostWriter = lazy(() => import('./components/ghost-writer/GhostWriter'));
 const NecronomiconNotes = lazy(() => import('./components/necronomicon-notes/NecronomiconNotes'));
 const GraveyardDashboard = lazy(() => import('./components/graveyard-dashboard/GraveyardDashboard').then(module => ({ default: module.GraveyardDashboard })));
-const ForestHub = lazy(() => import('./components/forest-hub/ForestHub'));
 const CursedCalendar = lazy(() => import('./components/cursed-calendar/CursedCalendar').then(module => ({ default: module.CursedCalendar })));
 const AchievementsPage = lazy(() => import('./components/achievements/AchievementsPage').then(module => ({ default: module.AchievementsPage })));
+const CompanionSelectionDemo = lazy(() => import('./components/spirit-companion/CompanionSelectionDemo').then(module => ({ default: module.CompanionSelectionDemo })));
+
+// Component to redirect authenticated users away from auth pages
+const AuthRedirect: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <LoadingFallback />;
+  }
+  
+  if (isAuthenticated) {
+    return <Navigate to="/graveyard-dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 const AppContent: React.FC = () => {
   const { isSidebarOpen, sidebarMode, toggleSidebar } = useApp();
@@ -95,9 +110,8 @@ const AppContent: React.FC = () => {
   //   setShowBootup(false);
   // };
 
-  const isForestHub = location.pathname === '/forest-hub';
-  const showNavigation = !isLandingPage && !isAuthPage && !isForestHub; // Removed showBootup check since animation is disabled
-  const contentClass = `${isLandingPage || isAuthPage || isForestHub ? 'landing-content' : 'main-content'} ${isSidebarOpen ? '' : 'sidebar-collapsed'}`;
+  const showNavigation = !isLandingPage && !isAuthPage;
+  const contentClass = `${isLandingPage || isAuthPage ? 'landing-content' : 'main-content'} ${isSidebarOpen ? '' : 'sidebar-collapsed'}`;
 
   return (
     <div className="app">
@@ -140,7 +154,9 @@ const AppContent: React.FC = () => {
                           path="/login" 
                           element={
                             <ErrorBoundary>
-                              <LoginPage />
+                              <AuthRedirect>
+                                <LoginPage />
+                              </AuthRedirect>
                             </ErrorBoundary>
                           } 
                         />
@@ -148,7 +164,9 @@ const AppContent: React.FC = () => {
                           path="/register" 
                           element={
                             <ErrorBoundary>
-                              <RegisterPage />
+                              <AuthRedirect>
+                                <RegisterPage />
+                              </AuthRedirect>
                             </ErrorBoundary>
                           } 
                         />
@@ -156,15 +174,9 @@ const AppContent: React.FC = () => {
                           path="/password-reset" 
                           element={
                             <ErrorBoundary>
-                              <PasswordReset />
-                            </ErrorBoundary>
-                          } 
-                        />
-                        <Route 
-                          path="/forest-hub" 
-                          element={
-                            <ErrorBoundary>
-                              <ForestHub />
+                              <AuthRedirect>
+                                <PasswordReset />
+                              </AuthRedirect>
                             </ErrorBoundary>
                           } 
                         />
@@ -225,6 +237,14 @@ const AppContent: React.FC = () => {
                                                           <ProtectedRoute>
                                                             <AchievementsPage />
                                                           </ProtectedRoute>
+                                                        </ErrorBoundary>
+                                                      } 
+                                                    />
+                                                    <Route 
+                                                      path="/companion-test" 
+                                                      element={
+                                                        <ErrorBoundary>
+                                                          <CompanionSelectionDemo />
                                                         </ErrorBoundary>
                                                       } 
                                                     />

@@ -4,6 +4,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from './AuthContext';
 import { cloudSyncService } from '../services/cloudSyncService';
 import type { AppSettings, ModuleName } from '../types';
+import type { CompanionType } from '../types/companion';
 
 export type SidebarMode = 'expanded' | 'collapsed' | 'hidden';
 
@@ -33,6 +34,11 @@ interface AppContextType {
   // Backward compatibility
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
+
+  // Companion state
+  companionType: CompanionType | null;
+  setCompanionType: (type: CompanionType) => Promise<void>;
+  hasSelectedCompanion: boolean;
 }
 
 const defaultSettings: AppSettings = {
@@ -50,7 +56,7 @@ interface AppProviderProps {
 /**
  * AppProvider component wrapping entire application
  * Manages global application state including current module, settings, and loading states
- * Requirements: 6.1, 6.2, 6.3
+ * Requirements: 6.1, 6.2, 6.3, FR-1.3, FR-4.2, FR-4.3, FR-4.5
  */
 export function AppProvider({ children }: AppProviderProps) {
   const { user, isAuthenticated } = useAuth();
@@ -72,6 +78,12 @@ export function AppProvider({ children }: AppProviderProps) {
 
   // Sidebar state, persisted to local storage
   const [sidebarMode, setSidebarMode] = useLocalStorage<SidebarMode>('sidebarMode', 'expanded');
+
+  // Companion type state, persisted to local storage (FR-1.3, FR-4.3)
+  const [companionType, setCompanionTypeState] = useLocalStorage<CompanionType | null>(
+    'dark-productivity-companion-type',
+    null
+  );
   
   // Backward compatibility: isSidebarOpen is true when not hidden
   const isSidebarOpen = sidebarMode !== 'hidden';
@@ -87,6 +99,37 @@ export function AppProvider({ children }: AppProviderProps) {
       return 'expanded';
     });
   }, [setSidebarMode]);
+
+  // Set companion type with Firebase sync (FR-4.1, FR-4.2, FR-4.3, FR-4.5)
+  const setCompanionType = useCallback(async (type: CompanionType) => {
+    // Validate companion type
+    if (!['shadow', 'forest', 'ember'].includes(type)) {
+      console.error('Invalid companion type:', type);
+      throw new Error('Invalid companion type');
+    }
+
+    // Update local state immediately
+    setCompanionTypeState(type);
+
+    // Sync to Firebase for authenticated users (FR-4.2, FR-4.5)
+    if (isAuthenticated && user) {
+      try {
+        await cloudSyncService.syncCompanionData(user.id, {
+          type,
+          selectedAt: new Date().toISOString(),
+        });
+        console.log('Companion type synced to Firebase:', type);
+      } catch (error) {
+        console.error('Failed to sync companion type to Firebase:', error);
+        // Don't throw - local storage is already updated
+      }
+    }
+  }, [setCompanionTypeState, isAuthenticated, user]);
+
+  // Computed property for companion selection status (FR-1.4)
+  const hasSelectedCompanion = useMemo(() => {
+    return companionType !== null;
+  }, [companionType]);
 
   // Load settings from cloud when user logs in (Requirement 10.3, 17.3)
   useEffect(() => {
@@ -114,6 +157,109 @@ export function AppProvider({ children }: AppProviderProps) {
 
     loadSettingsFromCloud();
   }, [isAuthenticated, user, setSettings]);
+
+  // Sync companion type between localStorage and Firebase (FR-4.2, FR-4.5)
+  useEffect(() => {
+    const syncCompanionType = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        // Fetch companion type from Firebase
+        const companionData = await cloudSyncService.fetchCompanionData(user.id);
+        const cloudType = companionData?.type;
+        
+        // Validate cloud type
+        const isValidCloudType = cloudType && ['shadow', 'forest', 'ember'].includes(cloudType);
+        
+        // Get local type from localStorage
+        const localType = companionType;
+        
+        // Sync logic: Resolve conflicts
+        if (isValidCloudType && localType) {
+          // Both exist - use cloud as source of truth for authenticated users
+          if (cloudType !== localType) {
+            console.log(`Syncing companion type from cloud (${cloudType}) to local (${localType})`);
+            setCompanionTypeState(cloudType);
+          }
+        } else if (isValidCloudType && !localType) {
+          // Cloud has data, local doesn't - sync from cloud to local
+          console.log('Syncing companion type from cloud to local:', cloudType);
+          setCompanionTypeState(cloudType);
+        } else if (!isValidCloudType && localType) {
+          // Local has data, cloud doesn't - sync from local to cloud
+          console.log('Syncing companion type from local to cloud:', localType);
+          await cloudSyncService.syncCompanionData(user.id, {
+            type: localType,
+            selectedAt: new Date().toISOString(),
+          });
+        } else if (isValidCloudType === false && cloudType) {
+          // Invalid cloud type - log warning
+          console.warn('Invalid companion type from cloud:', cloudType);
+        }
+        // If both are null, no action needed
+      } catch (error) {
+        console.error('Failed to sync companion type:', error);
+      }
+    };
+
+    syncCompanionType();
+  }, [isAuthenticated, user, companionType, setCompanionTypeState]);
+
+  // Real-time sync: Subscribe to Firebase changes and update localStorage (FR-4.5)
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    // Subscribe to real-time companion data updates from Firebase
+    const unsubscribe = cloudSyncService.subscribeToCompanionData(
+      user.id,
+      (companionData) => {
+        if (companionData?.type) {
+          const cloudType = companionData.type;
+          
+          // Validate the type from Firebase
+          if (['shadow', 'forest', 'ember'].includes(cloudType)) {
+            // Only update if different from current local state
+            if (cloudType !== companionType) {
+              console.log('Real-time sync: Updating companion type from Firebase:', cloudType);
+              setCompanionTypeState(cloudType);
+            }
+          } else {
+            console.warn('Invalid companion type from real-time update:', cloudType);
+          }
+        }
+      },
+      (error) => {
+        console.error('Error in companion data real-time sync:', error);
+      }
+    );
+
+    // Cleanup subscription on unmount or when user changes
+    return () => {
+      unsubscribe();
+    };
+  }, [isAuthenticated, user, companionType, setCompanionTypeState]);
+
+  // Migration: Default existing users to 'shadow' type (FR-6.3, NFR-4)
+  useEffect(() => {
+    const migrateExistingUsers = async () => {
+      // Only run migration if no companion type is set
+      if (companionType !== null) return;
+
+      // Check if user has any existing data (tasks, notes, etc.)
+      // For now, we'll check localStorage for any existing data
+      const hasExistingData = 
+        localStorage.getItem('tasks') !== null ||
+        localStorage.getItem('notes') !== null ||
+        localStorage.getItem('settings') !== null;
+
+      if (hasExistingData) {
+        console.log('Migrating existing user to Shadow Spirit companion');
+        await setCompanionType('shadow');
+      }
+    };
+
+    migrateExistingUsers();
+  }, [companionType, setCompanionType]);
 
   // Sync settings to cloud when they change (Requirement 10.3, 17.3)
   useEffect(() => {
@@ -164,7 +310,23 @@ export function AppProvider({ children }: AppProviderProps) {
     toggleSidebar,
     isSidebarOpen,
     setIsSidebarOpen,
-  }), [currentModule, settings, isLoading, loadingMessage, hasBootupAnimationPlayed, sidebarMode, toggleSidebar, isSidebarOpen, setIsSidebarOpen]);
+    companionType,
+    setCompanionType,
+    hasSelectedCompanion,
+  }), [
+    currentModule,
+    settings,
+    isLoading,
+    loadingMessage,
+    hasBootupAnimationPlayed,
+    sidebarMode,
+    toggleSidebar,
+    isSidebarOpen,
+    setIsSidebarOpen,
+    companionType,
+    setCompanionType,
+    hasSelectedCompanion,
+  ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

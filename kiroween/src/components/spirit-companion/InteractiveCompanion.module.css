@@ -4,7 +4,9 @@
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 2rem;
+  padding: 2.5rem;
+  max-width: 900px;
+  width: 100%;
   background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(45, 27, 78, 0.95));
   border: 2px solid var(--border-primary);
   border-radius: 16px;
@@ -496,8 +498,8 @@
 /* Companion 3D Display */
 .companion {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 300px;
+  height: 300px;
   cursor: pointer;
   transition: transform 0.3s ease;
   perspective: 1000px;
@@ -525,7 +527,7 @@
   border-radius: 8px;
   padding: 0.5rem 1rem;
   white-space: nowrap;
-  z-index: 1000;
+  z-index: 10000;
   pointer-events: none;
   animation: tooltipFadeIn 0.2s ease-out;
   box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
@@ -688,11 +690,41 @@
   }
 }
 
+/* Ghost video animation for Shadow Spirit */
+.ghostVideo {
+  position: absolute;
+  width: 116%;
+  height: 150%;
+  object-fit: cover;
+  opacity: 1;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  top: -20%;
+  left: -5%;
+  transform: translate(-50%, -50%);
+}
+
+/* Zombie video animation for Zombie Companion */
+.zombieVideo {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  opacity: 1;
+  z-index: 2;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .companionEmoji {
-  font-size: 8rem;
+  position: relative;
+  font-size: 12rem;
   filter: drop-shadow(0 0 20px var(--stage-color, var(--accent-purple)));
   animation: pulse 2s ease-in-out infinite;
-  z-index: 2;
+  z-index: 1;
 }
 
 .companion.celebrating .companionEmoji {
@@ -1162,27 +1194,28 @@
 /* Responsive */
 @media (max-width: 768px) {
   .companionContainer {
-    padding: 1.5rem;
+    padding: 1rem;
+    max-width: 100%;
   }
 
   .companion {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
   }
 
   .companionEmoji {
-    font-size: 6rem;
+    font-size: 5rem;
   }
 
   .companionName {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .evolutionText {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .celebrationText {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
 }

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useCompanion } from '../../contexts/CompanionContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { CompanionDialogue } from './CompanionDialogue';
+import { COMPANION_TYPES } from '../../types/companion';
 import styles from './InteractiveCompanion.module.css';
 
 export type EvolutionStage = 'egg' | 'hatchling' | 'juvenile' | 'adult' | 'elder' | 'ascended';
@@ -29,6 +30,7 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
   const [showEvolutionParticles, setShowEvolutionParticles] = useState(false);
   const [isEncouraging, setIsEncouraging] = useState(false);
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
+  const ghostVideoRef = useRef<HTMLVideoElement>(null);
 
   // Calculate evolution stage based on achievements and tasks
   useEffect(() => {
@@ -158,6 +160,9 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
   };
 
   const getStageInfo = () => {
+    // Get the companion definition based on active companion
+    const companionDef = COMPANION_TYPES[activeCompanion];
+    
     // Use theme colors for companion stages
     // Progression: lighter -> darker as companion evolves
     const stageColors = {
@@ -169,54 +174,32 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
       ascended: currentTheme.colors.borderPrimary,
     };
 
-    switch (stage) {
-      case 'egg':
-        return {
-          name: 'Mysterious Egg',
-          description: 'A dormant spirit awaits awakening',
-          emoji: '🥚',
-          color: stageColors.egg,
-        };
-      case 'hatchling':
-        return {
-          name: 'Spirit Wisp',
-          description: 'A tiny spark of ethereal energy',
-          emoji: '✨',
-          color: stageColors.hatchling,
-        };
-      case 'juvenile':
-        return {
-          name: 'Shadow Sprite',
-          description: 'Growing stronger with each deed',
-          emoji: '👻',
-          color: stageColors.juvenile,
-        };
-      case 'adult':
-        return {
-          name: 'Phantom Guardian',
-          description: 'A powerful protector of your realm',
-          emoji: '🦇',
-          color: stageColors.adult,
-        };
-      case 'elder':
-        return {
-          name: 'Ancient Wraith',
-          description: 'Wisdom incarnate, master of shadows',
-          emoji: '🌙',
-          color: stageColors.elder,
-        };
-      case 'ascended':
-        return {
-          name: 'Celestial Entity',
-          description: 'Transcended beyond mortal comprehension',
-          emoji: '⭐',
-          color: stageColors.ascended,
-        };
-    }
+    // Map stage index to stage name
+    const stageIndex = ['egg', 'hatchling', 'juvenile', 'adult', 'elder', 'ascended'].indexOf(stage);
+    const stageData = companionDef.stages[stageIndex];
+
+    return {
+      name: stageData.name,
+      description: stageData.description,
+      emoji: stageData.emoji,
+      color: stageColors[stage],
+    };
   };
 
   const stageInfo = getStageInfo();
   const progress = Math.min(100, ((achievementCount * 10 + taskCompletionCount) / 200) * 100);
+
+  // Apply ghost video positioning with !important to override CSS modules
+  useEffect(() => {
+    if (ghostVideoRef.current && activeCompanion === 'shadow') {
+      const video = ghostVideoRef.current;
+      video.style.setProperty('left', '-23%', 'important');
+      video.style.setProperty('top', '-10%', 'important');
+      video.style.setProperty('width', '150%', 'important');
+      video.style.setProperty('height', '152%', 'important');
+      video.style.setProperty('opacity', '1', 'important');
+    }
+  }, [activeCompanion]);
 
   return (
     <div className={styles.companionContainer}>
@@ -354,7 +337,34 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
         style={{ '--stage-color': stageInfo.color } as React.CSSProperties}
       >
         <div className={styles.companionBody}>
-          <div className={styles.companionEmoji}>{stageInfo.emoji}</div>
+          {/* Ghost animation video for Shadow Spirit companion */}
+          {activeCompanion === 'shadow' && (
+            <video
+              ref={ghostVideoRef}
+              className={styles.ghostVideo}
+              src="/ghost_)idle.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          )}
+          {/* Zombie animation video for Zombie companion */}
+          {activeCompanion === 'zombie' && (
+            <video
+              ref={ghostVideoRef}
+              className={styles.zombieVideo}
+              src="/zombie_idle.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+          )}
+          {/* Hide emoji for Shadow Spirit and Zombie, show for others */}
+          {activeCompanion !== 'shadow' && activeCompanion !== 'zombie' && (
+            <div className={styles.companionEmoji}>{stageInfo.emoji}</div>
+          )}
           <div className={styles.companionGlow}></div>
           <div className={styles.companionParticles}>
             {[...Array(8)].map((_, i) => (

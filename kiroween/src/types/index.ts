@@ -2,6 +2,10 @@
  * Core data models for Dark Productivity Suite
  */
 
+// Re-export companion types
+export type { CompanionType, EvolutionStage, CompanionDefinition } from './companion';
+export { COMPANION_TYPES } from './companion';
+
 export interface User {
   id: string;
   email: string;

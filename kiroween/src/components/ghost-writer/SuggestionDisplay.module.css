@@ -156,7 +156,7 @@
 
 /* Text container - handles scrolling for long suggestions */
 .textContainer {
-  max-height: 400px; /* Increased from 300px */
+  max-height: 600px; /* Increased from 400px to show more text */
   overflow-y: auto;
   overflow-x: hidden;
   word-wrap: break-word;
@@ -193,8 +193,8 @@
   
   /* Typography */
   font-family: var(--font-body, 'Lora', 'Merriweather', Georgia, serif);
-  font-size: 1rem;
-  line-height: 1.7; /* Improved from 1.6 */
+  font-size: 1.125rem; /* Increased from 1rem */
+  line-height: 1.8; /* Increased from 1.7 for better readability */
   letter-spacing: 0.01em;
   
   /* Italic for distinction */
