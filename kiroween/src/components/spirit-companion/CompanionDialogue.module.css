@@ -8,7 +8,7 @@
 /* Container positioning */
 .dialogueContainer {
   position: absolute;
-  z-index: 1000;
+  z-index: 10000;
   pointer-events: none;
   animation: dialogueEnter 0.3s ease-out;
 }

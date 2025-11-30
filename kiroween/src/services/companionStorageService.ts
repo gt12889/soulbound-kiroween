@@ -133,8 +133,6 @@ export async function saveCompanionType(type: CompanionType, userId?: string): P
     // Save to localStorage (FR-4.3)
     storageService.set(COMPANION_TYPE_KEY, type);
     storageService.set(COMPANION_SELECTION_TIMESTAMP_KEY, new Date());
-    
-    console.log('Companion type saved to localStorage:', type);
 
     // Save to Firebase for authenticated users (FR-4.2, FR-4.5)
     if (userId) {
@@ -150,7 +148,6 @@ export async function saveCompanionType(type: CompanionType, userId?: string): P
           MAX_RETRIES,
           'Firebase companion sync'
         );
-        console.log('Companion type synced to Firebase:', type);
       } catch (error) {
         console.error('Failed to sync companion type to Firebase after retries:', error);
         // Don't throw - localStorage save was successful

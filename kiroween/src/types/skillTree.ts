@@ -35,7 +35,7 @@ export interface Skill {
 /**
  * Companion type identifier
  */
-export type CompanionType = 'shadow' | 'forest' | 'ember';
+export type CompanionType = 'shadow' | 'zombie' | 'ember';
 
 /**
  * Complete skill tree for a companion
@@ -155,92 +155,92 @@ export const SHADOW_SKILLS: SkillBranches = {
 };
 
 // ============================================================================
-// FOREST SPIRIT SKILLS
+// ZOMBIE COMPANION SKILLS
 // ============================================================================
 
-export const FOREST_SKILLS: SkillBranches = {
+export const ZOMBIE_SKILLS: SkillBranches = {
   power: [
     {
-      id: 'natures_whisper',
-      name: "Nature's Whisper",
-      description: 'Provides gentle writing suggestions',
-      icon: '🌿',
+      id: 'undead_persistence',
+      name: 'Undead Persistence',
+      description: 'Provides relentless writing suggestions',
+      icon: '🧟',
       cost: 1,
       effect: { type: 'ghost_writer_hints', value: 1 }
     },
     {
-      id: 'growth_vision',
-      name: 'Growth Vision',
+      id: 'graveyard_insight',
+      name: 'Graveyard Insight',
       description: 'Predicts task priorities with 75% accuracy',
-      icon: '🌱',
+      icon: '⚰️',
       cost: 2,
-      prerequisite: 'natures_whisper',
+      prerequisite: 'undead_persistence',
       effect: { type: 'task_prediction', value: 75 }
     },
     {
-      id: 'ancient_wisdom',
-      name: 'Ancient Wisdom',
+      id: 'lich_wisdom',
+      name: 'Lich Wisdom',
       description: 'Enhances writing suggestions to expert level',
-      icon: '🌳',
+      icon: '👑',
       cost: 3,
-      prerequisite: 'growth_vision',
+      prerequisite: 'graveyard_insight',
       effect: { type: 'ghost_writer_hints', value: 2 }
     }
   ],
   wisdom: [
     {
-      id: 'forest_lore',
-      name: 'Forest Lore',
-      description: 'Unlocks nature-themed dialogue',
-      icon: '🍃',
+      id: 'undead_lore',
+      name: 'Undead Lore',
+      description: 'Unlocks zombie-themed dialogue',
+      icon: '💀',
       cost: 1,
-      effect: { type: 'dialogue_unlock', value: ['nature'] }
+      effect: { type: 'dialogue_unlock', value: ['undead'] }
     },
     {
-      id: 'seasons_cycle',
-      name: "Season's Cycle",
-      description: 'Unlocks growth and patience dialogue',
-      icon: '🍂',
+      id: 'eternal_patience',
+      name: 'Eternal Patience',
+      description: 'Unlocks persistence and determination dialogue',
+      icon: '⏳',
       cost: 2,
-      prerequisite: 'forest_lore',
-      effect: { type: 'dialogue_unlock', value: ['growth', 'patience'] }
+      prerequisite: 'undead_lore',
+      effect: { type: 'dialogue_unlock', value: ['persistence', 'determination'] }
     },
     {
-      id: 'elder_tree',
-      name: 'Elder Tree',
+      id: 'death_lord',
+      name: 'Death Lord',
       description: 'Gain 30% bonus experience from all activities',
-      icon: '🌲',
+      icon: '☠️',
       cost: 3,
-      prerequisite: 'seasons_cycle',
+      prerequisite: 'eternal_patience',
       effect: { type: 'xp_boost', value: 30 }
     }
   ],
   charm: [
     {
-      id: 'leaf_dance',
-      name: 'Leaf Dance',
-      description: 'Unlocks swirling leaves animation',
-      icon: '🍁',
+      id: 'shambling_walk',
+      name: 'Shambling Walk',
+      description: 'Unlocks zombie shuffle animation',
+      icon: '🚶',
       cost: 1,
-      effect: { type: 'animation_unlock', value: 'leaf_swirl' }
+      effect: { type: 'animation_unlock', value: 'zombie_shuffle' }
     },
     {
-      id: 'bloom_cycle',
-      name: 'Bloom Cycle',
-      description: 'Unlocks flowering idle behavior',
-      icon: '🌸',
+      id: 'decay_aura',
+      name: 'Decay Aura',
+      description: 'Unlocks eerie idle behavior',
+      icon: '🌫️',
       cost: 2,
-      prerequisite: 'leaf_dance',
-      effect: { type: 'idle_behavior', value: 'bloom_pulse' }
+      prerequisite: 'shambling_walk',
+      effect: { type: 'idle_behavior', value: 'decay_pulse' }
     },
     {
-      id: 'forest_guardian',
-      name: 'Forest Guardian',
-      description: 'Unlocks protective aura animation',
+      id: 'undead_guardian',
+      name: 'Undead Guardian',
+      description: 'Unlocks protective necromancy animation',
       icon: '🛡️',
       cost: 3,
-      prerequisite: 'bloom_cycle',
-      effect: { type: 'animation_unlock', value: 'guardian_aura' }
+      prerequisite: 'decay_aura',
+      effect: { type: 'animation_unlock', value: 'necro_shield' }
     }
   ]
 };
@@ -350,8 +350,8 @@ export function getSkillBranches(companionType: CompanionType): SkillBranches {
   switch (companionType) {
     case 'shadow':
       return SHADOW_SKILLS;
-    case 'forest':
-      return FOREST_SKILLS;
+    case 'zombie':
+      return ZOMBIE_SKILLS;
     case 'ember':
       return EMBER_SKILLS;
     default:

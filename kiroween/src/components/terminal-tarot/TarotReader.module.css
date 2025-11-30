@@ -208,18 +208,78 @@
   gap: 2rem;
 }
 
+.shufflingCards {
+  position: relative;
+  width: 200px;
+  height: 280px;
+  perspective: 1000px;
+}
+
+.shufflingCard {
+  position: absolute;
+  width: 140px;
+  height: 220px;
+  background: linear-gradient(135deg, #2d1b4e 0%, #4a2d6e 100%);
+  border: 2px solid var(--accent-purple-light);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6), 0 0 30px rgba(157, 78, 221, 0.4);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  animation: cardShuffle 1.5s ease-in-out infinite;
+}
+
+.shufflingCard::before {
+  content: '🔮';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+@keyframes cardShuffle {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateX(0) translateY(0) rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(-50%, -50%) translateX(-100px) translateY(-50px) rotate(-25deg) scale(1.05);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) translateX(100px) translateY(50px) rotate(25deg) scale(0.95);
+    opacity: 0.85;
+  }
+  75% {
+    transform: translate(-50%, -50%) translateX(-80px) translateY(80px) rotate(-20deg) scale(1.05);
+    opacity: 1;
+  }
+}
+
 .loadingText {
   font-size: 1.2rem;
   color: var(--text-secondary);
   font-style: italic;
   text-align: center;
+  animation: textPulse 2s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .readingContainer {
   max-width: 1400px;
   margin: 0 auto;
-  min-height: auto;
-  height: auto;
+  padding: 2rem 1rem;
 }
 
 .demoNotice {
@@ -241,6 +301,7 @@
   gap: 2rem;
   margin: 3rem 0;
   padding: 2rem;
+  min-height: 450px;
 }
 
 .interpretation {

@@ -21,6 +21,7 @@ const TarotReader: React.FC = () => {
   }, [error]);
 
   const generateDemoReading = async () => {
+    console.log('🔮 TAROT: Starting demo reading, setting loading=true');
     setLoading(true);
     setError(null);
     setReading(null);
@@ -38,12 +39,13 @@ const TarotReader: React.FC = () => {
       
       // Simulate a brief delay for dramatic effect
       setTimeout(() => {
+        console.log('🔮 TAROT: Demo reading complete, setting loading=false');
         setReading(newReading);
         setLoading(false);
       }, 1000);
 
     } catch (err) {
-      console.error('Error generating tarot reading:', err);
+      console.error('🔮 TAROT ERROR:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate reading');
       setLoading(false);
     }
@@ -169,6 +171,27 @@ const TarotReader: React.FC = () => {
 
       {loading && (
         <div className={styles.loading} role="status" aria-live="polite">
+          <div className={styles.shufflingCards}>
+            {[...Array(5)].map((_, i) => {
+              console.log(`🔮 Tarot Card ${i}: delay=${i * 0.25}s, zIndex=${5 - i}`);
+              const offsetX = (i - 2) * 15; // Spread cards horizontally
+              const offsetY = (i - 2) * 8;  // Spread cards vertically
+              const rotation = (i - 2) * 3; // Slight rotation
+              return (
+                <div 
+                  key={i} 
+                  className={styles.shufflingCard}
+                  style={{ 
+                    animationDelay: `${i * 0.25}s`,
+                    zIndex: 5 - i,
+                    left: `calc(50% + ${offsetX}px)`,
+                    top: `calc(50% + ${offsetY}px)`,
+                    transform: `translate(-50%, -50%) rotate(${rotation}deg)`
+                  }}
+                />
+              );
+            })}
+          </div>
           <p className={styles.loadingText}>
             🔮 Consulting the spirits of your commits...
           </p>

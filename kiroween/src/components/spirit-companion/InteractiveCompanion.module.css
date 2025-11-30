@@ -11,7 +11,7 @@
   border: 2px solid var(--border-primary);
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Evolution Effect */
@@ -708,15 +708,39 @@
 /* Zombie video animation for Zombie Companion */
 .zombieVideo {
   position: absolute;
-  width: 120%;
-  height: 120%;
+  width: 198%;
+  height: 150%;
   object-fit: cover;
   opacity: 1;
   z-index: 2;
   pointer-events: none;
-  top: 50%;
-  left: 50%;
+  mix-blend-mode: screen;
+  top: -20%;
+  left: -49%;
   transform: translate(-50%, -50%);
+  filter: hue-rotate(0deg) saturate(1.2) brightness(1) contrast(0.8);
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 65% at 50% 50%,
+    black 0%,
+    black 20%,
+    rgba(0, 0, 0, 0.8) 40%,
+    rgba(0, 0, 0, 0.5) 55%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.05) 85%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 70% 65% at 50% 50%,
+    black 0%,
+    black 20%,
+    rgba(0, 0, 0, 0.8) 40%,
+    rgba(0, 0, 0, 0.5) 55%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.05) 85%,
+    transparent 100%
+  );
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
 }
 
 .companionEmoji {

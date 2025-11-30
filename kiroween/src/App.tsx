@@ -9,6 +9,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { NotesProvider } from './contexts/NotesContext';
 import { TasksProvider } from './contexts/TasksContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { TimerProvider } from './contexts/TimerContext';
 import Navigation from './components/common/Navigation';
 import AudioController from './components/common/AudioController';
 import { KeyboardShortcutsPanel } from './components/common/KeyboardShortcutsPanel';
@@ -18,6 +19,7 @@ import LoadingFallback from './components/common/LoadingFallback';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { ToastContainer } from './components/common/ToastNotification';
 import { GlobalSearchModal } from './components/global-search/GlobalSearchModal';
+import { TimerIndicator } from './components/common/TimerIndicator';
 // Bootup animation disabled for performance
 // import { BootupAnimation } from './components/common/BootupAnimation';
 // Keep auth pages as regular imports for faster initial load
@@ -39,7 +41,7 @@ const NecronomiconNotes = lazy(() => import('./components/necronomicon-notes/Nec
 const GraveyardDashboard = lazy(() => import('./components/graveyard-dashboard/GraveyardDashboard').then(module => ({ default: module.GraveyardDashboard })));
 const CursedCalendar = lazy(() => import('./components/cursed-calendar/CursedCalendar').then(module => ({ default: module.CursedCalendar })));
 const AchievementsPage = lazy(() => import('./components/achievements/AchievementsPage').then(module => ({ default: module.AchievementsPage })));
-const CompanionSelectionDemo = lazy(() => import('./components/spirit-companion/CompanionSelectionDemo').then(module => ({ default: module.CompanionSelectionDemo })));
+const FocusedTimerPage = lazy(() => import('./components/focused-timer/FocusedTimerPage').then(module => ({ default: module.FocusedTimerPage })));
 
 // Component to redirect authenticated users away from auth pages
 const AuthRedirect: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -241,10 +243,12 @@ const AppContent: React.FC = () => {
                                                       } 
                                                     />
                                                     <Route 
-                                                      path="/companion-test" 
+                                                      path="/focused-timer" 
                                                       element={
                                                         <ErrorBoundary>
-                                                          <CompanionSelectionDemo />
+                                                          <ProtectedRoute>
+                                                            <FocusedTimerPage />
+                                                          </ProtectedRoute>
                                                         </ErrorBoundary>
                                                       } 
                                                     />
@@ -260,6 +264,7 @@ const AppContent: React.FC = () => {
       <QuickCapture isOpen={showQuickCapture} onClose={() => setShowQuickCapture(false)} />
       <GlobalSearchModal isOpen={showGlobalSearch} onClose={() => setShowGlobalSearch(false)} />
       <ToastContainer />
+      <TimerIndicator />
     </div>
   );
 };
@@ -271,15 +276,17 @@ const App: React.FC = () => {
         <AppProvider>
           <ThemeProvider>
             <ToastProvider>
-              <KeyboardProvider>
-                <NotesProvider>
-                  <CompanionProvider>
-                    <TasksProvider>
-                      <AppContent />
-                    </TasksProvider>
-                  </CompanionProvider>
-                </NotesProvider>
-              </KeyboardProvider>
+              <TimerProvider>
+                <KeyboardProvider>
+                  <NotesProvider>
+                    <CompanionProvider>
+                      <TasksProvider>
+                        <AppContent />
+                      </TasksProvider>
+                    </CompanionProvider>
+                  </NotesProvider>
+                </KeyboardProvider>
+              </TimerProvider>
             </ToastProvider>
           </ThemeProvider>
         </AppProvider>

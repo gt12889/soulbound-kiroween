@@ -9,7 +9,7 @@
   height: 400px;
   transform-style: preserve-3d;
   cursor: pointer;
-  opacity: 0; /* Make card initially invisible */
+  opacity: 1;
 }
 
 .card.revealed {
@@ -18,11 +18,9 @@
 
 @keyframes deal {
   from {
-    opacity: 0;
     transform: translateY(100px) rotateZ(-15deg) scale(0.8);
   }
   to {
-    opacity: 1;
     transform: translateY(0) rotateZ(0) scale(1);
   }
 }

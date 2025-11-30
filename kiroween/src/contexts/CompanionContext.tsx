@@ -172,7 +172,7 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
   const [unlockedCompanions, setUnlockedCompanions] = useLocalStorage<CompanionType[]>('unlockedCompanions', ['shadow']);
   const [customNames, setCustomNames] = useLocalStorage<Record<CompanionType, string | undefined>>(
     'companionCustomNames',
-    { shadow: undefined, forest: undefined, ember: undefined }
+    { shadow: undefined, zombie: undefined, ember: undefined }
   );
   
   // Mood and interaction state
@@ -192,7 +192,7 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     'companionSkillTrees',
     {
       shadow: initializeSkillTree('shadow'),
-      forest: initializeSkillTree('forest'),
+      zombie: initializeSkillTree('zombie'),
       ember: initializeSkillTree('ember'),
     }
   );
@@ -444,12 +444,31 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
    * Requirements: 14.5
    */
   const switchCompanion = useCallback((type: CompanionType) => {
+    console.log('🔍 switchCompanion called:', {
+      requestedType: type,
+      unlockedCompanions,
+      isUnlocked: unlockedCompanions.includes(type),
+      currentActive: activeCompanion
+    });
+    
+    // Auto-unlock companion if not already unlocked (for first-time selection)
     if (!unlockedCompanions.includes(type)) {
-      console.warn(`Cannot switch to locked companion: ${type}`);
-      return;
+      console.log(`🔓 Auto-unlocking companion: ${type}`);
+      setUnlockedCompanions(prev => [...prev, type]);
     }
+    
+    // Initialize skill tree if it doesn't exist for this companion
+    if (!skillTrees[type]) {
+      console.log(`🌳 Initializing skill tree for: ${type}`);
+      setSkillTrees(prev => ({
+        ...prev,
+        [type]: initializeSkillTree(type)
+      }));
+    }
+    
+    console.log('🔍 Switching to:', type);
     setActiveCompanion(type);
-  }, [unlockedCompanions, setActiveCompanion]);
+  }, [unlockedCompanions, setActiveCompanion, setUnlockedCompanions, activeCompanion, skillTrees, setSkillTrees]);
   
   /**
    * Set custom name for a companion

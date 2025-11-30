@@ -37,7 +37,7 @@ const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
   const [textColor, setTextColor] = useState('#4a4a4a');
   const [showFormatting, setShowFormatting] = useState(false);
   const [markdownViewMode, setMarkdownViewMode] = useState<'edit' | 'preview' | 'split'>('split');
-  const [useEnhancedEditor, setUseEnhancedEditor] = useState(true);
+  const useEnhancedEditor = true; // Always use enhanced editor
 
   const { playGhostDisappear, playSuggestionAccept, playUIClick } = useAudio();
 
@@ -164,21 +164,6 @@ const NotePageComponent: React.FC<NotePageProps> = ({ noteId }) => {
     <div className={styles.notePage} dir="ltr">
       {/* Toolbar */}
       <div className={styles.toolbar}>
-        {/* Enhanced Editor Toggle */}
-        {!note.markdown && (
-          <button
-            className={`${styles.toolbarButton} ${useEnhancedEditor ? styles.active : ''}`}
-            onClick={() => {
-              playUIClick();
-              setUseEnhancedEditor(!useEnhancedEditor);
-            }}
-            title={useEnhancedEditor ? 'Use legacy editor' : 'Use enhanced editor'}
-          >
-            <span>✨</span>
-            <span className={styles.buttonLabel}>Enhanced</span>
-          </button>
-        )}
-
         {/* Markdown Toggle */}
         <button
           className={`${styles.toolbarButton} ${note.markdown ? styles.active : ''}`}

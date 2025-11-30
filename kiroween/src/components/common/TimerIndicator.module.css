@@ -1,0 +1,165 @@
+.indicator {
+  position: fixed;
+  z-index: 1000;
+  background: var(--card-bg, rgba(26, 32, 44, 0.95));
+  border: 2px solid var(--border-color, #4a5568);
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.indicator:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+  border-color: var(--primary-color, #8b5cf6);
+}
+
+.indicator:focus {
+  outline: 2px solid var(--primary-color, #8b5cf6);
+  outline-offset: 2px;
+}
+
+/* Position variants */
+.top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.top-left {
+  top: 20px;
+  left: 20px;
+}
+
+.bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+.bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+.progressRing {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.svg {
+  transform: rotate(-90deg);
+}
+
+.backgroundCircle {
+  opacity: 0.2;
+}
+
+.progressCircle {
+  stroke-linecap: round;
+}
+
+.timeDisplay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary, #e2e8f0);
+  font-family: 'Courier New', monospace;
+}
+
+.pauseButton {
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-color, #8b5cf6);
+  border: 2px solid var(--card-bg, #1a202c);
+  color: white;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pauseButton:hover {
+  background: var(--primary-hover, #7c3aed);
+  transform: scale(1.1);
+}
+
+.pauseButton:focus {
+  outline: 2px solid var(--primary-color, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.sessionType {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--card-bg, #1a202c);
+  border: 2px solid var(--border-color, #4a5568);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .indicator {
+    padding: 6px;
+  }
+
+  .progressRing {
+    width: 50px;
+    height: 50px;
+  }
+
+  .svg {
+    width: 50px;
+    height: 50px;
+  }
+
+  .time {
+    font-size: 10px;
+  }
+
+  .pauseButton {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .sessionType {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .indicator {
+    border-width: 3px;
+  }
+
+  .progressCircle {
+    stroke-width: 5;
+  }
+}
