@@ -1,0 +1,306 @@
+/**
+ * Low-End Device Optimizations
+ * Applied when .low-end-device class is added to document root
+ */
+
+/* ============================================
+   DISABLE HEAVY ANIMATIONS
+   ============================================ */
+
+/* Disable particle effects */
+.low-end-device .particle {
+  display: none !important;
+}
+
+/* Disable complex glow effects */
+.low-end-device .glowEffect,
+.low-end-device .acceptGlow,
+.low-end-device .radialGlowOverlay {
+  display: none !important;
+}
+
+/* Disable shimmer effects */
+.low-end-device .textShimmer::after {
+  display: none !important;
+}
+
+/* ============================================
+   SIMPLIFY ANIMATIONS
+   ============================================ */
+
+/* Reduce acceptance animation duration */
+.low-end-device .accepting {
+  animation-duration: 0.5s !important;
+}
+
+/* Simplify ghost appearance */
+.low-end-device .suggestionDisplay.visible {
+  animation: simpleFadeIn 0.3s ease-out forwards !important;
+}
+
+@keyframes simpleFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+/* Simplify loading spinner */
+.low-end-device .spinner {
+  animation: none !important;
+}
+
+.low-end-device .spinnerRing:nth-child(2),
+.low-end-device .spinnerRing:nth-child(3) {
+  display: none !important;
+}
+
+.low-end-device .spinnerRing:nth-child(1) {
+  animation-duration: 1s !important;
+}
+
+/* Simplify ghost icon float */
+.low-end-device .ghostIcon {
+  animation: none !important;
+}
+
+/* Simplify message fade */
+.low-end-device .message {
+  animation: none !important;
+  opacity: 1 !important;
+}
+
+/* ============================================
+   REMOVE SHADOWS AND FILTERS
+   ============================================ */
+
+/* Reduce box shadows */
+.low-end-device .suggestionDisplay {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.low-end-device .actionsContainer {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.low-end-device .actionButton {
+  box-shadow: none !important;
+}
+
+.low-end-device .actionButton:hover {
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Remove backdrop filters */
+.low-end-device .overlay {
+  backdrop-filter: none !important;
+}
+
+.low-end-device .actionsContainer {
+  backdrop-filter: none !important;
+}
+
+/* Remove text shadows */
+.low-end-device .message {
+  text-shadow: none !important;
+}
+
+/* ============================================
+   SIMPLIFY BUTTON ANIMATIONS
+   ============================================ */
+
+/* Disable icon animations on hover */
+.low-end-device .acceptButton:hover .buttonIcon,
+.low-end-device .regenerateButton:hover .buttonIcon,
+.low-end-device .rejectButton:hover .buttonIcon {
+  animation: none !important;
+}
+
+/* Simplify button hover */
+.low-end-device .actionButton:hover {
+  transform: none !important;
+}
+
+.low-end-device .actionButton:active {
+  transform: scale(0.98) !important;
+}
+
+/* ============================================
+   SIMPLIFY CHECKMARK
+   ============================================ */
+
+/* Simplify checkmark appearance */
+.low-end-device .successCheckmark {
+  animation: simpleCheckmark 0.3s ease-out forwards !important;
+}
+
+@keyframes simpleCheckmark {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   REDUCE GRADIENT COMPLEXITY
+   ============================================ */
+
+/* Simplify backgrounds */
+.low-end-device .suggestionDisplay {
+  background: rgba(139, 92, 246, 0.15) !important;
+}
+
+.low-end-device .progressBar {
+  background: rgba(139, 92, 246, 0.8) !important;
+}
+
+.low-end-device .progressBar::after {
+  display: none !important;
+}
+
+/* ============================================
+   DISABLE FLOATING ANIMATIONS
+   ============================================ */
+
+.low-end-device .ghostIndicator {
+  animation: none !important;
+}
+
+/* ============================================
+   OPTIMIZE TRANSITIONS
+   ============================================ */
+
+/* Reduce transition durations */
+.low-end-device * {
+  transition-duration: 0.15s !important;
+}
+
+/* ============================================
+   REMOVE WILL-CHANGE HINTS
+   ============================================ */
+
+/* Remove will-change on low-end devices to reduce memory */
+.low-end-device .accepting,
+.low-end-device .acceptGlow,
+.low-end-device .successCheckmark,
+.low-end-device .textShimmer,
+.low-end-device .radialGlowOverlay,
+.low-end-device .spinner,
+.low-end-device .spinnerRing,
+.low-end-device .ghostIcon,
+.low-end-device .particle {
+  will-change: auto !important;
+}
+
+/* ============================================
+   SIMPLIFY CAROUSEL
+   ============================================ */
+
+.low-end-device .carouselContainer {
+  transition: transform 0.2s ease !important;
+}
+
+.low-end-device .carouselSlide {
+  transition: opacity 0.2s ease !important;
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Further reduce animations on mobile low-end devices */
+  .low-end-device .suggestionDisplay.visible {
+    animation: none !important;
+    opacity: 0.9 !important;
+    transform: none !important;
+  }
+
+  .low-end-device .accepting {
+    animation: none !important;
+  }
+
+  /* Disable all hover effects on mobile */
+  .low-end-device .actionButton:hover {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  /* Simplify tooltips */
+  .low-end-device .tooltip {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   PERFORMANCE INDICATORS
+   ============================================ */
+
+/* Optional: Show performance mode indicator */
+.low-end-device::before {
+  content: '';
+  /* Hidden by default, can be enabled for debugging */
+  display: none;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background: orange;
+  border-radius: 50%;
+  z-index: 9999;
+}
+
+/* Enable indicator in development */
+.low-end-device.show-performance-indicator::before {
+  display: block;
+}
+
+/* ============================================
+   FALLBACK FOR VERY LOW-END DEVICES
+   ============================================ */
+
+/* Ultra-low-end mode (can be enabled programmatically) */
+.ultra-low-end-device .suggestionDisplay,
+.ultra-low-end-device .actionsContainer,
+.ultra-low-end-device .overlay {
+  animation: none !important;
+  transition: none !important;
+}
+
+.ultra-low-end-device * {
+  animation: none !important;
+  transition: none !important;
+}
+
+.ultra-low-end-device .suggestionDisplay {
+  background: rgba(139, 92, 246, 0.2) !important;
+  box-shadow: none !important;
+  border: 2px solid rgba(139, 92, 246, 0.5) !important;
+}
+
+/* ============================================
+   PRINT OPTIMIZATIONS
+   ============================================ */
+
+@media print {
+  /* Disable all animations for printing */
+  .particle,
+  .glowEffect,
+  .acceptGlow,
+  .radialGlowOverlay,
+  .textShimmer,
+  .ghostIndicator {
+    display: none !important;
+  }
+
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

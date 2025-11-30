@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accept Button Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #1a1a1a;
+      font-family: 'Lora', Georgia, serif;
+      color: #e0e0e0;
+    }
+
+    h1 {
+      color: #8b5cf6;
+      margin-bottom: 2rem;
+    }
+
+    .test-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    h2 {
+      color: #10b981;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    /* Accept Button Styles */
+    .acceptButton {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      min-width: 100px;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(16, 185, 129, 0.5);
+      border-radius: 8px;
+      color: rgba(224, 224, 224, 0.95);
+      cursor: pointer;
+      transition: 
+        transform 0.15s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        color 0.2s ease;
+      outline: none;
+      user-select: none;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .acceptButton:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      box-shadow: 
+        0 0 25px rgba(16, 185, 129, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: scale(1.05);
+      color: #ffffff;
+    }
+
+    .acceptButton:hover .buttonIcon {
+      animation: pulse 0.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+    }
+
+    .acceptButton:active {
+      transform: scale(0.95);
+      box-shadow: 
+        0 0 20px rgba(16, 185, 129, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .acceptButton:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .buttonIcon {
+      font-size: 1.125rem;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+
+    .buttonText {
+      flex: 1;
+      text-align: left;
+    }
+
+    .shortcut {
+      padding: 0.25rem 0.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: rgba(224, 224, 224, 0.7);
+      margin-left: auto;
+    }
+
+    .status {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 8px;
+      color: #10b981;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    .checklist li {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 4px;
+      border-left: 3px solid #10b981;
+    }
+
+    .checklist li::before {
+      content: "✓ ";
+      color: #10b981;
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Accept Button Implementation Test</h1>
+
+  <div class="test-section">
+    <h2>✓ Default State (Green Glow)</h2>
+    <button class="acceptButton" onclick="handleAccept(this)">
+      <span class="buttonIcon">✓</span>
+      <span class="buttonText">Accept</span>
+      <span class="shortcut">Tab</span>
+    </button>
+    <div id="status1" class="status">Button clicked! ✓</div>
+  </div>
+
+  <div class="test-section">
+    <h2>✓ Without Shortcut</h2>
+    <button class="acceptButton" onclick="handleAccept(this)">
+      <span class="buttonIcon">✓</span>
+      <span class="buttonText">Accept</span>
+    </button>
+    <div id="status2" class="status">Button clicked! ✓</div>
+  </div>
+
+  <div class="test-section">
+    <h2>✓ Disabled State</h2>
+    <button class="acceptButton" disabled>
+      <span class="buttonIcon">✓</span>
+      <span class="buttonText">Accept</span>
+      <span class="shortcut">Tab</span>
+    </button>
+    <p style="margin-top: 1rem; color: #888;">This button should be dimmed and not clickable</p>
+  </div>
+
+  <div class="test-section">
+    <h2>✓ Implementation Checklist</h2>
+    <ul class="checklist">
+      <li>Green glow effect (box-shadow with rgba(16, 185, 129, 0.3))</li>
+      <li>Hover state with brighter green glow</li>
+      <li>Hover animation (pulse effect on icon)</li>
+      <li>Scale transform on hover (1.05)</li>
+      <li>Scale transform on active (0.95)</li>
+      <li>Tooltip with keyboard shortcut (Tab or Enter)</li>
+      <li>Disabled state with reduced opacity</li>
+      <li>Accessible with ARIA labels</li>
+      <li>Smooth transitions (0.15s - 0.2s)</li>
+      <li>Glassmorphism effect on container</li>
+    </ul>
+  </div>
+
+  <script>
+    let clickCount = 0;
+    function handleAccept(button) {
+      clickCount++;
+      const statusId = button.parentElement.querySelector('.status').id;
+      const status = document.getElementById(statusId);
+      status.textContent = `Button clicked ${clickCount} time(s)! ✓`;
+      status.classList.add('show');
+      
+      setTimeout(() => {
+        status.classList.remove('show');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

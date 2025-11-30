@@ -1,0 +1,551 @@
+/* Ghost Writer Animations - Mystical acceptance and transition effects */
+
+/* ============================================
+   ACCEPTANCE ANIMATION SEQUENCE
+   ============================================ */
+
+/**
+ * Main acceptance animation - transforms suggestion to accepted text
+ * Duration: 1s total
+ * Optimized to use only transform and opacity for better performance
+ * Note: Background colors and borders are handled via CSS transitions on the element
+ */
+@keyframes acceptSuggestion {
+  /* Phase 1: Initial scale up (0-20%) */
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  20% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  
+  /* Phase 2: Sustained (20-50%) */
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+  
+  /* Phase 3: Return to normal (50-80%) */
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  /* Phase 4: Complete (80-100%) */
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   GREEN GLOW EFFECT
+   ============================================ */
+
+/**
+ * Pulsing green glow for acceptance
+ * Creates a radiant success effect
+ * Optimized to use only opacity for better performance
+ * Note: Box-shadow is set on the element itself, animation only controls opacity
+ */
+@keyframes acceptGlow {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  
+  25% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  75% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/**
+ * Radial glow pulse - emanates from center
+ */
+@keyframes radialGlow {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  
+  50% {
+    transform: scale(1.2);
+    opacity: 0.6;
+  }
+  
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   SUCCESS CHECKMARK INDICATOR
+   ============================================ */
+
+/**
+ * Checkmark appearance animation
+ * Slides in from right with bounce
+ */
+@keyframes checkmarkAppear {
+  0% {
+    opacity: 0;
+    transform: translateX(20px) scale(0.5) rotate(-45deg);
+  }
+  
+  60% {
+    opacity: 1;
+    transform: translateX(-5px) scale(1.2) rotate(0deg);
+  }
+  
+  80% {
+    transform: translateX(2px) scale(0.95) rotate(0deg);
+  }
+  
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1) rotate(0deg);
+  }
+}
+
+/**
+ * Checkmark fade out animation
+ */
+@keyframes checkmarkFadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/**
+ * Checkmark glow pulse
+ * Optimized to use only opacity for better performance
+ * Note: Drop-shadow is set on the element itself
+ */
+@keyframes checkmarkGlow {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* ============================================
+   TEXT TRANSITION EFFECTS
+   ============================================ */
+
+/**
+ * Text transition animation
+ * Optimized to use only opacity for better performance
+ * Note: Font-style, color, and letter-spacing are handled via CSS transitions
+ */
+@keyframes textNormalize {
+  0% {
+    opacity: 0.95;
+    transform: translateX(0);
+  }
+  
+  50% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/**
+ * Shimmer effect during text transition
+ * Optimized to use only transform for better performance
+ */
+@keyframes textShimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  
+  50% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   SMOOTH STATE TRANSITIONS
+   ============================================ */
+
+/**
+ * Fade in transition for entering elements
+ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  
+  to {
+    opacity: 1;
+  }
+}
+
+/**
+ * Fade out transition for exiting elements
+ */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  
+  to {
+    opacity: 0;
+  }
+}
+
+/**
+ * Slide up and fade in
+ */
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/**
+ * Slide down and fade out
+ */
+@keyframes slideDownFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/**
+ * Scale and fade in (for success indicators)
+ */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/**
+ * Scale and fade out
+ */
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/**
+ * Apply acceptance animation to element
+ */
+.accepting {
+  animation: acceptSuggestion 1s ease-out forwards;
+}
+
+/**
+ * Apply glow effect
+ * Positioned as an overlay to create visible green glow
+ */
+.acceptGlow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 8px;
+  background: radial-gradient(
+    circle at center,
+    rgba(16, 185, 129, 0.15) 0%,
+    rgba(16, 185, 129, 0.05) 50%,
+    transparent 100%
+  );
+  animation: acceptGlow 1s ease-out forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/**
+ * Success checkmark container
+ */
+.successCheckmark {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+  color: #10b981;
+  animation: 
+    checkmarkAppear 0.4s ease-out forwards,
+    checkmarkGlow 1s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/**
+ * Fade out checkmark after display
+ */
+.successCheckmark.fadeOut {
+  animation: checkmarkFadeOut 0.3s ease-out forwards;
+}
+
+/**
+ * Text shimmer overlay during transition
+ */
+.textShimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.textShimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(16, 185, 129, 0.2) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: textShimmer 1s ease-out forwards;
+  pointer-events: none;
+}
+
+/**
+ * Radial glow overlay
+ */
+.radialGlowOverlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(16, 185, 129, 0.3) 0%,
+    transparent 70%
+  );
+  animation: radialGlow 0.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT
+   ============================================ */
+
+/**
+ * Simplified animations for users who prefer reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes acceptSuggestion {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes acceptGlow,
+  @keyframes radialGlow,
+  @keyframes checkmarkGlow,
+  @keyframes textShimmer {
+    /* Disable complex animations */
+    from, to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  
+  @keyframes checkmarkAppear {
+    from {
+      opacity: 0;
+      transform: scale(1);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .successCheckmark {
+    animation: checkmarkAppear 0.2s ease-out forwards;
+  }
+}
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/**
+ * Enable GPU acceleration for animated elements
+ * Only use will-change for elements that are actively animating
+ */
+.accepting,
+.acceptGlow,
+.successCheckmark,
+.textShimmer,
+.radialGlowOverlay {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+/**
+ * Contain layout changes to animated elements
+ */
+.accepting {
+  contain: layout style paint;
+}
+
+/* ============================================
+   HIGH CONTRAST MODE SUPPORT
+   ============================================ */
+
+/**
+ * Enhanced visibility for high contrast mode
+ * Optimized to use only transform and opacity
+ */
+@media (prefers-contrast: high) {
+  @keyframes acceptSuggestion {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    20% {
+      opacity: 1;
+      transform: scale(1.02);
+    }
+    
+    50% {
+      opacity: 1;
+      transform: scale(1.01);
+    }
+    
+    80% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes acceptGlow {
+    0% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    
+    25% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    75% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes textNormalize {
+    0% {
+      opacity: 0.95;
+      transform: translateX(0);
+    }
+    
+    50% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}

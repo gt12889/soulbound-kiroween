@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Writer - Error Mapping Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      background: linear-gradient(135deg, #1a0b2e 0%, #2d1b3d 100%);
+      color: #e0e0e0;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #c084fc;
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+      text-shadow: 0 0 20px rgba(192, 132, 252, 0.5);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(224, 224, 224, 0.7);
+      margin-bottom: 3rem;
+      font-style: italic;
+    }
+
+    .error-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .error-card {
+      background: rgba(45, 27, 30, 0.8);
+      border: 2px solid rgba(239, 68, 68, 0.4);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .error-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 40px rgba(239, 68, 68, 0.4);
+      border-color: rgba(239, 68, 68, 0.6);
+    }
+
+    .error-type {
+      font-size: 0.875rem;
+      color: rgba(239, 68, 68, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .error-icon {
+      font-size: 2.5rem;
+      text-align: center;
+      margin: 1rem 0;
+      filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.5));
+    }
+
+    .friendly-message {
+      font-size: 1.125rem;
+      color: rgba(254, 202, 202, 0.95);
+      font-style: italic;
+      text-align: center;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+    }
+
+    .context-message {
+      font-size: 0.9rem;
+      color: rgba(224, 224, 224, 0.75);
+      text-align: center;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .technical-error {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: rgba(224, 224, 224, 0.5);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      margin-top: 1rem;
+      word-break: break-word;
+    }
+
+    .technical-label {
+      font-size: 0.7rem;
+      color: rgba(224, 224, 224, 0.4);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .mapping-flow {
+      background: rgba(45, 27, 30, 0.6);
+      border: 2px solid rgba(139, 92, 246, 0.4);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 3rem;
+    }
+
+    .mapping-flow h2 {
+      color: #c084fc;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      border-left: 3px solid rgba(139, 92, 246, 0.6);
+    }
+
+    .flow-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #c084fc;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .flow-content {
+      flex: 1;
+    }
+
+    .flow-title {
+      font-weight: 600;
+      color: rgba(224, 224, 224, 0.9);
+      margin-bottom: 0.25rem;
+    }
+
+    .flow-description {
+      font-size: 0.875rem;
+      color: rgba(224, 224, 224, 0.6);
+    }
+
+    .arrow {
+      text-align: center;
+      color: rgba(139, 92, 246, 0.6);
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .error-icon {
+      animation: pulse 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👻 Ghost Writer Error Mapping</h1>
+    <p class="subtitle">Technical errors transformed into mystical messages</p>
+
+    <div class="error-grid">
+      <!-- Network Error -->
+      <div class="error-card">
+        <div class="error-type">NETWORK_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">Connection to the ethereal realm lost</div>
+        <div class="context-message">Check your internet connection and try again</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">NetworkError: Failed to fetch</div>
+      </div>
+
+      <!-- API Error -->
+      <div class="error-card">
+        <div class="error-type">API_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">The spirits are silent... Try again?</div>
+        <div class="context-message">The AI service encountered an issue</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">Error: API request failed with status 500</div>
+      </div>
+
+      <!-- Timeout Error -->
+      <div class="error-card">
+        <div class="error-type">TIMEOUT_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">The spirits are taking too long to respond...</div>
+        <div class="context-message">The request took too long to complete</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">TimeoutError: Request exceeded 30000ms</div>
+      </div>
+
+      <!-- Rate Limit Error -->
+      <div class="error-card">
+        <div class="error-type">RATE_LIMIT_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">The ghost writer needs rest (rate limited)</div>
+        <div class="context-message">You've made too many requests. Please wait a moment</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">Error: Rate limit exceeded (429)</div>
+      </div>
+
+      <!-- Invalid Key Error -->
+      <div class="error-card">
+        <div class="error-type">INVALID_KEY_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">API key missing - check your settings</div>
+        <div class="context-message">Configure your API key in settings to use Ghost Writer</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">AuthenticationError: Invalid API key (401)</div>
+      </div>
+
+      <!-- Unknown Error -->
+      <div class="error-card">
+        <div class="error-type">UNKNOWN_ERROR</div>
+        <div class="error-icon">💀</div>
+        <div class="friendly-message">Something mysterious went wrong</div>
+        <div class="context-message">An unexpected error occurred</div>
+        <div class="technical-label">Technical Error:</div>
+        <div class="technical-error">Error: Unexpected error in processing</div>
+      </div>
+    </div>
+
+    <div class="mapping-flow">
+      <h2>Error Mapping Flow</h2>
+      
+      <div class="flow-step">
+        <div class="flow-number">1</div>
+        <div class="flow-content">
+          <div class="flow-title">Error Occurs</div>
+          <div class="flow-description">Network failure, API error, timeout, etc.</div>
+        </div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-number">2</div>
+        <div class="flow-content">
+          <div class="flow-title">State Machine Creates GhostWriterError</div>
+          <div class="flow-description">Error is categorized with type, message, and retryable flag</div>
+        </div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-number">3</div>
+        <div class="flow-content">
+          <div class="flow-title">GhostWriter Passes Error to Display</div>
+          <div class="flow-description">Both error message and type are provided</div>
+        </div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-number">4</div>
+        <div class="flow-content">
+          <div class="flow-title">GhostErrorDisplay Maps to Friendly Message</div>
+          <div class="flow-description">Uses explicit type or pattern matching on error text</div>
+        </div>
+      </div>
+
+      <div class="arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-number">5</div>
+        <div class="flow-content">
+          <div class="flow-title">Display Error with Context</div>
+          <div class="flow-description">Shows friendly message, context help, and technical details</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

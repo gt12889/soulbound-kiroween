@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuggestionDisplay - Scrolling Demo</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: #1a1a2e;
+      font-family: 'Lora', Georgia, serif;
+      color: #e0e0e0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #8b5cf6;
+    }
+
+    .demo-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .demo-section {
+      margin-bottom: 3rem;
+    }
+
+    .demo-section h2 {
+      color: #e0e0e0;
+      margin-bottom: 1rem;
+    }
+
+    /* SuggestionDisplay styles */
+    .suggestionDisplay {
+      position: relative;
+      z-index: 1000;
+      max-width: 600px;
+      min-width: 300px;
+      background: rgba(139, 92, 246, 0.1);
+      border-left: 3px solid #8b5cf6;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin: 0.5rem 0;
+      box-shadow: 
+        0 0 20px rgba(139, 92, 246, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+    }
+
+    .textContainer {
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(139, 92, 246, 0.5) rgba(0, 0, 0, 0.2);
+    }
+
+    .textContainer::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .textContainer::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+
+    .textContainer::-webkit-scrollbar-thumb {
+      background: rgba(139, 92, 246, 0.5);
+      border-radius: 3px;
+    }
+
+    .textContainer::-webkit-scrollbar-thumb:hover {
+      background: rgba(139, 92, 246, 0.7);
+    }
+
+    .suggestionText {
+      margin: 0;
+      padding: 0;
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.95);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .ghostIndicator {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 32px;
+      height: 32px;
+      background: rgba(139, 92, 246, 0.3);
+      border: 2px solid #8b5cf6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+    }
+
+    .note {
+      color: #a0a0a0;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>👻 SuggestionDisplay Scrolling Demo</h1>
+  
+  <div class="demo-container">
+    <div class="demo-section">
+      <h2>Short Suggestion (No Scrolling)</h2>
+      <div class="suggestionDisplay">
+        <div class="textContainer">
+          <p class="suggestionText">
+            The spirits whisper ancient wisdom through the veil of time...
+          </p>
+        </div>
+        <div class="ghostIndicator">👻</div>
+      </div>
+      <p class="note">✓ Content fits within max-height, no scrollbar appears</p>
+    </div>
+
+    <div class="demo-section">
+      <h2>Medium Suggestion (Approaching Limit)</h2>
+      <div class="suggestionDisplay">
+        <div class="textContainer">
+          <p class="suggestionText">
+            In the depths of the haunted forest, where moonlight barely penetrates the thick canopy, 
+            ancient spirits dance among the twisted branches. Their ethereal forms shimmer with an otherworldly 
+            glow, casting eerie shadows that seem to move of their own accord. The air is thick with mystery 
+            and magic, as whispers of forgotten tales echo through the darkness.
+          </p>
+        </div>
+        <div class="ghostIndicator">👻</div>
+      </div>
+      <p class="note">✓ Content approaching max-height of 300px</p>
+    </div>
+
+    <div class="demo-section">
+      <h2>Long Suggestion (Scrolling Required)</h2>
+      <div class="suggestionDisplay">
+        <div class="textContainer">
+          <p class="suggestionText">
+            In the depths of the haunted forest, where moonlight barely penetrates the thick canopy, 
+            ancient spirits dance among the twisted branches. Their ethereal forms shimmer with an otherworldly 
+            glow, casting eerie shadows that seem to move of their own accord. The air is thick with mystery 
+            and magic, as whispers of forgotten tales echo through the darkness. Each step deeper into the 
+            woods reveals new wonders and terrors, as the boundary between the living and the dead grows ever 
+            thinner. The spirits beckon, calling out to those brave enough to venture into their realm, 
+            promising secrets and knowledge beyond mortal comprehension.
+            <br><br>
+            The ancient trees themselves seem alive with consciousness, their gnarled roots reaching out 
+            like skeletal fingers across the forest floor. Mist swirls between the trunks, forming shapes 
+            that almost resemble faces—watching, waiting, judging those who dare to trespass in this sacred 
+            space. The very air hums with supernatural energy, making the hair on your neck stand on end.
+            <br><br>
+            As you venture deeper, the forest reveals its true nature. Time seems to flow differently here, 
+            moments stretching into eternities while hours pass in the blink of an eye. The spirits grow 
+            bolder, their whispers becoming clearer, their forms more distinct. They tell stories of ages 
+            past, of civilizations long forgotten, of magic that once flowed freely through the world.
+            <br><br>
+            This is their domain, their sanctuary, and they welcome those who approach with respect and 
+            an open heart. But beware—the forest does not suffer fools gladly, and those who come seeking 
+            to exploit its power will find themselves lost in its depths forever, becoming just another 
+            whisper in the wind, another shadow among the trees.
+          </p>
+        </div>
+        <div class="ghostIndicator">👻</div>
+      </div>
+      <p class="note">✓ Content exceeds 300px max-height, purple scrollbar appears on the right</p>
+    </div>
+
+    <div class="demo-section">
+      <h2>Very Long Suggestion (Extensive Scrolling)</h2>
+      <div class="suggestionDisplay">
+        <div class="textContainer">
+          <p class="suggestionText">
+            In the depths of the haunted forest, where moonlight barely penetrates the thick canopy, 
+            ancient spirits dance among the twisted branches. Their ethereal forms shimmer with an otherworldly 
+            glow, casting eerie shadows that seem to move of their own accord. The air is thick with mystery 
+            and magic, as whispers of forgotten tales echo through the darkness.
+            <br><br>
+            Each step deeper into the woods reveals new wonders and terrors, as the boundary between the 
+            living and the dead grows ever thinner. The spirits beckon, calling out to those brave enough 
+            to venture into their realm, promising secrets and knowledge beyond mortal comprehension.
+            <br><br>
+            The ancient trees themselves seem alive with consciousness, their gnarled roots reaching out 
+            like skeletal fingers across the forest floor. Mist swirls between the trunks, forming shapes 
+            that almost resemble faces—watching, waiting, judging those who dare to trespass in this sacred 
+            space. The very air hums with supernatural energy, making the hair on your neck stand on end.
+            <br><br>
+            As you venture deeper, the forest reveals its true nature. Time seems to flow differently here, 
+            moments stretching into eternities while hours pass in the blink of an eye. The spirits grow 
+            bolder, their whispers becoming clearer, their forms more distinct. They tell stories of ages 
+            past, of civilizations long forgotten, of magic that once flowed freely through the world.
+            <br><br>
+            Legends speak of a great tree at the heart of the forest, older than memory itself, its roots 
+            reaching down to the very core of the earth. It is said that this tree is the source of all 
+            magic in the realm, a conduit between worlds, a bridge between the living and the dead.
+            <br><br>
+            Those who have seen it describe a trunk so wide that ten men with arms outstretched could not 
+            encircle it, branches that reach up to touch the stars themselves. Its leaves glow with an 
+            inner light, each one containing a fragment of a soul, a memory, a dream.
+            <br><br>
+            The spirits guard this tree jealously, for it is their anchor to this world, their connection 
+            to the realm of the living. Without it, they would fade into nothingness, forgotten by time 
+            and memory. And so they dance and sing around it, weaving spells of protection, ensuring that 
+            only the worthy may approach.
+            <br><br>
+            This is their domain, their sanctuary, and they welcome those who approach with respect and 
+            an open heart. But beware—the forest does not suffer fools gladly, and those who come seeking 
+            to exploit its power will find themselves lost in its depths forever, becoming just another 
+            whisper in the wind, another shadow among the trees.
+          </p>
+        </div>
+        <div class="ghostIndicator">👻</div>
+      </div>
+      <p class="note">✓ Extensive content requires significant scrolling, smooth scrollbar interaction</p>
+    </div>
+  </div>
+</body>
+</html>

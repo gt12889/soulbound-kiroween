@@ -1,0 +1,409 @@
+/* CompanionOption.module.css */
+
+/* Card Container */
+.card {
+  position: relative;
+  width: 280px;
+  min-height: 400px;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 30, 0.95) 0%,
+    rgba(30, 30, 40, 0.9) 100%
+  );
+  border: 3px solid var(--companion-primary, #9d4edd);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: cardAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Card entrance animation */
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Staggered entrance for multiple cards */
+.card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Hover state */
+.card:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5),
+    0 0 40px var(--companion-primary, #9d4edd);
+  border-width: 4px;
+}
+
+/* Focus state for keyboard navigation */
+.card:focus {
+  outline: none;
+  border-color: var(--companion-primary, #9d4edd);
+  box-shadow: 0 0 0 4px rgba(157, 78, 221, 0.3),
+    0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Selected state */
+.card.selected {
+  border-width: 5px;
+  border-color: var(--companion-primary, #9d4edd);
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 40, 0.98) 0%,
+    rgba(40, 40, 50, 0.95) 100%
+  );
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
+    0 0 60px var(--companion-primary, #9d4edd);
+  animation: selectionPulse 2s ease-in-out infinite;
+}
+
+/* Selection pulse animation */
+@keyframes selectionPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
+      0 0 60px var(--companion-primary, #9d4edd);
+  }
+  50% {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
+      0 0 80px var(--companion-primary, #9d4edd);
+  }
+}
+
+/* Selection Indicator */
+.selectionIndicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: var(--companion-primary, #9d4edd);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: checkmarkAppear 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+@keyframes checkmarkAppear {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.checkmark {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Emoji Container */
+.emojiContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+/* Emoji Display */
+.emoji {
+  font-size: 5rem;
+  line-height: 1;
+  animation: emojiFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  z-index: 2;
+  position: relative;
+}
+
+/* Emoji floating animation */
+@keyframes emojiFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(3deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(-3deg);
+  }
+}
+
+/* Hover enhancement for emoji */
+.card:hover .emoji {
+  animation: emojiFloat 2s ease-in-out infinite;
+  transform: scale(1.1);
+}
+
+/* Emoji Glow Effect */
+.emojiGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(
+    circle,
+    var(--companion-primary, #9d4edd) 0%,
+    transparent 70%
+  );
+  opacity: 0.3;
+  animation: glowPulse 2s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* Companion Name */
+.name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--companion-primary, #9d4edd);
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+}
+
+/* Theme */
+.theme {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Personality Description */
+.personality {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  text-align: center;
+  margin: 0.5rem 0;
+  flex-grow: 1;
+}
+
+/* Evolution Preview Section */
+.evolutionPreview {
+  width: 100%;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.evolutionLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Evolution Stages Container */
+.evolutionStages {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Mini Emoji for Evolution Preview */
+.miniEmoji {
+  font-size: 1.5rem;
+  line-height: 1;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  cursor: help;
+  filter: grayscale(0.3);
+}
+
+.miniEmoji:hover {
+  opacity: 1;
+  transform: scale(1.2);
+  filter: grayscale(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    max-width: 320px;
+    min-height: 380px;
+    padding: 1.5rem 1rem;
+  }
+
+  .emoji {
+    font-size: 4rem;
+  }
+
+  .emojiContainer {
+    width: 100px;
+    height: 100px;
+  }
+
+  .name {
+    font-size: 1.25rem;
+  }
+
+  .personality {
+    font-size: 0.875rem;
+  }
+
+  .miniEmoji {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    min-height: 360px;
+    padding: 1.25rem 0.875rem;
+  }
+
+  .emoji {
+    font-size: 3.5rem;
+  }
+
+  .emojiContainer {
+    width: 90px;
+    height: 90px;
+    margin: 0.5rem 0;
+  }
+
+  .name {
+    font-size: 1.125rem;
+  }
+
+  .theme {
+    font-size: 0.75rem;
+  }
+
+  .personality {
+    font-size: 0.8125rem;
+  }
+
+  .miniEmoji {
+    font-size: 1.125rem;
+    gap: 0.375rem;
+  }
+
+  .selectionIndicator {
+    width: 35px;
+    height: 35px;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .checkmark {
+    font-size: 1.25rem;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    animation: none;
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+
+  .emoji {
+    animation: none;
+  }
+
+  .emojiGlow {
+    animation: none;
+  }
+
+  .card.selected {
+    animation: none;
+  }
+
+  .selectionIndicator {
+    animation: none;
+  }
+
+  .miniEmoji:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .card {
+    border-width: 4px;
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  .card:focus {
+    border-width: 5px;
+  }
+
+  .card.selected {
+    border-width: 6px;
+  }
+
+  .name,
+  .personality,
+  .theme {
+    text-shadow: none;
+  }
+}

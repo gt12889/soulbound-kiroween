@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Writer - Acceptance Animation Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      padding: 2rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      color: #8b5cf6;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .demo-container {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .controls {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    button {
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin: 0 0.5rem;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .timeline {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .timeline h3 {
+      color: #8b5cf6;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-item {
+      padding: 0.5rem;
+      margin: 0.25rem 0;
+      border-left: 3px solid #8b5cf6;
+      padding-left: 1rem;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .timeline-item.active {
+      opacity: 1;
+      background: rgba(139, 92, 246, 0.1);
+    }
+
+    /* Import animations from animations.css */
+    @import url('./animations.css');
+
+    /* Suggestion Display Styles */
+    .suggestionDisplay {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 auto;
+      
+      background: rgba(139, 92, 246, 0.1);
+      border-left: 3px solid #8b5cf6;
+      border-radius: 8px;
+      
+      padding: 1rem 1.5rem;
+      margin: 0.5rem 0;
+      
+      box-shadow: 
+        0 0 20px rgba(139, 92, 246, 0.3),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+      
+      backdrop-filter: blur(10px);
+      
+      opacity: 0.9;
+      
+      transition: 
+        opacity 0.3s ease-in-out,
+        transform 0.5s ease-in-out,
+        background 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .suggestionDisplay.accepting {
+      animation: acceptSuggestion 1s ease-out forwards;
+    }
+
+    .textContainer {
+      position: relative;
+    }
+
+    .textContainer.textShimmer::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(16, 185, 129, 0.2) 50%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: textShimmer 1s ease-out forwards;
+      pointer-events: none;
+    }
+
+    .suggestionText {
+      margin: 0;
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.95);
+      transition: font-style 0.3s ease, color 0.3s ease, letter-spacing 0.3s ease;
+    }
+
+    .suggestionDisplay.accepting .suggestionText {
+      animation: textNormalize 1s ease-out forwards;
+    }
+
+    .successCheckmark {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: #10b981;
+      animation: 
+        checkmarkAppear 0.4s ease-out forwards,
+        checkmarkGlow 1s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .successCheckmark.fadeOut {
+      animation: checkmarkFadeOut 0.3s ease-out forwards;
+    }
+
+    .acceptGlow {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      animation: acceptGlow 1s ease-out forwards;
+      pointer-events: none;
+    }
+
+    .radialGlowOverlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at center,
+        rgba(16, 185, 129, 0.3) 0%,
+        transparent 70%
+      );
+      animation: radialGlow 0.8s ease-out forwards;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ghostIndicator {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 32px;
+      height: 32px;
+      background: rgba(139, 92, 246, 0.3);
+      border: 2px solid #8b5cf6;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+    }
+
+    .status-label {
+      color: #8b5cf6;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .status-value {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <h1>👻 Ghost Writer Acceptance Animation Demo</h1>
+    
+    <div class="controls">
+      <button onclick="startAnimation()">Start Acceptance Animation</button>
+      <button onclick="resetAnimation()">Reset</button>
+    </div>
+
+    <div class="timeline">
+      <h3>Animation Timeline (1000ms total)</h3>
+      <div class="timeline-item" data-time="0">0ms: Animation starts - Purple to green transition begins</div>
+      <div class="timeline-item" data-time="200">200ms: Peak green glow</div>
+      <div class="timeline-item" data-time="500">500ms: Checkmark appears</div>
+      <div class="timeline-item" data-time="800">800ms: Checkmark starts fading</div>
+      <div class="timeline-item" data-time="1000">1000ms: Animation complete - Returns to normal</div>
+    </div>
+
+    <div id="suggestionContainer">
+      <div class="suggestionDisplay" id="suggestion">
+        <div class="textContainer" id="textContainer">
+          <p class="suggestionText">
+            The spirits whisper ancient wisdom through the veil, guiding your words with ethereal grace. 
+            Let their mystical energy flow through your writing, transforming mere text into something magical.
+          </p>
+        </div>
+        <div class="ghostIndicator">👻</div>
+      </div>
+    </div>
+
+    <div class="status">
+      <div class="status-label">Current Phase:</div>
+      <div class="status-value" id="statusText">Ready</div>
+    </div>
+  </div>
+
+  <script>
+    let animationTimeout;
+    let checkmarkTimeout;
+    let fadeTimeout;
+    let timelineTimeouts = [];
+
+    function updateStatus(text) {
+      document.getElementById('statusText').textContent = text;
+    }
+
+    function highlightTimelineItem(time) {
+      // Remove all active classes
+      document.querySelectorAll('.timeline-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // Add active class to current item
+      const item = document.querySelector(`[data-time="${time}"]`);
+      if (item) {
+        item.classList.add('active');
+      }
+    }
+
+    function startAnimation() {
+      resetAnimation();
+      
+      const suggestion = document.getElementById('suggestion');
+      const textContainer = document.getElementById('textContainer');
+      const container = document.getElementById('suggestionContainer');
+      
+      // Phase 1: Start accepting (0ms)
+      updateStatus('Phase 1: Starting acceptance animation');
+      highlightTimelineItem(0);
+      suggestion.classList.add('accepting');
+      textContainer.classList.add('textShimmer');
+      
+      // Add glow effects
+      const acceptGlow = document.createElement('div');
+      acceptGlow.className = 'acceptGlow';
+      acceptGlow.id = 'acceptGlow';
+      suggestion.insertBefore(acceptGlow, suggestion.firstChild);
+      
+      const radialGlow = document.createElement('div');
+      radialGlow.className = 'radialGlowOverlay';
+      radialGlow.id = 'radialGlow';
+      suggestion.insertBefore(radialGlow, suggestion.firstChild);
+      
+      // Phase 2: Peak glow (200ms)
+      timelineTimeouts.push(setTimeout(() => {
+        updateStatus('Phase 2: Peak green glow');
+        highlightTimelineItem(200);
+      }, 200));
+      
+      // Phase 3: Checkmark appears (500ms)
+      checkmarkTimeout = setTimeout(() => {
+        updateStatus('Phase 3: Success checkmark appears');
+        highlightTimelineItem(500);
+        
+        const checkmark = document.createElement('div');
+        checkmark.className = 'successCheckmark';
+        checkmark.id = 'checkmark';
+        checkmark.textContent = '✓';
+        suggestion.appendChild(checkmark);
+      }, 500);
+      
+      // Phase 4: Checkmark fades (800ms)
+      fadeTimeout = setTimeout(() => {
+        updateStatus('Phase 4: Checkmark fading out');
+        highlightTimelineItem(800);
+        
+        const checkmark = document.getElementById('checkmark');
+        if (checkmark) {
+          checkmark.classList.add('fadeOut');
+        }
+      }, 800);
+      
+      // Phase 5: Animation complete (1000ms)
+      animationTimeout = setTimeout(() => {
+        updateStatus('Phase 5: Animation complete - Ready for next');
+        highlightTimelineItem(1000);
+        
+        // Clean up after a brief pause
+        setTimeout(() => {
+          resetAnimation();
+          updateStatus('Ready');
+        }, 500);
+      }, 1000);
+    }
+
+    function resetAnimation() {
+      // Clear all timeouts
+      if (animationTimeout) clearTimeout(animationTimeout);
+      if (checkmarkTimeout) clearTimeout(checkmarkTimeout);
+      if (fadeTimeout) clearTimeout(fadeTimeout);
+      timelineTimeouts.forEach(timeout => clearTimeout(timeout));
+      timelineTimeouts = [];
+      
+      // Reset elements
+      const suggestion = document.getElementById('suggestion');
+      const textContainer = document.getElementById('textContainer');
+      
+      suggestion.classList.remove('accepting');
+      textContainer.classList.remove('textShimmer');
+      
+      // Remove dynamic elements
+      const acceptGlow = document.getElementById('acceptGlow');
+      const radialGlow = document.getElementById('radialGlow');
+      const checkmark = document.getElementById('checkmark');
+      
+      if (acceptGlow) acceptGlow.remove();
+      if (radialGlow) radialGlow.remove();
+      if (checkmark) checkmark.remove();
+      
+      // Reset timeline
+      document.querySelectorAll('.timeline-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      updateStatus('Ready');
+    }
+
+    // Auto-start on load for demonstration
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        startAnimation();
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

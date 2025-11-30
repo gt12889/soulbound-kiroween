@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghost Writer Undo Button Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e0e0e0;
+      padding: 2rem;
+    }
+
+    .demo-container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(26, 26, 46, 0.8);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #e0e0e0;
+      text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+
+    .description {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: rgba(224, 224, 224, 0.7);
+      font-style: italic;
+    }
+
+    .editor-area {
+      position: relative;
+      min-height: 300px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(139, 92, 246, 0.3);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .editor-text {
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .accepted-text {
+      color: #10b981;
+      animation: fadeInGreen 0.5s ease-out;
+    }
+
+    @keyframes fadeInGreen {
+      from {
+        background: rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      }
+      to {
+        background: transparent;
+        box-shadow: none;
+      }
+    }
+
+    /* Undo button container */
+    .undoContainer {
+      position: absolute;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 15;
+      animation: slideInFromRight 0.3s ease-out;
+    }
+
+    @keyframes slideInFromRight {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Undo button */
+    .undoButton {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.3));
+      border: 2px solid rgba(139, 92, 246, 0.5);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(139, 92, 246, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .undoButton:hover {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.4));
+      border-color: rgba(139, 92, 246, 0.7);
+      box-shadow: 
+        0 6px 16px rgba(0, 0, 0, 0.4),
+        0 0 30px rgba(139, 92, 246, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .undoButton:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, rgba(77, 45, 110, 0.3), rgba(61, 90, 128, 0.3));
+      border: 2px solid rgba(139, 92, 246, 0.4);
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-family: 'Lora', 'Merriweather', Georgia, serif;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, rgba(77, 45, 110, 0.4), rgba(61, 90, 128, 0.4));
+      border-color: rgba(139, 92, 246, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: 8px;
+      font-style: italic;
+      color: rgba(224, 224, 224, 0.8);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <h1>👻 Ghost Writer Undo Demo</h1>
+    <p class="description">
+      This demo shows the undo button that appears after accepting a suggestion.
+      The button displays for 3 seconds, giving you a chance to undo the acceptance.
+    </p>
+
+    <div class="editor-area">
+      <div class="editor-text">
+        <span id="originalText">Once upon a time, in a dark and mysterious forest,</span>
+        <span id="acceptedText" class="hidden"></span>
+      </div>
+
+      <div id="undoContainer" class="undoContainer hidden">
+        <button class="undoButton" onclick="handleUndo()">
+          ↶ Undo
+        </button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button onclick="simulateAccept()">✓ Simulate Accept Suggestion</button>
+      <button onclick="reset()">🔄 Reset Demo</button>
+    </div>
+
+    <div id="status" class="status">
+      Click "Simulate Accept Suggestion" to see the undo button appear
+    </div>
+  </div>
+
+  <script>
+    let undoTimeout = null;
+    const suggestionText = " there lived a ghostly writer who penned tales of the supernatural.";
+
+    function simulateAccept() {
+      const acceptedTextEl = document.getElementById('acceptedText');
+      const undoContainer = document.getElementById('undoContainer');
+      const status = document.getElementById('status');
+
+      // Show the accepted text with animation
+      acceptedTextEl.textContent = suggestionText;
+      acceptedTextEl.classList.remove('hidden');
+      acceptedTextEl.classList.add('accepted-text');
+
+      // Show undo button
+      undoContainer.classList.remove('hidden');
+
+      // Update status
+      status.textContent = 'Suggestion accepted! You have 3 seconds to undo...';
+
+      // Clear any existing timeout
+      if (undoTimeout) {
+        clearTimeout(undoTimeout);
+      }
+
+      // Hide undo button after 3 seconds
+      undoTimeout = setTimeout(() => {
+        undoContainer.classList.add('hidden');
+        status.textContent = 'Undo window expired. The suggestion is now permanent.';
+      }, 3000);
+    }
+
+    function handleUndo() {
+      const acceptedTextEl = document.getElementById('acceptedText');
+      const undoContainer = document.getElementById('undoContainer');
+      const status = document.getElementById('status');
+
+      // Remove the accepted text
+      acceptedTextEl.textContent = '';
+      acceptedTextEl.classList.add('hidden');
+
+      // Hide undo button
+      undoContainer.classList.add('hidden');
+
+      // Clear timeout
+      if (undoTimeout) {
+        clearTimeout(undoTimeout);
+        undoTimeout = null;
+      }
+
+      // Update status
+      status.textContent = 'Suggestion undone! The text has been restored.';
+    }
+
+    function reset() {
+      const acceptedTextEl = document.getElementById('acceptedText');
+      const undoContainer = document.getElementById('undoContainer');
+      const status = document.getElementById('status');
+
+      acceptedTextEl.textContent = '';
+      acceptedTextEl.classList.add('hidden');
+      undoContainer.classList.add('hidden');
+
+      if (undoTimeout) {
+        clearTimeout(undoTimeout);
+        undoTimeout = null;
+      }
+
+      status.textContent = 'Click "Simulate Accept Suggestion" to see the undo button appear';
+    }
+  </script>
+</body>
+</html>

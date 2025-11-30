@@ -1,0 +1,60 @@
+.bootupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 1;
+  transition: opacity 0.8s var(--ease-in-out);
+}
+
+.bootupOverlay.fadingOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.terminal {
+  width: 90%;
+  max-width: 600px;
+  font-family: var(--font-mono);
+  color: var(--accent-purple-light);
+  text-shadow: 0 0 8px var(--glow-purple);
+}
+
+.line {
+  margin: 0.5rem 0;
+  display: flex;
+}
+
+.prompt {
+  margin-right: 0.75rem;
+  opacity: 0.8;
+}
+
+.lineText {
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 2px solid transparent;
+  animation: typing 2s steps(40, end);
+}
+
+.cursor {
+  display: inline-block;
+  vertical-align: middle;
+  animation: blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes blink {
+  from, to { color: transparent }
+  50% { color: var(--accent-purple-light) }
+}

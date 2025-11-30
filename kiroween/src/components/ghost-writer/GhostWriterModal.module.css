@@ -1,0 +1,287 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: auto;
+  min-height: 120px;
+  max-height: 300px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-top: 2px solid var(--accent-purple, #9d4edd);
+  box-shadow: 
+    0 0 40px rgba(157, 78, 221, 0.3),
+    0 -10px 60px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+  padding: 1.5rem 2.5rem;
+  gap: 2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-primary, #e0e0e0);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+  white-space: nowrap;
+}
+
+.closeButton {
+  /* Inherits global button styles */
+  background: none; /* Override default background */
+  border: none; /* Override default border */
+  color: var(--text-secondary); /* Specific text color */
+  font-size: 1.5rem; /* Specific font size for close icon */
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px; /* Unique shape */
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.closeButton:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+.content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-width: 0;
+}
+
+.contextSection {
+  display: none;
+}
+
+.suggestionSection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.sectionTitle {
+  display: none;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.ghostAnimation {
+  font-size: 1.5rem;
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.loading p {
+  color: var(--text-secondary, #a0a0a0);
+  font-style: italic;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.error p {
+  color: #fca5a5;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.retryButton {
+  /* Inherits global button styles and will use .button-danger */
+  background: var(--warning-red-dark); /* Specific background for error */
+  border: 1px solid var(--warning-red); /* Specific border for error */
+  color: var(--text-primary); /* Specific color for error */
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.retryButton:hover {
+  /* Handled by global .button-danger:hover */
+}
+
+.suggestion {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.suggestionText {
+  margin: 0;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-family: 'Georgia', serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
+}
+
+.footer {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.primaryButton, .secondaryButton {
+  /* These will inherit global button styles */
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  /* Removed specific background, color, border as they will be handled by global classes */
+}
+
+.primaryButton {
+  /* This will use .button-primary */
+}
+
+.primaryButton:hover:not(:disabled) {
+  /* Handled by global .button-primary:hover */
+}
+
+.primaryButton:disabled {
+  /* Handled by global button:disabled */
+}
+
+.secondaryButton {
+  /* This will use .button-secondary */
+}
+
+.secondaryButton:hover:not(:disabled) {
+  /* Handled by global .button-secondary:hover */
+}
+
+@media (max-width: 768px) {
+  .modal {
+    padding: 1rem 1.5rem;
+    gap: 1rem;
+    min-height: 100px;
+    max-height: 200px;
+  }
+  .title {
+    font-size: 1rem;
+  }
+  .suggestionText {
+    font-size: 0.9rem;
+    -webkit-line-clamp: 3;
+  }
+  .primaryButton, .secondaryButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .backdrop {
+    background: rgba(0, 0, 0, 0.95);
+  }
+  
+  .modal {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-top-width: 3px;
+    border-top-color: #9d4edd;
+  }
+  
+  .title {
+    color: #ffffff;
+    text-shadow: none;
+  }
+  
+  .closeButton {
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .closeButton:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .loading p {
+    color: #ffffff;
+  }
+  
+  .error p {
+    color: #ffffff;
+  }
+  
+  .retryButton {
+    border-width: 2px;
+    color: #ffffff;
+  }
+  
+  .suggestionText {
+    color: #ffffff;
+  }
+  
+  .primaryButton, .secondaryButton {
+    border-width: 2px;
+    color: #ffffff;
+  }
+}

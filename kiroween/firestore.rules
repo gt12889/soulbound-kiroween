@@ -1,0 +1,126 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to validate note data
+    function isValidNote() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'userId', 'title', 'content', 'markdown', 'tags', 'createdAt', 'updatedAt'])
+        && data.id is string
+        && data.userId is string
+        && data.title is string
+        && data.content is string
+        && data.markdown is bool
+        && data.tags is list
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+    
+    // Helper function to validate task data
+    function isValidTask() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'userId', 'title', 'description', 'priority', 'completed', 'archived', 'tags', 'createdAt'])
+        && data.id is string
+        && data.userId is string
+        && data.title is string
+        && data.description is string
+        && data.priority in ['low', 'medium', 'high']
+        && data.completed is bool
+        && data.archived is bool
+        && data.tags is list
+        && data.createdAt is timestamp;
+    }
+    
+    // Helper function to validate tarot reading data
+    function isValidTarotReading() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'userId', 'date', 'cards', 'interpretation', 'commitStats'])
+        && data.id is string
+        && data.userId is string
+        && data.date is timestamp
+        && data.cards is list
+        && data.interpretation is string
+        && data.commitStats is map;
+    }
+    
+    // Helper function to validate pomodoro session data
+    function isValidPomodoroSession() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['id', 'userId', 'startTime', 'duration', 'type', 'completed'])
+        && data.id is string
+        && data.userId is string
+        && data.startTime is timestamp
+        && data.duration is number
+        && data.type in ['work', 'break']
+        && data.completed is bool;
+    }
+    
+    // Helper function to validate settings data
+    function isValidSettings() {
+      let data = request.resource.data;
+      return (data.audioEnabled == null || data.audioEnabled is bool)
+        && (data.audioVolume == null || (data.audioVolume is number && data.audioVolume >= 0 && data.audioVolume <= 100))
+        && (data.theme == null || data.theme is string)
+        && (data.keyboardShortcuts == null || data.keyboardShortcuts is list);
+    }
+    
+    // User profile rules
+    match /users/{userId}/profile/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
+    }
+    
+    // Notes rules
+    match /users/{userId}/notes/{noteId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidNote();
+      allow update: if isOwner(userId) && isValidNote();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Tasks rules
+    match /users/{userId}/tasks/{taskId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidTask();
+      allow update: if isOwner(userId) && isValidTask();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Tarot readings rules
+    match /users/{userId}/tarot_readings/{readingId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidTarotReading();
+      allow update: if isOwner(userId) && isValidTarotReading();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Pomodoro sessions rules
+    match /users/{userId}/pomodoro_sessions/{sessionId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidPomodoroSession();
+      allow update: if isOwner(userId) && isValidPomodoroSession();
+      allow delete: if isOwner(userId);
+    }
+    
+    // Settings rules
+    match /users/{userId}/settings/{document=**} {
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && isValidSettings();
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
