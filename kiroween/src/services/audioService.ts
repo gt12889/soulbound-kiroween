@@ -13,7 +13,12 @@ export type SoundEffect =
   | 'tombstone-sink'
   | 'ui-click'
   | 'ui-hover'
-  | 'pomodoro-complete';
+  | 'pomodoro-complete'
+  | 'terminal-type'
+  | 'terminal-connect'
+  | 'terminal-disconnect'
+  | 'workflow-complete'
+  | 'lore-event';
 
 interface AudioState {
   context: AudioContext | null;
@@ -229,6 +234,39 @@ class AudioService {
         this.generateTone(523, 0.3, 'sine', 0.35); // C5
         setTimeout(() => this.generateTone(659, 0.3, 'sine', 0.35), 200); // E5
         setTimeout(() => this.generateTone(784, 0.4, 'sine', 0.4), 400); // G5
+        break;
+
+      case 'terminal-type':
+        // Quick typing sound - short click
+        this.generateTone(1200, 0.03, 'square', 0.15);
+        break;
+
+      case 'terminal-connect':
+        // Connection established - ascending beep
+        this.generateTone(440, 0.15, 'sine', 0.3);
+        setTimeout(() => this.generateTone(554, 0.15, 'sine', 0.25), 100);
+        setTimeout(() => this.generateTone(659, 0.2, 'sine', 0.3), 200);
+        break;
+
+      case 'terminal-disconnect':
+        // Disconnection - descending beep
+        this.generateTone(659, 0.15, 'sine', 0.3);
+        setTimeout(() => this.generateTone(554, 0.15, 'sine', 0.25), 100);
+        setTimeout(() => this.generateTone(440, 0.2, 'sine', 0.2), 200);
+        break;
+
+      case 'workflow-complete':
+        // Workflow completion - success chime
+        this.generateTone(523, 0.2, 'sine', 0.3); // C5
+        setTimeout(() => this.generateTone(659, 0.2, 'sine', 0.3), 150); // E5
+        setTimeout(() => this.generateTone(784, 0.3, 'sine', 0.35), 300); // G5
+        break;
+
+      case 'lore-event':
+        // Mysterious lore event sound - ethereal tone
+        this.generateTone(220, 0.25, 'sine', 0.2);
+        setTimeout(() => this.generateTone(277, 0.2, 'sine', 0.18), 100);
+        setTimeout(() => this.generateTone(330, 0.3, 'sine', 0.15), 200);
         break;
 
       default:

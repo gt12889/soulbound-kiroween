@@ -5,6 +5,7 @@ import { generateTarotReading } from '../../services/tarotService';
 import { useAudio } from '../../hooks/useAudio';
 import TarotCard from './TarotCard';
 import LoadingFallback from '../common/LoadingFallback';
+import ErrorBoundary from '../common/ErrorBoundary';
 import styles from './TarotReader.module.css';
 
 const GhostArchive = lazy(() => import('./ghost-archive/GhostArchive').then(module => ({ default: module.GhostArchive })));
@@ -287,13 +288,22 @@ const TarotReader: React.FC = () => {
         </div>
       )}
 
-      {activeTab === 'ghost-archive' && (
-        <div id="ghost-archive-panel" role="tabpanel" aria-labelledby="ghost-archive-tab">
-          <Suspense fallback={<LoadingFallback message="Initializing Ghost Archive..." />}>
-            <GhostArchive />
-          </Suspense>
-        </div>
-      )}
+          {activeTab === 'ghost-archive' && (
+            <div id="ghost-archive-panel" role="tabpanel" aria-labelledby="ghost-archive-tab">
+              <ErrorBoundary
+                fallback={
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}>
+                    <h2>Terminal Connection Lost</h2>
+                    <p>The Ghost Archive terminal encountered an error. Please refresh the page.</p>
+                  </div>
+                }
+              >
+                <Suspense fallback={<LoadingFallback message="Initializing Ghost Archive..." />}>
+                  <GhostArchive />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          )}
     </div>
   );
 };

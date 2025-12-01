@@ -3,7 +3,7 @@
  * Shows terminal output with typewriter animation
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, memo } from 'react';
 import type { TerminalOutput } from '../../../types/ghostArchive';
 import styles from './TerminalDisplay.module.css';
 
@@ -16,9 +16,8 @@ interface TerminalDisplayProps {
   };
 }
 
-export const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ outputs, theme }) => {
+export const TerminalDisplay: React.FC<TerminalDisplayProps> = memo(({ outputs, theme }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const outputRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Auto-scroll to bottom on new output
   useEffect(() => {
@@ -26,14 +25,6 @@ export const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ outputs, theme
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [outputs]);
-
-  const setOutputRef = (id: string, element: HTMLDivElement | null) => {
-    if (element) {
-      outputRefs.current.set(id, element);
-    } else {
-      outputRefs.current.delete(id);
-    }
-  };
 
   const getOutputClassName = (output: TerminalOutput): string => {
     const base = styles.outputLine;
@@ -82,7 +73,6 @@ export const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ outputs, theme
       {outputs.map((output) => (
         <div
           key={output.id}
-          ref={(el) => setOutputRef(output.id, el)}
           className={getOutputClassName(output)}
           style={{
             textShadow: theme?.glowColor ? `0 0 8px ${theme.glowColor}` : undefined,
@@ -131,5 +121,16 @@ export const TerminalDisplay: React.FC<TerminalDisplayProps> = ({ outputs, theme
       ))}
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison for memoization
+  return (
+    prevProps.outputs.length === nextProps.outputs.length &&
+    prevProps.outputs.every((output, idx) => output.id === nextProps.outputs[idx]?.id) &&
+    prevProps.theme?.textColor === nextProps.theme?.textColor &&
+    prevProps.theme?.glowColor === nextProps.theme?.glowColor &&
+    prevProps.theme?.backgroundColor === nextProps.theme?.backgroundColor
+  );
+});
+
+TerminalDisplay.displayName = 'TerminalDisplay';
 

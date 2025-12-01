@@ -1,0 +1,460 @@
+/**
+ * StreakIndicator Styles
+ * Requirements: Task 4.2 - Streak Indicator in Nav
+ * 
+ * Features:
+ * - Compact design that doesn't clutter UI
+ * - Pulse animation when streak at risk
+ * - Smooth hover effects
+ * - Accessible focus indicators
+ * - Responsive design
+ * - Custom tooltip with all streaks
+ */
+
+/* Container for indicator and tooltip */
+.container {
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--timing-micro) var(--ease-in-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--shadow-light), transparent);
+  transition: left var(--timing-normal) var(--ease-in-out);
+}
+
+.indicator:hover::before {
+  left: 100%;
+}
+
+.indicator:hover {
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-color: var(--accent-purple-light);
+  box-shadow: 0 4px 12px var(--shadow-medium), 0 0 15px var(--glow-purple);
+  transform: translateY(-2px);
+}
+
+.indicator:focus {
+  outline: 2px solid var(--accent-purple-light);
+  outline-offset: 2px;
+}
+
+.indicator:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px var(--shadow-medium);
+}
+
+/* Icon Container */
+.iconContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Fire Icon */
+.fireIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 0 8px var(--glow-orange));
+  animation: flicker 2s ease-in-out infinite;
+  transition: transform var(--timing-hover) var(--ease-in-out);
+}
+
+@keyframes flicker {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px var(--glow-orange));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px var(--glow-orange));
+    transform: scale(1.05);
+  }
+}
+
+.indicator:hover .fireIcon {
+  transform: scale(1.15);
+  animation: flicker 1s ease-in-out infinite;
+}
+
+/* Streak Number */
+.streakNumber {
+  font-family: var(--font-header);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 0 10px var(--glow-purple);
+  letter-spacing: 0.05em;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* Warning Badge */
+.warningBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-orange);
+  border: 2px solid var(--bg-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  box-shadow: 0 0 10px var(--glow-orange);
+  animation: pulse 1.5s ease-in-out infinite;
+  z-index: 2;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+/* At Risk State */
+.indicator.atRisk {
+  border-color: var(--accent-orange);
+  animation: pulseWarning 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarning {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
+  }
+}
+
+.indicator.atRisk .fireIcon {
+  animation: flickerWarning 1s ease-in-out infinite;
+}
+
+@keyframes flickerWarning {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px var(--glow-orange));
+  }
+  25% {
+    filter: drop-shadow(0 0 4px var(--glow-orange));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px var(--glow-orange));
+  }
+  75% {
+    filter: drop-shadow(0 0 6px var(--glow-orange));
+  }
+}
+
+/* Collapsed Navigation State */
+.navigation.collapsed .indicator {
+  padding: 0.5rem;
+  justify-content: center;
+}
+
+.navigation.collapsed .streakNumber {
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .indicator {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .fireIcon {
+    font-size: 1.3rem;
+  }
+  
+  .streakNumber {
+    font-size: 1rem;
+  }
+  
+  .warningBadge {
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .indicator {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .fireIcon {
+    font-size: 1.2rem;
+  }
+  
+  .streakNumber {
+    font-size: 0.95rem;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .indicator {
+    border-width: 2px;
+  }
+  
+  .indicator:focus {
+    outline-width: 3px;
+  }
+  
+  .warningBadge {
+    border-width: 3px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .fireIcon,
+  .indicator.atRisk,
+  .warningBadge {
+    animation: none;
+  }
+  
+  .indicator::before {
+    transition: none;
+  }
+}
+
+/* Tooltip Styles */
+.tooltip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 1rem;
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 0;
+  min-width: 200px;
+  box-shadow: 0 8px 24px var(--shadow-heavy), 0 0 20px var(--glow-purple);
+  z-index: 1000;
+  animation: tooltipFadeIn var(--timing-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+/* Tooltip arrow */
+.tooltip::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--border-primary) transparent transparent;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 7px 7px 0;
+  border-color: transparent var(--bg-tertiary) transparent transparent;
+}
+
+/* Tooltip Header */
+.tooltipHeader {
+  padding: 0.75rem 1rem;
+  font-family: var(--font-header);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  border-bottom: 1px solid var(--border-primary);
+  background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+  border-radius: 8px 8px 0 0;
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+/* Tooltip Content */
+.tooltipContent {
+  padding: 0.5rem;
+}
+
+/* Tooltip Row */
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background var(--timing-micro) var(--ease-in-out);
+}
+
+.tooltipRow:hover {
+  background: var(--bg-tertiary);
+}
+
+.tooltipRowAtRisk {
+  background: rgba(255, 140, 0, 0.1);
+}
+
+.tooltipRowAtRisk:hover {
+  background: rgba(255, 140, 0, 0.15);
+}
+
+/* Tooltip Icon */
+.tooltipIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px var(--glow-purple));
+}
+
+/* Tooltip Label */
+.tooltipLabel {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Tooltip Value */
+.tooltipValue {
+  font-family: var(--font-header);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tooltipWarning {
+  display: inline-block;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Tooltip Footer */
+.tooltipFooter {
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  border-top: 1px solid var(--border-primary);
+  background: var(--bg-secondary);
+  border-radius: 0 0 8px 8px;
+  font-style: italic;
+}
+
+/* Responsive Tooltip */
+@media (max-width: 1024px) {
+  .tooltip {
+    left: auto;
+    right: 100%;
+    margin-left: 0;
+    margin-right: 1rem;
+  }
+
+  .tooltip::before {
+    left: auto;
+    right: -8px;
+    border-width: 8px 0 8px 8px;
+    border-color: transparent transparent transparent var(--border-primary);
+  }
+
+  .tooltip::after {
+    left: auto;
+    right: -6px;
+    border-width: 7px 0 7px 7px;
+    border-color: transparent transparent transparent var(--bg-tertiary);
+  }
+}
+
+@media (max-width: 768px) {
+  .tooltip {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: 100%;
+    transform: translateX(-50%);
+    margin: 0 0 1rem 0;
+    max-width: 90vw;
+  }
+
+  .tooltip::before,
+  .tooltip::after {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: -8px;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0 8px;
+  }
+
+  .tooltip::before {
+    border-color: var(--border-primary) transparent transparent transparent;
+  }
+
+  .tooltip::after {
+    bottom: -6px;
+    border-width: 7px 7px 0 7px;
+    border-color: var(--bg-tertiary) transparent transparent transparent;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .indicator,
+  .tooltip {
+    display: none;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    animation: none;
+  }
+
+  .tooltipWarning {
+    animation: none;
+  }
+}

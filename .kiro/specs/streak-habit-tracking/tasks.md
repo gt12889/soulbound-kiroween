@@ -615,7 +615,8 @@
 
 -
 
-- [-] Add activity heatmap
+- [x] Add activity heatmap
+
 
 
 
@@ -625,12 +626,25 @@
 - [x] Show token display
 
 
+
+
+-
+
 - [x] Add milestone progress
 
 
 
 
+
+
+
+
+-
+
 - [x] Create navigation route
+
+
+
 
 
 **Acceptance:**
@@ -642,13 +656,42 @@
 ---
 
 ### Task 4.2: Streak Indicator in Nav
-**Priority:** P2 | **Estimate:** 2h
-- [ ] Create `src/components/common/StreakIndicator.tsx`
+**P-iority:** P2 | **Estimate:** 2h
 
-- [ ] Show mini fire icon with number
-- [ ] Add tooltip with all streaks
-- [ ] Pulse animation when at risk
-- [ ] Link to dashboard
+- [x] Create `src/components/common/StreakIndicator.tsx`
+
+
+
+
+- [x] Show mini fire icon with number
+
+
+
+
+
+
+- [x] Add tooltip with all streaks
+
+
+
+
+
+- [x] Pulse animation when at risk
+
+
+
+
+
+
+
+
+-
+
+- [x] Link to dashboard
+
+
+
+
 
 **Acceptance:**
 - Visible in navigation bar
@@ -659,17 +702,51 @@
 ---
 
 ### Task 4.3: Milestone Celebrations
-**Priority:** P2 | **Estimate:** 3h
+- [x] Create celebration animation component
+
+
+
 - [ ] Create celebration animation component
+
 - [ ] Integrate with companion particles
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - [ ] Add special dialogue for milestones
 - [ ] Award XP bonuses
+
+
+
 - [ ] Show achievement unlock
 
 **Acceptance:**
 - Celebration feels rewarding
 - Companion reacts appropriately
+
+
+
 - XP awarded correctly
+
+
+
+
+
+
+
+
 - Achievement recorded
 
 ---
@@ -677,9 +754,14 @@
 ### Task 4.4: Streak Settings
 **Priority:** P2 | **Estimate:** 3h
 - [ ] Add streak section to settings page
+
+
+
 - [ ] Toggle notifications on/off
 - [ ] Set custom streak goals
+
 - [ ] Choose notification time
+
 - [ ] Reset streak option (with confirmation)
 
 **Acceptance:**

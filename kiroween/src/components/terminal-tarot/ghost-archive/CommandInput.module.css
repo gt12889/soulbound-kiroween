@@ -33,11 +33,21 @@
 
 .cursor {
   display: inline-block;
-  width: 8px;
-  height: 16px;
+  vertical-align: middle;
   margin-left: 2px;
   animation: blink 0.75s step-end infinite;
-  background-color: #00ff00;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.8);
+}
+
+.cursorBlock {
+  width: 8px;
+  height: 1em;
+}
+
+.cursorUnderline {
+  width: 0.7em;
+  height: 2px;
+  margin-top: 0.8em;
 }
 
 @keyframes blink {

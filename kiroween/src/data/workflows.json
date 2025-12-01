@@ -147,6 +147,54 @@
         "retries": 0
       }
     ]
+  },
+  {
+    "id": "codebase-review",
+    "name": "Codebase Review",
+    "description": "Multi-agent comprehensive codebase review with different perspectives.",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "architecture-analysis",
+        "type": "agent",
+        "agentId": "einstein",
+        "action": "Analyze the codebase architecture, design patterns, and structural quality.",
+        "input": {
+          "codebase": "{{input.codebase}}"
+        },
+        "onSuccess": "security-review"
+      },
+      {
+        "id": "security-review",
+        "type": "agent",
+        "agentId": "marie-curie",
+        "action": "Review the codebase for security vulnerabilities, authentication issues, and data protection concerns.",
+        "input": {
+          "codebase": "{{input.codebase}}",
+          "architecture_analysis": "{{stepResults.architecture-analysis}}"
+        },
+        "onSuccess": "code-quality-review"
+      },
+      {
+        "id": "code-quality-review",
+        "type": "agent",
+        "agentId": "shakespeare",
+        "action": "Review code quality, readability, maintainability, and adherence to best practices from a literary perspective.",
+        "input": {
+          "codebase": "{{input.codebase}}",
+          "previous_reviews": "{{stepResults.security-review}}"
+        },
+        "onSuccess": "synthesize-review"
+      },
+      {
+        "id": "synthesize-review",
+        "type": "aggregate",
+        "action": "Combine all review perspectives into a comprehensive report.",
+        "input": {
+          "fromSteps": ["architecture-analysis", "security-review", "code-quality-review"]
+        }
+      }
+    ]
   }
 ]
 

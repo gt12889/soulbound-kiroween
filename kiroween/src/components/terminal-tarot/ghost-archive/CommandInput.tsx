@@ -3,7 +3,8 @@
  * Handles command input with history navigation
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useAudio } from '../../../hooks/useAudio';
 import styles from './CommandInput.module.css';
 
 interface CommandInputProps {
@@ -13,6 +14,7 @@ interface CommandInputProps {
   theme?: {
     textColor: string;
     glowColor: string;
+    cursorStyle?: 'block' | 'underline' | 'none';
   };
 }
 
@@ -25,20 +27,32 @@ export const CommandInput: React.FC<CommandInputProps> = ({
   const [input, setInput] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { playTerminalType } = useAudio();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
+  // Cleanup typing timeout
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
+      playTerminalType(); // Play typing sound on command execution
       onExecute(input);
       setInput('');
       setHistoryIndex(-1);
     }
-  }, [input, onExecute]);
+  }, [input, onExecute, playTerminalType]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp') {
@@ -78,6 +92,16 @@ export const CommandInput: React.FC<CommandInputProps> = ({
         onChange={(e) => {
           setInput(e.target.value);
           setHistoryIndex(-1);
+          
+          // Play typing sound with debounce
+          if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+          }
+          typingTimeoutRef.current = setTimeout(() => {
+            if (e.target.value.length > 0) {
+              playTerminalType();
+            }
+          }, 150); // Debounce typing sounds
         }}
         onKeyDown={handleKeyDown}
         className={styles.input}
@@ -89,9 +113,16 @@ export const CommandInput: React.FC<CommandInputProps> = ({
         spellCheck={false}
         aria-label="Terminal command input"
       />
-      <span className={styles.cursor} style={{ backgroundColor: theme?.textColor || '#00ff00' }}>
-        ▋
-      </span>
+      {theme?.cursorStyle !== 'none' && (
+        <span
+          className={`${styles.cursor} ${
+            theme?.cursorStyle === 'underline' ? styles.cursorUnderline : styles.cursorBlock
+          }`}
+          style={{ backgroundColor: theme?.textColor || '#00ff00' }}
+        >
+          {theme?.cursorStyle === 'underline' ? '▁' : '▋'}
+        </span>
+      )}
     </form>
   );
 };

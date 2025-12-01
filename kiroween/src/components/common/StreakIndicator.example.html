@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Streak Indicator - Visual Example</title>
+  <style>
+    :root {
+      --bg-primary: #0f1419;
+      --bg-secondary: #1a1f2e;
+      --bg-tertiary: #252b3b;
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --border-primary: #4a5568;
+      --accent-purple: #8b5cf6;
+      --accent-purple-dark: #6d28d9;
+      --accent-purple-light: #a78bfa;
+      --accent-orange: #ff8c00;
+      --glow-purple: rgba(139, 92, 246, 0.5);
+      --glow-orange: rgba(255, 140, 0, 0.5);
+      --shadow-medium: rgba(0, 0, 0, 0.3);
+      --shadow-light: rgba(255, 255, 255, 0.1);
+      --timing-micro: 150ms;
+      --timing-normal: 300ms;
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    h1 {
+      color: var(--accent-purple-light);
+      margin-bottom: 10px;
+    }
+
+    .section {
+      background: var(--bg-secondary);
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid var(--border-primary);
+    }
+
+    .section h2 {
+      color: var(--accent-purple);
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .examples {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .example {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .example-label {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    /* Streak Indicator Styles */
+    .indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+      border: 1px solid var(--border-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all var(--timing-micro) var(--ease-in-out);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .indicator:hover {
+      background: linear-gradient(135deg, var(--accent-purple-dark) 0%, var(--accent-purple) 100%);
+      border-color: var(--accent-purple-light);
+      box-shadow: 0 4px 12px var(--shadow-medium), 0 0 15px var(--glow-purple);
+      transform: translateY(-2px);
+    }
+
+    .iconContainer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fireIcon {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 0 8px var(--glow-orange));
+      animation: flicker 2s ease-in-out infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% {
+        filter: drop-shadow(0 0 8px var(--glow-orange));
+        transform: scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 12px var(--glow-orange));
+        transform: scale(1.05);
+      }
+    }
+
+    .streakNumber {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-shadow: 0 0 10px var(--glow-purple);
+      letter-spacing: 0.05em;
+      min-width: 1.5rem;
+      text-align: center;
+    }
+
+    .warningBadge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-orange);
+      border: 2px solid var(--bg-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      box-shadow: 0 0 10px var(--glow-orange);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .indicator.atRisk {
+      border-color: var(--accent-orange);
+      animation: pulseWarning 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseWarning {
+      0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+      }
+      50% {
+        box-shadow: 0 0 20px rgba(255, 140, 0, 0.6);
+      }
+    }
+
+    .indicator.atRisk .fireIcon {
+      animation: flickerWarning 1s ease-in-out infinite;
+    }
+
+    @keyframes flickerWarning {
+      0%, 100% {
+        filter: drop-shadow(0 0 8px var(--glow-orange));
+      }
+      25% {
+        filter: drop-shadow(0 0 4px var(--glow-orange));
+      }
+      50% {
+        filter: drop-shadow(0 0 12px var(--glow-orange));
+      }
+      75% {
+        filter: drop-shadow(0 0 6px var(--glow-orange));
+      }
+    }
+
+    .tooltip-demo {
+      background: var(--bg-tertiary);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border-primary);
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .code {
+      background: var(--bg-primary);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥 Streak Indicator Component</h1>
+  <p style="color: var(--text-secondary);">Visual examples of the StreakIndicator component in different states</p>
+
+  <div class="section">
+    <h2>Normal State</h2>
+    <div class="examples">
+      <div class="example">
+        <div class="indicator" title="🌲 Login: 15 days&#10;⚰️ Tasks: 15 days&#10;📖 Notes: 8 days&#10;⏱️ Focus: 3 days">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">15</span>
+          </div>
+        </div>
+        <span class="example-label">15-day streak</span>
+      </div>
+
+      <div class="example">
+        <div class="indicator" title="🌲 Login: 7 days&#10;⚰️ Tasks: 7 days&#10;📖 Notes: 5 days&#10;⏱️ Focus: 2 days">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">7</span>
+          </div>
+        </div>
+        <span class="example-label">7-day streak</span>
+      </div>
+
+      <div class="example">
+        <div class="indicator" title="🌲 Login: 100 days&#10;⚰️ Tasks: 100 days&#10;📖 Notes: 95 days&#10;⏱️ Focus: 87 days">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">100</span>
+          </div>
+        </div>
+        <span class="example-label">100-day milestone!</span>
+      </div>
+    </div>
+
+    <div class="tooltip-demo">
+      <strong>Tooltip Content:</strong><br>
+      🌲 Login: 15 days<br>
+      ⚰️ Tasks: 15 days<br>
+      📖 Notes: 8 days<br>
+      ⏱️ Focus: 3 days
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>At Risk State</h2>
+    <div class="examples">
+      <div class="example">
+        <div class="indicator atRisk" title="🌲 Login: 15 days&#10;⚰️ Tasks: 15 days ⚠️&#10;📖 Notes: 8 days&#10;⏱️ Focus: 3 days">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">15</span>
+          </div>
+          <div class="warningBadge">⚠️</div>
+        </div>
+        <span class="example-label">Streak at risk!</span>
+      </div>
+
+      <div class="example">
+        <div class="indicator atRisk" title="🌲 Login: 30 days ⚠️&#10;⚰️ Tasks: 30 days ⚠️&#10;📖 Notes: 28 days&#10;⏱️ Focus: 25 days">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">30</span>
+          </div>
+          <div class="warningBadge">⚠️</div>
+        </div>
+        <span class="example-label">Multiple at risk</span>
+      </div>
+    </div>
+
+    <div class="tooltip-demo">
+      <strong>Tooltip Content (with warnings):</strong><br>
+      🌲 Login: 15 days<br>
+      ⚰️ Tasks: 15 days ⚠️<br>
+      📖 Notes: 8 days<br>
+      ⏱️ Focus: 3 days
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Hover State</h2>
+    <p style="color: var(--text-secondary); margin-bottom: 20px;">
+      Hover over the indicators to see the interactive effects:
+    </p>
+    <div class="examples">
+      <div class="example">
+        <div class="indicator" title="Hover me!">
+          <div class="iconContainer">
+            <span class="fireIcon">🔥</span>
+            <span class="streakNumber">42</span>
+          </div>
+        </div>
+        <span class="example-label">Hover for effects</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Integration Example</h2>
+    <div class="code">
+// In Navigation.tsx<br>
+import { StreakIndicator } from './StreakIndicator';<br>
+<br>
+&lt;div className={styles.navFooter}&gt;<br>
+&nbsp;&nbsp;&lt;SyncStatusIndicator /&gt;<br>
+&nbsp;&nbsp;&lt;StreakIndicator /&gt;  {/* Shows highest streak */}<br>
+&nbsp;&nbsp;&lt;button className={styles.quickCaptureButton}&gt;...&lt;/button&gt;<br>
+&lt;/div&gt;
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Features</h2>
+    <ul style="color: var(--text-secondary); line-height: 1.8;">
+      <li>✅ Shows highest current streak across all types</li>
+      <li>✅ Fire icon with flickering animation</li>
+      <li>✅ Tooltip displays all streak details</li>
+      <li>✅ Warning badge when any streak at risk</li>
+      <li>✅ Pulse animation for at-risk state</li>
+      <li>✅ Click navigates to /streaks dashboard</li>
+      <li>✅ Keyboard accessible (Enter/Space)</li>
+      <li>✅ Audio feedback on hover/click</li>
+      <li>✅ Responsive design</li>
+      <li>✅ Respects reduced motion preferences</li>
+    </ul>
+  </div>
+</body>
+</html>

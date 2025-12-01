@@ -7,6 +7,7 @@ import { useNotes } from '../../contexts/NotesContext';
 import { useTasks } from '../../contexts/TasksContext';
 import { useApp } from '../../contexts/AppContext';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
+import { StreakIndicator } from './StreakIndicator';
 import SettingsModal from './SettingsModal';
 import { ExportDialog } from '../import-export/ExportDialog';
 import QuickCapture from './QuickCapture';
@@ -195,6 +196,9 @@ const Navigation: React.FC = () => {
         <div className={styles.navFooter}>
           {/* Sync Status Indicator - Requirements: 17.7 */}
           <SyncStatusIndicator />
+          
+          {/* Streak Indicator - Requirements: Task 4.2 */}
+          <StreakIndicator />
           
           {/* Quick Capture Button - Requirements: 13.1, 6.1 */}
           <button 

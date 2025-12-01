@@ -87,4 +87,22 @@ describe('StreakDashboard', () => {
     
     expect(screen.getByText(/Loading your streaks/i)).toBeInTheDocument();
   });
+
+  it('renders milestone progress section', async () => {
+    renderDashboard();
+    
+    // Wait for loading to complete
+    await screen.findByText(/Your Streaks/i);
+    
+    // Check for milestone section
+    expect(screen.getByText(/Next Milestone/i)).toBeInTheDocument();
+    
+    // Check for milestone progress elements
+    const progressBar = screen.getByRole('progressbar');
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('aria-valuemin', '0');
+    
+    // Check for all milestones list
+    expect(screen.getByText(/All Milestones/i)).toBeInTheDocument();
+  });
 });
