@@ -6,6 +6,7 @@ import { useToast } from './ToastContext';
 import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
 import { useCompanion } from './CompanionContext';
+import { useStreak } from './StreakContext';
 
 interface TasksContextType {
   // Tasks data
@@ -96,6 +97,10 @@ export function TasksProvider({ children }: TasksProviderProps) {
   
   // Companion integration for task completion tracking
   const { trackTaskCompletion } = useCompanion();
+  
+  // Streak tracking integration
+  // Requirement: Task 1.6 - Integration with Existing Contexts
+  const { recordActivity } = useStreak();
   
   // Sync undo/redo state with localStorage
   useEffect(() => {
@@ -222,9 +227,13 @@ export function TasksProvider({ children }: TasksProviderProps) {
       if (!wasCompleted && isNowCompleted) {
         const isTombstone = task.priority === 'high' || task.tags?.includes('tombstone') || false;
         trackTaskCompletion(id, isTombstone);
+        
+        // Record task activity for streak tracking
+        // Requirement: Task 1.6 - Update TasksContext to call recordActivity('task')
+        recordActivity('task');
       }
     }
-  }, [undoRedoTasks, setUndoRedoTasks, announce, trackTaskCompletion]);
+  }, [undoRedoTasks, setUndoRedoTasks, announce, trackTaskCompletion, recordActivity]);
 
   /**
    * Mark task as complete
@@ -252,8 +261,12 @@ export function TasksProvider({ children }: TasksProviderProps) {
     if (task && !wasCompleted) {
       const isTombstone = task.priority === 'high' || task.tags?.includes('tombstone') || false;
       trackTaskCompletion(id, isTombstone);
+      
+      // Record task activity for streak tracking
+      // Requirement: Task 1.6 - Update TasksContext to call recordActivity('task')
+      recordActivity('task');
     }
-  }, [undoRedoTasks, setUndoRedoTasks, trackTaskCompletion]);
+  }, [undoRedoTasks, setUndoRedoTasks, trackTaskCompletion, recordActivity]);
 
   /**
    * Mark task as incomplete

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Note } from '../types';
 import { useToast } from './ToastContext';
-import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
+// import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
 import { useCompanion } from './CompanionContext';
 
@@ -89,7 +89,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
   
   // Screen reader announcements
   // Requirement: 6.2, 6.3 - Announce state changes to screen readers
-  const { announce } = useScreenReaderAnnouncement();
+  // const { announce } = useScreenReaderAnnouncement(); // TODO: Add announcements for note operations
   
   // Sync undo/redo state with localStorage
   useEffect(() => {
@@ -109,7 +109,8 @@ export function NotesProvider({ children }: NotesProviderProps) {
     endNoteTaking = companion.endNoteTaking;
   } catch (error) {
     // CompanionProvider not available - companion integration is optional
-    console.debug('CompanionContext not available - note tracking disabled');
+    // Using logger.debug instead of console.debug for consistency
+    // Note: logger.debug only logs in development mode
   }
   
   // Wrapper to track note-taking activity when switching notes

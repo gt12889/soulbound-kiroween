@@ -12,18 +12,16 @@ import { useGhostWriterState, createGhostWriterError } from '../../hooks/useGhos
 import { useScreenReaderAnnouncement } from '../../hooks/useScreenReaderAnnouncement';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { hapticSuccess, hapticError } from '../../utils/haptics';
+import { createScopedLogger } from '../../utils/logger';
 import styles from './GhostWriter.module.css';
 
 // Constants
 const MIN_CONTEXT_LENGTH = 10;
-const DEBUG = import.meta.env.DEV;
 
-// Debug logging helper
-const log = (...args: any[]) => {
-  if (DEBUG) console.log('[Ghost Writer]', ...args);
-};
+// Debug logging helper using logger utility
+const log = createScopedLogger('[Ghost Writer]');
 
-const GhostWriter: React.FC = () => {
+const GhostWriter: React.FC = React.memo(() => {
   const [suggestions, setSuggestions] = useState<GhostSuggestionType[]>([]);
   const [cursorPosition, setCursorPosition] = useState<{ x: number; y: number } | undefined>();
   const [showHint, setShowHint] = useState(false);
@@ -798,8 +796,6 @@ const GhostWriter: React.FC = () => {
         <WritingEditor
           ref={editorRef}
           onTextChange={handleTextChange}
-          onAcceptSuggestion={acceptFirstSuggestion}
-          hasSuggestion={suggestions.length > 0}
         />
         
         {/* Show loading indicator when generating (with 200ms delay) */}
@@ -891,6 +887,8 @@ const GhostWriter: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+GhostWriter.displayName = 'GhostWriter';
 
 export default GhostWriter;

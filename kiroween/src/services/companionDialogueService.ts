@@ -12,6 +12,15 @@ import type { ThemeId } from '../themes';
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 
 /**
+ * Migrate old 'zombie' companion type to 'forest'
+ * For backwards compatibility with existing user data
+ */
+function migrateCompanionType(type: CompanionType | 'zombie'): 'shadow' | 'forest' | 'ember' {
+  if (type === 'zombie') return 'forest';
+  return type as 'shadow' | 'forest' | 'ember';
+}
+
+/**
  * Get current time of day
  */
 export function getTimeOfDay(): TimeOfDay {
@@ -299,7 +308,8 @@ export function generateContextualDialogue(
   companion: CompanionType,
   mood: MoodState
 ): string {
-  const companionDialogue = DIALOGUE_DATABASE[companion];
+  const migratedCompanion = migrateCompanionType(companion);
+  const companionDialogue = DIALOGUE_DATABASE[migratedCompanion];
   
   // Priority 1: Module-specific dialogue
   if (context.currentModule !== 'home' && companionDialogue.contextual[context.currentModule]) {
@@ -321,7 +331,8 @@ export function generateContextualDialogue(
  * Get a greeting based on companion type and time of day
  */
 export function getGreeting(companion: CompanionType, timeOfDay: TimeOfDay): string {
-  const greetings = DIALOGUE_DATABASE[companion].greetings[timeOfDay];
+  const migratedCompanion = migrateCompanionType(companion);
+  const greetings = DIALOGUE_DATABASE[migratedCompanion].greetings[timeOfDay];
   return greetings[Math.floor(Math.random() * greetings.length)];
 }
 
@@ -329,6 +340,7 @@ export function getGreeting(companion: CompanionType, timeOfDay: TimeOfDay): str
  * Get celebration dialogue for achievements
  */
 export function getCelebration(companion: CompanionType, achievement: string): string {
+  const migratedCompanion = migrateCompanionType(companion);
   const celebrations = {
     shadow: [
       `The shadows celebrate your ${achievement}!`,
@@ -347,7 +359,7 @@ export function getCelebration(companion: CompanionType, achievement: string): s
     ]
   };
   
-  const companionCelebrations = celebrations[companion];
+  const companionCelebrations = celebrations[migratedCompanion];
   return companionCelebrations[Math.floor(Math.random() * companionCelebrations.length)];
 }
 
@@ -355,6 +367,7 @@ export function getCelebration(companion: CompanionType, achievement: string): s
  * Get encouragement dialogue for inactivity
  */
 export function getEncouragement(companion: CompanionType, daysSinceTask: number): string {
+  const migratedCompanion = migrateCompanionType(companion);
   const encouragements = {
     shadow: [
       `It's been ${daysSinceTask} days. The shadows miss your presence.`,
@@ -373,7 +386,7 @@ export function getEncouragement(companion: CompanionType, daysSinceTask: number
     ]
   };
   
-  const companionEncouragements = encouragements[companion];
+  const companionEncouragements = encouragements[migratedCompanion];
   return companionEncouragements[Math.floor(Math.random() * companionEncouragements.length)];
 }
 
@@ -381,7 +394,8 @@ export function getEncouragement(companion: CompanionType, daysSinceTask: number
  * Get random idle dialogue based on mood
  */
 export function getRandomIdle(companion: CompanionType, mood: MoodState): string {
-  const companionDialogue = DIALOGUE_DATABASE[companion];
+  const migratedCompanion = migrateCompanionType(companion);
+  const companionDialogue = DIALOGUE_DATABASE[migratedCompanion];
   
   if (companionDialogue.mood[mood]) {
     const moodDialogue = companionDialogue.mood[mood];
@@ -398,7 +412,8 @@ export function getRandomIdle(companion: CompanionType, mood: MoodState): string
  * Requirements: 10.5 - React to theme changes
  */
 export function getThemeDialogue(companion: CompanionType, themeId: ThemeId): string {
-  const companionDialogue = DIALOGUE_DATABASE[companion];
+  const migratedCompanion = migrateCompanionType(companion);
+  const companionDialogue = DIALOGUE_DATABASE[migratedCompanion];
   
   if (companionDialogue.themes[themeId]) {
     const themeDialogue = companionDialogue.themes[themeId];

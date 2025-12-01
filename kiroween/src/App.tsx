@@ -31,6 +31,7 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useUndoRedoShortcuts } from './hooks/useUndoRedoShortcuts';
 import { useSettingsInitialization, useSettingsPersistence } from './hooks/useSettingsInitialization';
 import { DEFAULT_SHORTCUTS } from './utils/keyboardShortcuts';
+import { ComposeProviders } from './utils/ComposeProviders';
 import './App.css';
 
 // Lazy load main application routes for code splitting
@@ -272,25 +273,21 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Router>
-      <AuthProvider>
-        <AppProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <TimerProvider>
-                <KeyboardProvider>
-                  <NotesProvider>
-                    <CompanionProvider>
-                      <TasksProvider>
-                        <AppContent />
-                      </TasksProvider>
-                    </CompanionProvider>
-                  </NotesProvider>
-                </KeyboardProvider>
-              </TimerProvider>
-            </ToastProvider>
-          </ThemeProvider>
-        </AppProvider>
-      </AuthProvider>
+      <ComposeProviders
+        providers={[
+          AuthProvider,
+          AppProvider,
+          ThemeProvider,
+          ToastProvider,
+          TimerProvider,
+          KeyboardProvider,
+          NotesProvider,
+          CompanionProvider,
+          TasksProvider,
+        ]}
+      >
+        <AppContent />
+      </ComposeProviders>
     </Router>
   );
 };

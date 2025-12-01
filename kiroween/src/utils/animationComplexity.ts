@@ -3,6 +3,7 @@
  * Dynamically adjusts animation complexity based on performance metrics
  */
 
+import React from 'react';
 import {
   AnimationPerformanceMonitor,
   detectLowEndDevice,

@@ -466,7 +466,6 @@ class CloudSyncService {
    */
   private handleOnline(): void {
     this.isOnline = true;
-    console.log('Connection restored, processing sync queue...');
     // Note: processSyncQueue needs userId, will be called by hook
   }
 
@@ -475,7 +474,6 @@ class CloudSyncService {
    */
   private handleOffline(): void {
     this.isOnline = false;
-    console.log('Connection lost, queuing changes for later sync...');
   }
 
   /**
@@ -526,7 +524,6 @@ class CloudSyncService {
     const delay = RETRY_DELAY_MS * Math.pow(2, currentAttempts);
     
     const timeout = setTimeout(() => {
-      console.log(`Retry attempt ${currentAttempts + 1} for ${type} ${id}...`);
       this.retryAttempts.set(retryKey, currentAttempts + 1);
       this.retryTimeouts.delete(retryKey);
       // Note: Actual retry logic should be implemented by the caller

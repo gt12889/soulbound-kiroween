@@ -1,16 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
-import type { ContentBlock, BlockType } from '../../types';
+import type { ContentBlock } from '../../types';
 import { useEditorState } from '../../hooks/useEditorState';
 import BlockRenderer from './BlockRenderer';
-import {
-  ParagraphBlock,
-  HeadingBlock,
-  ListBlock,
-  CodeBlock,
-  QuoteBlock,
-  CalloutBlock,
-  DividerBlock,
-} from './blocks';
 import styles from './EnhancedEditor.module.css';
 
 interface EnhancedEditorProps {
@@ -35,7 +26,6 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
     activeBlockId,
     setActiveBlock,
     updateBlock,
-    addBlock,
     deleteBlock,
     splitBlockAt,
     mergeWithPrevious,
@@ -55,40 +45,6 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
 
     return () => clearTimeout(timeoutId);
   }, [blocks, onChange, autoSave, autoSaveDelay]);
-
-  // Get the appropriate block component
-  const getBlockComponent = useCallback((block: ContentBlock) => {
-    const commonProps = {
-      block,
-      onUpdate: (updatedBlock: ContentBlock) => updateBlock(block.id, updatedBlock),
-      onKeyDown: () => {}, // Placeholder - will be handled by BlockRenderer
-    };
-
-    switch (block.type) {
-      case 'heading-1':
-      case 'heading-2':
-      case 'heading-3':
-      case 'heading-4':
-      case 'heading-5':
-      case 'heading-6':
-        return <HeadingBlock {...commonProps} />;
-      case 'bullet-list':
-      case 'numbered-list':
-      case 'checklist':
-        return <ListBlock {...commonProps} />;
-      case 'code':
-        return <CodeBlock {...commonProps} />;
-      case 'quote':
-        return <QuoteBlock {...commonProps} />;
-      case 'callout':
-        return <CalloutBlock {...commonProps} />;
-      case 'divider':
-        return <DividerBlock block={block} />;
-      case 'paragraph':
-      default:
-        return <ParagraphBlock {...commonProps} />;
-    }
-  }, [updateBlock]);
 
   // Handle block operations
   const handleBlockUpdate = useCallback(

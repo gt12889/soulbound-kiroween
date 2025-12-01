@@ -82,11 +82,49 @@
 }
 
 .taskItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
   background: var(--accent-purple-dark);
   color: var(--text-primary);
   padding: 0.25rem 0.5rem;
+  border: 1px solid transparent;
   border-radius: 3px;
   font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.taskItem:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple-light);
+  transform: translateX(2px);
+}
+
+.taskItem:active {
+  transform: scale(0.98);
+}
+
+.taskCompleted {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: var(--bg-tertiary);
+}
+
+.taskCompleted:hover {
+  opacity: 0.8;
+}
+
+.taskCheckbox {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--accent-purple-light);
+}
+
+.taskTitle {
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -1,11 +1,9 @@
-import React, { useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import GhostWriterModal from './GhostWriterModal';
 import styles from './WritingEditor.module.css';
 
 interface WritingEditorProps {
   onTextChange?: (text: string, context: string, cursorPosition: number) => void;
-  onAcceptSuggestion?: () => boolean;
-  hasSuggestion?: boolean;
 }
 
 export interface WritingEditorHandle {
@@ -22,12 +20,10 @@ export interface WritingEditorHandle {
 const STORAGE_KEY = 'ghostwriter_content';
 const AUTOSAVE_DELAY = 1000; // Save after 1 second of inactivity
 
-const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onTextChange, onAcceptSuggestion, hasSuggestion }, ref) => {
+const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onTextChange }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentText, setCurrentText] = useState('');
-  const lastTabTime = useRef<number>(0);
-  const DOUBLE_TAB_THRESHOLD = 500; // milliseconds
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Extract current sentence or paragraph context

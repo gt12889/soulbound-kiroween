@@ -6,6 +6,7 @@ import { getFirestore } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { getAnalytics, isSupported as isAnalyticsSupported } from 'firebase/analytics';
 import type { Analytics } from 'firebase/analytics';
+import { logger } from '../utils/logger';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -45,28 +46,28 @@ if (isFirebaseConfigured) {
           if (supported) {
             try {
               analytics = getAnalytics(app!);
-              console.log('Firebase Analytics initialized');
+              logger.log('Firebase Analytics initialized');
             } catch (error) {
-              console.warn('Failed to initialize Firebase Analytics:', error);
+              logger.warn('Failed to initialize Firebase Analytics:', error);
             }
           } else {
-            console.log('Firebase Analytics not supported in this environment');
+            logger.log('Firebase Analytics not supported in this environment');
           }
         })
         .catch((error) => {
-          console.warn('Error checking Analytics support:', error);
+          logger.warn('Error checking Analytics support:', error);
         });
     }
     
-    console.log('Firebase initialized successfully');
+    logger.log('Firebase initialized successfully');
   } catch (error) {
-    console.error('Firebase initialization error:', error);
-    console.warn('App will run in offline mode without authentication');
+    logger.error('Firebase initialization error:', error);
+    logger.warn('App will run in offline mode without authentication');
   }
 } else {
-  console.warn('Firebase not configured. Create a .env file with your Firebase credentials.');
-  console.warn('Copy .env.example to .env and fill in your Firebase project details.');
-  console.warn('App will run in offline mode without authentication.');
+  logger.warn('Firebase not configured. Create a .env file with your Firebase credentials.');
+  logger.warn('Copy .env.example to .env and fill in your Firebase project details.');
+  logger.warn('App will run in offline mode without authentication.');
 }
 
 export { auth, db, analytics, isFirebaseConfigured };

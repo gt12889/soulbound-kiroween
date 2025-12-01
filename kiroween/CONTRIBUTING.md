@@ -149,6 +149,14 @@ The Dark Productivity Suite is organized into several feature areas:
 - Avoid `any` type unless absolutely necessary
 - Use meaningful variable and function names
 
+**Note**: Test files, examples, and demos are excluded from production builds:
+- `**/*.test.ts` and `**/*.test.tsx` - Test files
+- `**/*.example.tsx` - Example components
+- `**/*Demo.tsx` - Demo components
+- `**/INTEGRATION_EXAMPLE.tsx` - Integration examples
+
+These files are for development/documentation only and won't be included in the production bundle.
+
 ```typescript
 // Good
 interface Task {

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useCompanion } from '../../contexts/CompanionContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { CompanionDialogue } from './CompanionDialogue';
-import { COMPANION_TYPES } from '../../types/companion';
+import { COMPANION_TYPES, type CompanionType } from '../../types/companion';
 import styles from './InteractiveCompanion.module.css';
 
 export type EvolutionStage = 'egg' | 'hatchling' | 'juvenile' | 'adult' | 'elder' | 'ascended';
@@ -13,7 +13,7 @@ interface InteractiveCompanionProps {
   onInteract?: () => void;
 }
 
-export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
+export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = React.memo(({
   achievementCount,
   taskCompletionCount,
   onInteract,
@@ -161,7 +161,9 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
 
   const getStageInfo = () => {
     // Get the companion definition based on active companion
-    const companionDef = COMPANION_TYPES[activeCompanion];
+    // Migrate 'zombie' to 'forest' for backwards compatibility
+    const migratedCompanion = activeCompanion === 'zombie' ? 'forest' : activeCompanion;
+    const companionDef = COMPANION_TYPES[migratedCompanion as CompanionType];
     
     // Use theme colors for companion stages
     // Progression: lighter -> darker as companion evolves
@@ -441,6 +443,8 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
       </div>
     </div>
   );
-};
+});
+
+InteractiveCompanion.displayName = 'InteractiveCompanion';
 
 export default InteractiveCompanion;

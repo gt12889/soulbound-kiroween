@@ -5,7 +5,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { ContentBlock } from '../types';
-import { generateBlockId, splitBlock, mergeBlocks, createEmptyBlock } from '../utils/blockUtils';
+import { splitBlock, mergeBlocks, createEmptyBlock } from '../utils/blockUtils';
 
 interface EditorState {
   blocks: ContentBlock[];

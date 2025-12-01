@@ -60,6 +60,13 @@ src/
   - noUnusedParameters: true
   - noFallthroughCasesInSwitch: true
   - noUncheckedSideEffectImports: true
+- Build exclusions (not compiled to production):
+  - `src/test/**/*` (test directory)
+  - `**/*.test.ts` (TypeScript test files)
+  - `**/*.test.tsx` (React test files)
+  - `**/*.example.tsx` (example/demo files)
+  - `**/*Demo.tsx` (demo components)
+  - `**/INTEGRATION_EXAMPLE.tsx` (integration examples)
 
 ### 6. CSS Modules Support ✓
 - CSS Modules supported by default in Vite
