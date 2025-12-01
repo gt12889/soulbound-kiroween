@@ -118,6 +118,16 @@ service cloud.firestore {
       allow write: if isOwner(userId) && isValidSettings();
     }
     
+    // Companion data rules
+    match /users/{userId}/companion/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Streak data rules
+    match /users/{userId}/streaks/{document=**} {
+      allow read, write: if isOwner(userId);
+    }
+    
     // Deny all other access
     match /{document=**} {
       allow read, write: if false;

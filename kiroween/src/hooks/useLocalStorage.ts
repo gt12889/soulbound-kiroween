@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { storageService, StorageError } from '../services/storageService';
+import { createScopedLogger } from '../utils/logger';
+
+const logger = createScopedLogger('[LocalStorage]');
 
 /**
  * Custom hook for syncing state with LocalStorage
@@ -22,7 +25,7 @@ export function useLocalStorage<T>(
       const item = storageService.get<T>(key);
       return item !== null ? item : initialValue;
     } catch (err) {
-      console.error(`Error loading from storage (${key}):`, err);
+      logger.error(`Error loading from storage (${key}):`, err);
       setError(err instanceof StorageError ? err : null);
       return initialValue;
     }
@@ -41,13 +44,13 @@ export function useLocalStorage<T>(
         storageService.set(key, value);
         setError(null);
       } catch (err) {
-        console.error(`Error saving to storage (${key}):`, err);
+        logger.error(`Error saving to storage (${key}):`, err);
         setError(err instanceof StorageError ? err : null);
         
         // If quota exceeded, notify user
         if (err instanceof StorageError && err.code === 'QUOTA_EXCEEDED') {
           // Could trigger a global notification here
-          console.warn('Storage quota exceeded. Consider exporting and clearing old data.');
+          logger.warn('Storage quota exceeded. Consider exporting and clearing old data.');
         }
       }
     }, 1000);
@@ -80,7 +83,7 @@ export function useLocalStorage<T>(
           const newValue = JSON.parse(e.newValue);
           setStoredValue(newValue);
         } catch (err) {
-          console.error(`Error parsing storage event (${key}):`, err);
+          logger.error(`Error parsing storage event (${key}):`, err);
         }
       }
     };

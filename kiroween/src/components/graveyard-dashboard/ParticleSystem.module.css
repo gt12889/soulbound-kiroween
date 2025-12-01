@@ -1,0 +1,120 @@
+/* Particle System Styles */
+.particleContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* Life energy particles (active tasks) */
+.particleLife {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: radial-gradient(circle, #4ade80 0%, #60a5fa 100%);
+  border-radius: 50%;
+  animation: particleRise 2s ease-out forwards;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.8);
+}
+
+@keyframes particleRise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) translateX(calc(var(--drift, 0) * 20px)) scale(0.5);
+  }
+}
+
+/* Spirit particles (completed tasks) */
+.particleSpirit {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  animation: particleFloat 3s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8), 0 0 12px rgba(173, 216, 230, 0.6);
+}
+
+@keyframes particleFloat {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1.2);
+  }
+}
+
+/* Soul release animation (when completing) */
+.particleContainer.releasingSouls .particleSpirit {
+  animation: soulRise 2s ease-out forwards;
+  width: 4px;
+  height: 4px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 16px rgba(173, 216, 230, 0.8);
+}
+
+@keyframes soulRise {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) translateX(calc(var(--drift, 0) * 30px)) scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100px) translateX(calc(var(--drift, 0) * 50px)) scale(0.5);
+  }
+}
+
+/* Urgency particles (high priority) */
+.particleUrgency {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #f87171 0%, #fb923c 100%);
+  border-radius: 50%;
+  animation: particleBurst 1s ease-out forwards;
+  box-shadow: 0 0 8px rgba(248, 113, 113, 0.9);
+}
+
+@keyframes particleBurst {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-80px) translateX(calc((var(--index, 0) - 5) * 15px));
+  }
+}
+
+/* Hover particle trigger */
+.tombstone:hover .particleContainer {
+  animation: particleSpawn 0.5s ease-out;
+}
+
+@keyframes particleSpawn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .particleLife,
+  .particleSpirit,
+  .particleUrgency {
+    display: none;
+  }
+}
+

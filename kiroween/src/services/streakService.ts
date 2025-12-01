@@ -73,6 +73,7 @@ import type {
   FocusStreakInfo,
   TokenValidation,
   MilestoneDay,
+  TokenData,
 } from '../types/streak';
 
 /**
@@ -787,4 +788,291 @@ export function mergeActivityRecords(
     focusMinutes: Math.max(record1.focusMinutes, record2.focusMinutes),
     login: record1.login || record2.login,
   };
+}
+
+// ============================================================================
+// Token Economy System
+// ============================================================================
+
+/**
+ * Calculate how many tokens should be earned for reaching a milestone
+ * 
+ * Token earning rules:
+ * - 30 days: 1 token
+ * - 100 days: 2 tokens
+ * - 365 days: 3 tokens
+ * - Other milestones: 0 tokens
+ * 
+ * @param milestoneDay - The milestone day count reached
+ * @returns Number of tokens to award
+ */
+export function calculateTokensForMilestone(milestoneDay: MilestoneDay): number {
+  switch (milestoneDay) {
+    case 30:
+      return 1;
+    case 100:
+      return 2;
+    case 365:
+      return 3;
+    default:
+      return 0;
+  }
+}
+
+/**
+ * Award tokens for reaching a milestone
+ * Enforces the 3-token maximum limit
+ * 
+ * @param streakData - Current streak data
+ * @param milestoneDay - The milestone day count reached
+ * @returns Updated token data
+ */
+export function awardTokensForMilestone(
+  streakData: StreakData,
+  milestoneDay: MilestoneDay
+): TokenData {
+  const tokensToAward = calculateTokensForMilestone(milestoneDay);
+  
+  if (tokensToAward === 0) {
+    return streakData.tokens;
+  }
+  
+  const newAvailable = Math.min(
+    streakData.tokens.available + tokensToAward,
+    3 // Maximum 3 tokens
+  );
+  
+  const actualTokensAwarded = newAvailable - streakData.tokens.available;
+  
+  return {
+    available: newAvailable,
+    earned: streakData.tokens.earned + actualTokensAwarded,
+    used: streakData.tokens.used,
+  };
+}
+
+/**
+ * Check if a streak has reached a new milestone
+ * Returns the milestone if reached, null otherwise
+ * 
+ * @param previousStreak - Previous streak count
+ * @param currentStreak - Current streak count
+ * @returns Milestone day if a new milestone was reached
+ */
+export function detectMilestoneReached(
+  previousStreak: number,
+  currentStreak: number
+): MilestoneDay | null {
+  const milestones: readonly MilestoneDay[] = [3, 7, 14, 30, 60, 100, 365];
+  
+  // Check if we crossed any milestone threshold
+  for (const milestone of milestones) {
+    if (previousStreak < milestone && currentStreak >= milestone) {
+      return milestone;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Validate if a token can be used for streak recovery
+ * Checks all token usage rules:
+ * 1. User has tokens available
+ * 2. Streak is actually broken
+ * 3. Within 48-hour recovery window
+ * 
+ * @param streakData - Current streak data
+ * @param streakType - Type of streak to recover
+ * @param missedDate - Date that was missed (ISO string)
+ * @param currentDate - Current date (defaults to now)
+ * @returns Validation result with detailed reason if not allowed
+ */
+export function validateTokenUsageDetailed(
+  streakData: StreakData,
+  streakType: StreakType,
+  missedDate: string,
+  currentDate: Date = new Date()
+): TokenValidation {
+  // Rule 1: Check if tokens available
+  if (streakData.tokens.available <= 0) {
+    return {
+      allowed: false,
+      reason: 'no_tokens',
+    };
+  }
+  
+  // Rule 2: Check if streak is broken
+  const streakInfo = getStreakInfo(streakData, streakType);
+  if (streakInfo.current > 0) {
+    return {
+      allowed: false,
+      reason: 'already_active',
+    };
+  }
+  
+  // Rule 3: Check if within 48-hour recovery window
+  const missedDateObj = parseISODateString(missedDate);
+  const hoursSinceMissed = (currentDate.getTime() - missedDateObj.getTime()) / (1000 * 60 * 60);
+  const RECOVERY_WINDOW_HOURS = 48;
+  
+  if (hoursSinceMissed > RECOVERY_WINDOW_HOURS) {
+    return {
+      allowed: false,
+      reason: 'too_late',
+    };
+  }
+  
+  // All checks passed
+  return {
+    allowed: true,
+  };
+}
+
+/**
+ * Use a recovery token to restore a broken streak
+ * Decrements available tokens and marks the streak as recovered
+ * 
+ * @param streakData - Current streak data
+ * @param streakType - Type of streak to recover
+ * @param missedDate - Date that was missed (ISO string)
+ * @param currentDate - Current date (defaults to now)
+ * @returns Updated streak data with token used, or null if validation failed
+ */
+export function useRecoveryToken(
+  streakData: StreakData,
+  streakType: StreakType,
+  missedDate: string,
+  currentDate: Date = new Date()
+): StreakData | null {
+  // Validate token usage
+  const validation = validateTokenUsageDetailed(streakData, streakType, missedDate, currentDate);
+  
+  if (!validation.allowed) {
+    return null;
+  }
+  
+  // Create updated streak data
+  const updatedData: StreakData = {
+    ...streakData,
+    tokens: {
+      ...streakData.tokens,
+      available: streakData.tokens.available - 1,
+      used: streakData.tokens.used + 1,
+    },
+  };
+  
+  // Mark the missed date as having activity (recovery)
+  const missedDateStr = missedDate;
+  updatedData.activityHistory = {
+    ...updatedData.activityHistory,
+    [missedDateStr]: {
+      ...updatedData.activityHistory[missedDateStr],
+      // Mark as recovered by ensuring minimum activity
+      tasks: Math.max(updatedData.activityHistory[missedDateStr]?.tasks || 0, 1),
+      login: true,
+    },
+  };
+  
+  return updatedData;
+}
+
+/**
+ * Check if the 48-hour recovery window is still open for a missed date
+ * 
+ * @param missedDate - Date that was missed
+ * @param currentDate - Current date (defaults to now)
+ * @returns True if within 48-hour window
+ */
+export function isWithinRecoveryWindow(
+  missedDate: Date,
+  currentDate: Date = new Date()
+): boolean {
+  const hoursSinceMissed = (currentDate.getTime() - missedDate.getTime()) / (1000 * 60 * 60);
+  const RECOVERY_WINDOW_HOURS = 48;
+  
+  return hoursSinceMissed <= RECOVERY_WINDOW_HOURS;
+}
+
+/**
+ * Get hours remaining in the recovery window
+ * 
+ * @param missedDate - Date that was missed
+ * @param currentDate - Current date (defaults to now)
+ * @returns Hours remaining, or 0 if window expired
+ */
+export function getRecoveryWindowHoursRemaining(
+  missedDate: Date,
+  currentDate: Date = new Date()
+): number {
+  const hoursSinceMissed = (currentDate.getTime() - missedDate.getTime()) / (1000 * 60 * 60);
+  const RECOVERY_WINDOW_HOURS = 48;
+  
+  const remaining = RECOVERY_WINDOW_HOURS - hoursSinceMissed;
+  return Math.max(0, remaining);
+}
+
+/**
+ * Enforce the 3-token maximum limit
+ * Caps available tokens at 3
+ * 
+ * @param tokenData - Current token data
+ * @returns Token data with enforced maximum
+ */
+export function enforceTokenMaximum(tokenData: TokenData): TokenData {
+  const MAX_TOKENS = 3;
+  
+  if (tokenData.available > MAX_TOKENS) {
+    return {
+      ...tokenData,
+      available: MAX_TOKENS,
+    };
+  }
+  
+  return tokenData;
+}
+
+/**
+ * Check if user can earn more tokens (not at maximum)
+ * 
+ * @param streakData - Current streak data
+ * @returns True if user can earn more tokens
+ */
+export function canEarnMoreTokens(streakData: StreakData): boolean {
+  const MAX_TOKENS = 3;
+  return streakData.tokens.available < MAX_TOKENS;
+}
+
+/**
+ * Get the next milestone that awards tokens
+ * 
+ * @param currentStreak - Current streak count
+ * @returns Next token-awarding milestone, or null if none remaining
+ */
+export function getNextTokenMilestone(currentStreak: number): MilestoneDay | null {
+  const tokenMilestones: readonly MilestoneDay[] = [30, 100, 365];
+  
+  for (const milestone of tokenMilestones) {
+    if (currentStreak < milestone) {
+      return milestone;
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Calculate days until next token-earning milestone
+ * 
+ * @param currentStreak - Current streak count
+ * @returns Days remaining, or 0 if no more token milestones
+ */
+export function daysUntilNextToken(currentStreak: number): number {
+  const nextMilestone = getNextTokenMilestone(currentStreak);
+  
+  if (!nextMilestone) {
+    return 0;
+  }
+  
+  return nextMilestone - currentStreak;
 }

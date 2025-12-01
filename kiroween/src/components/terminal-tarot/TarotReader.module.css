@@ -32,6 +32,50 @@
   transition: color var(--timing-normal) var(--ease-standard);
 }
 
+/* Tab Navigation */
+.tabNavigation {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+
+.tab {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-family: 'Cinzel', 'Georgia', serif;
+  background: rgba(26, 26, 46, 0.4);
+  border: 2px solid var(--accent-purple-light);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--timing-normal) var(--ease-standard);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.tab:hover {
+  background: rgba(77, 45, 110, 0.3);
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 15px rgba(77, 45, 110, 0.4);
+  transform: translateY(-2px);
+}
+
+.tab.activeTab {
+  background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-purple-light) 100%);
+  border-color: var(--accent-purple-light);
+  box-shadow: 0 0 20px rgba(77, 45, 110, 0.6);
+  color: var(--text-primary);
+}
+
+.tabIcon {
+  font-size: 1.5rem;
+}
+
 .controls {
   display: flex;
   flex-direction: column;

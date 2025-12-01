@@ -1,12 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, lazy, Suspense } from 'react';
 import type { TarotReading } from '../../types';
 import { analyzeCommits, generateDemoCommits } from '../../services/gitService';
 import { generateTarotReading } from '../../services/tarotService';
 import { useAudio } from '../../hooks/useAudio';
 import TarotCard from './TarotCard';
+import LoadingFallback from '../common/LoadingFallback';
 import styles from './TarotReader.module.css';
 
+const GhostArchive = lazy(() => import('./ghost-archive/GhostArchive').then(module => ({ default: module.GhostArchive })));
+
 const TarotReader: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'tarot' | 'ghost-archive'>('tarot');
   const [reading, setReading] = useState<TarotReading | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,6 +118,11 @@ const TarotReader: React.FC = () => {
     setError(null);
   }, []);
 
+  const handleTabChange = useCallback((tab: 'tarot' | 'ghost-archive') => {
+    playUIClick();
+    setActiveTab(tab);
+  }, [playUIClick]);
+
   return (
     <div className={styles.tarotReader}>
       <div className={styles.header}>
@@ -123,7 +132,34 @@ const TarotReader: React.FC = () => {
         </p>
       </div>
 
-      {!reading && !loading && (
+      {/* Tab Navigation */}
+      <div className={styles.tabNavigation}>
+        <button
+          className={`${styles.tab} ${activeTab === 'tarot' ? styles.activeTab : ''}`}
+          onClick={() => handleTabChange('tarot')}
+          onMouseEnter={playUIHover}
+          aria-selected={activeTab === 'tarot'}
+          aria-controls="tarot-panel"
+        >
+          <span className={styles.tabIcon} aria-hidden="true">🔮</span>
+          Tarot Reading
+        </button>
+        <button
+          className={`${styles.tab} ${activeTab === 'ghost-archive' ? styles.activeTab : ''}`}
+          onClick={() => handleTabChange('ghost-archive')}
+          onMouseEnter={playUIHover}
+          aria-selected={activeTab === 'ghost-archive'}
+          aria-controls="ghost-archive-panel"
+        >
+          <span className={styles.tabIcon} aria-hidden="true">👻</span>
+          Ghost Archive
+        </button>
+      </div>
+
+      {/* Tab Panels */}
+      {activeTab === 'tarot' && (
+        <div id="tarot-panel" role="tabpanel" aria-labelledby="tarot-tab">
+          {!reading && !loading && (
         <>
           <div className={styles.githubInput}>
             <input
@@ -246,6 +282,16 @@ const TarotReader: React.FC = () => {
               <li>Each reading provides mystical insights into your coding journey</li>
             </ol>
           </div>
+        </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'ghost-archive' && (
+        <div id="ghost-archive-panel" role="tabpanel" aria-labelledby="ghost-archive-tab">
+          <Suspense fallback={<LoadingFallback message="Initializing Ghost Archive..." />}>
+            <GhostArchive />
+          </Suspense>
         </div>
       )}
     </div>

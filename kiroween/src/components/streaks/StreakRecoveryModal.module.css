@@ -1,0 +1,880 @@
+/**
+ * StreakRecoveryModal Component Styles
+ * Requirements: Task 3.2 - Streak Recovery Modal
+ * - Mystical theme styling
+ * - Clear visual hierarchy
+ * - Accessible and responsive
+ */
+
+/* Modal Backdrop */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.modalContent {
+  background: var(--bg-primary, #0d0d0d);
+  border: 2px solid var(--accent-purple-light, #4a2d6e);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.8),
+    0 0 40px rgba(107, 70, 193, 0.3),
+    inset 0 1px 0 rgba(139, 92, 246, 0.1);
+  max-width: 550px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+/* Mystical border glow effect */
+.modalContent::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(139, 92, 246, 0.3), 
+    rgba(107, 70, 193, 0.3), 
+    rgba(74, 45, 110, 0.3),
+    rgba(139, 92, 246, 0.3)
+  );
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.5;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.modalHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-primary, #2d1b4e);
+  background: linear-gradient(135deg, var(--bg-secondary, #1a1a1a), var(--bg-primary, #0d0d0d));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mystical shimmer effect on header */
+.modalHeader::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(139, 92, 246, 0.1), 
+    transparent
+  );
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 100%;
+  }
+}
+
+.headerIcon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 8px rgba(107, 70, 193, 0.5));
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.modalTitle {
+  flex: 1;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary, #e0e0e0);
+  font-family: 'Cinzel', serif;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(107, 70, 193, 0.3);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary, #808080);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover:not(:disabled) {
+  background: var(--bg-tertiary, #242424);
+  color: var(--text-primary, #e0e0e0);
+}
+
+.closeButton:focus {
+  outline: 2px solid var(--accent-purple, #6b46c1);
+  outline-offset: 2px;
+}
+
+.closeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal Body */
+.modalBody {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Broken Streak Info */
+.brokenInfo {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(74, 45, 110, 0.05));
+  border: 1px solid var(--border-secondary, #2d1b4e);
+  border-radius: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+  }
+}
+
+.brokenIcon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  10%, 30% {
+    transform: scale(1.1);
+  }
+  20%, 40% {
+    transform: scale(0.95);
+  }
+}
+
+.brokenText {
+  flex: 1;
+}
+
+.brokenMessage {
+  font-size: 1rem;
+  color: var(--text-primary, #e0e0e0);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.5;
+}
+
+.brokenMessage strong {
+  color: var(--accent-purple-light, #8b5cf6);
+  font-weight: 700;
+}
+
+.brokenSubtext {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #b0b0b0);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Token Section */
+.tokenSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary, #b0b0b0);
+  font-family: 'Cinzel', serif;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tokenDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  background: var(--bg-secondary, #1a1a1a);
+  border: 2px solid var(--border-primary, #2d1b4e);
+  border-radius: 16px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tokenIcons {
+  display: flex;
+  gap: 1rem;
+}
+
+.tokenIcon {
+  font-size: 2rem;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.tokenAvailable {
+  color: var(--accent-purple-light, #8b5cf6);
+  background: rgba(139, 92, 246, 0.1);
+  border: 2px solid var(--accent-purple-light, #8b5cf6);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  animation: glow 2s ease-in-out infinite, tokenPulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+/* Mystical particle effect for available tokens */
+.tokenAvailable::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: particleExpand 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tokenPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes particleExpand {
+  0%, 100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+  }
+}
+
+.tokenUsed {
+  color: var(--text-tertiary, #808080);
+  background: var(--bg-tertiary, #242424);
+  border: 2px solid var(--border-secondary, #2d1b4e);
+}
+
+.tokenCount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #e0e0e0);
+  font-family: 'Cinzel', serif;
+}
+
+/* Token Explanation */
+.tokenExplanation {
+  padding: 1rem;
+  background: rgba(74, 45, 110, 0.1);
+  border-left: 3px solid var(--accent-purple-light, #8b5cf6);
+  border-radius: 8px;
+}
+
+.explanationText {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #b0b0b0);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Error Message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 12px;
+  color: #fca5a5;
+  font-size: 0.875rem;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Warning Message */
+.warningMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  color: #fcd34d;
+  font-size: 0.875rem;
+}
+
+.warningIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Modal Footer */
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-primary, #2d1b4e);
+  background: var(--bg-secondary, #1a1a1a);
+}
+
+.cancelButton {
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-tertiary, #242424);
+  border: 1px solid var(--border-primary, #2d1b4e);
+  border-radius: 12px;
+  color: var(--text-primary, #e0e0e0);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cinzel', serif;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: var(--bg-secondary, #1a1a1a);
+  border-color: var(--accent-purple-light, #4a2d6e);
+}
+
+.cancelButton:focus {
+  outline: 2px solid var(--accent-purple, #6b46c1);
+  outline-offset: 2px;
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recoverButton {
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-purple, #6b46c1), var(--accent-purple-light, #8b5cf6));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cinzel', serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mystical energy flow effect on recover button */
+.recoverButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.recoverButton:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.recoverButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 70, 193, 0.4);
+}
+
+.recoverButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.recoverButton:focus {
+  outline: 2px solid var(--accent-purple-light, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.recoverButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Confirmation State */
+.confirmationContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.confirmationIcon {
+  font-size: 3rem;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.confirmationText {
+  font-size: 1.125rem;
+  color: var(--text-primary, #e0e0e0);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.confirmationText strong {
+  color: var(--accent-purple-light, #8b5cf6);
+  font-weight: 700;
+}
+
+.confirmationWarning {
+  padding: 1.25rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  width: 100%;
+}
+
+.warningText {
+  font-size: 0.875rem;
+  color: #fcd34d;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.confirmButton {
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-purple, #6b46c1), var(--accent-purple-light, #8b5cf6));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Cinzel', serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+}
+
+.confirmButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 70, 193, 0.4);
+}
+
+.confirmButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.confirmButton:focus {
+  outline: 2px solid var(--accent-purple-light, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.confirmButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success State */
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  animation: successPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes successPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.successIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: sparkle 1s ease-in-out infinite;
+  position: relative;
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+}
+
+/* Mystical aura around success icon */
+.successIcon::after {
+  content: '✨';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  opacity: 0;
+  animation: auraExpand 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1) drop-shadow(0 0 20px rgba(139, 92, 246, 0.8));
+  }
+  50% {
+    transform: scale(1.1) rotate(10deg);
+    filter: brightness(1.3) drop-shadow(0 0 30px rgba(139, 92, 246, 1));
+  }
+}
+
+@keyframes auraExpand {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2);
+  }
+}
+
+.successTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent-purple-light, #8b5cf6);
+  font-family: 'Cinzel', serif;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 0 2px 12px rgba(139, 92, 246, 0.5);
+}
+
+.successText {
+  font-size: 1rem;
+  color: var(--text-secondary, #b0b0b0);
+  margin: 0 0 2rem 0;
+}
+
+.successStreak {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(74, 45, 110, 0.1));
+  border: 2px solid var(--accent-purple-light, #8b5cf6);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+}
+
+.successStreakIcon {
+  font-size: 2rem;
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.5));
+}
+
+.successStreakCount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent-purple-light, #8b5cf6);
+  font-family: 'Cinzel', serif;
+  text-shadow: 0 2px 12px rgba(139, 92, 246, 0.5);
+}
+
+.successStreakLabel {
+  font-size: 1rem;
+  color: var(--text-secondary, #b0b0b0);
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modalContent {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .modalHeader {
+    padding: 1.25rem;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+
+  .modalBody {
+    padding: 1.25rem;
+  }
+
+  .brokenInfo {
+    padding: 1.25rem;
+  }
+
+  .tokenDisplay {
+    padding: 1.25rem;
+  }
+
+  .tokenIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.5rem;
+  }
+
+  .modalFooter {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalBackdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modalContent {
+    border-radius: 20px 20px 0 0;
+    max-height: 85vh;
+  }
+
+  .brokenInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .tokenIcons {
+    gap: 0.75rem;
+  }
+
+  .tokenIcon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.25rem;
+  }
+
+  .modalFooter {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .recoverButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .successState {
+    padding: 2rem 1.5rem;
+  }
+
+  .successIcon {
+    font-size: 3rem;
+  }
+
+  .successTitle {
+    font-size: 1.5rem;
+  }
+
+  .successStreak {
+    padding: 1rem 1.5rem;
+  }
+
+  .successStreakCount {
+    font-size: 2rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .modalBackdrop,
+  .modalContent,
+  .successState,
+  .pulse,
+  .heartbeat,
+  .glow,
+  .sparkle,
+  .shake,
+  .spinner,
+  .borderGlow,
+  .shimmer,
+  .iconFloat,
+  .tokenPulse,
+  .particleExpand,
+  .auraExpand {
+    animation: none;
+    transition: none;
+  }
+
+  .recoverButton:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .modalContent::before,
+  .modalHeader::after,
+  .tokenAvailable::before,
+  .recoverButton::before,
+  .successIcon::after {
+    display: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .modalContent {
+    border-width: 3px;
+  }
+
+  .tokenDisplay,
+  .brokenInfo {
+    border-width: 2px;
+  }
+
+  .closeButton:focus,
+  .cancelButton:focus,
+  .recoverButton:focus {
+    outline-width: 3px;
+  }
+}

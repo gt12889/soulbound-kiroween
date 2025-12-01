@@ -153,6 +153,7 @@ export interface AppSettings {
   lastModule: string;
   theme?: string;
   keyboardShortcuts?: KeyboardShortcut[];
+  hapticsEnabled?: boolean;
 }
 
 export interface SyncStatus {

@@ -55,7 +55,7 @@ const GhostWriter: React.FC = React.memo(() => {
   const ghostState = useGhostWriterState({
     acceptAnimationDuration: 1000, // Match the CSS animation duration
     onStateChange: (newState, previousState) => {
-      log('State transition:', previousState, '→', newState);
+      log.log('State transition:', previousState, '→', newState);
       
       // Announce state changes to screen readers
       switch (newState) {
@@ -155,7 +155,7 @@ const GhostWriter: React.FC = React.memo(() => {
   // Monitor online/offline status
   useEffect(() => {
     const handleOnline = () => {
-      log('Network connection restored');
+      log.log('Network connection restored');
       setIsOnline(true);
       announce('Network connection restored');
       
@@ -166,7 +166,7 @@ const GhostWriter: React.FC = React.memo(() => {
     };
     
     const handleOffline = () => {
-      log('Network connection lost');
+      log.log('Network connection lost');
       setIsOnline(false);
       announce('Network connection lost');
       
@@ -188,14 +188,14 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle text changes and generate suggestions
   const handleTextChange = useCallback(async (_text: string, context: string, position: number, isManual: boolean = false) => {
-    log('Text changed, context length:', context.trim().length, 'manual:', isManual);
+    log.log('Text changed, context length:', context.trim().length, 'manual:', isManual);
     
     // Store context for retry
     lastContextRef.current = { context, position };
     
     // Only generate suggestions if there's meaningful context
     if (context.trim().length < MIN_CONTEXT_LENGTH) {
-      log('Context too short, skipping suggestion');
+      log.log('Context too short, skipping suggestion');
       setSuggestions([]);
       ghostState.reset();
       
@@ -225,7 +225,7 @@ const GhostWriter: React.FC = React.memo(() => {
 
     // Cancel any pending request
     if (abortControllerRef.current) {
-      log('Aborting previous request');
+      log.log('Aborting previous request');
       abortControllerRef.current.abort();
     }
     abortControllerRef.current = new AbortController();
@@ -255,7 +255,7 @@ const GhostWriter: React.FC = React.memo(() => {
       setSuggestions([optimisticSuggestion]);
       setIsOptimistic(true);
       setCurrentSuggestionIndex(0);
-      log('Showing optimistic suggestion:', optimisticText);
+      log.log('Showing optimistic suggestion:', optimisticText);
       
       // Only show loading indicator for manual generation (not automatic background suggestions)
       // Delay showing loading indicator by 200ms to avoid flash for fast responses
@@ -265,12 +265,12 @@ const GhostWriter: React.FC = React.memo(() => {
         }, 200);
       }
       
-      log('Requesting suggestion for context:', context.substring(0, 50) + '...', 'isManual:', isManual);
+      log.log('Requesting suggestion for context:', context.substring(0, 50) + '...', 'isManual:', isManual);
       const suggestionText = await aiService.getSuggestion(context, 1, isManual);
       
       // Check if this request was cancelled
       if (abortControllerRef.current?.signal.aborted) {
-        log('Request was cancelled, ignoring result');
+        log.log('Request was cancelled, ignoring result');
         // Clear loading delay timeout
         if (loadingDelayTimeoutRef.current) {
           clearTimeout(loadingDelayTimeoutRef.current);
@@ -287,7 +287,7 @@ const GhostWriter: React.FC = React.memo(() => {
       }
       setShowLoadingIndicator(false);
       
-      log('Received suggestion:', suggestionText);
+      log.log('Received suggestion:', suggestionText);
       
       // Create new suggestion
       const newSuggestion: GhostSuggestionType = {
@@ -298,7 +298,7 @@ const GhostWriter: React.FC = React.memo(() => {
       };
 
       // Replace optimistic suggestion with real one
-      log('Replacing optimistic suggestion with real one:', newSuggestion);
+      log.log('Replacing optimistic suggestion with real one:', newSuggestion);
       setSuggestions([newSuggestion]);
       setIsOptimistic(false);
       
@@ -316,7 +316,7 @@ const GhostWriter: React.FC = React.memo(() => {
       
       // Auto-accept if this was triggered by double-Tab
       if (autoAcceptNext && isManual) {
-        log('Auto-accepting suggestion from double-Tab');
+        log.log('Auto-accepting suggestion from double-Tab');
         setAutoAcceptNext(false);
         // Accept the suggestion immediately
         setTimeout(() => {
@@ -338,7 +338,7 @@ const GhostWriter: React.FC = React.memo(() => {
       // Check if error is due to cancellation
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       if (errorMessage.includes('cancel') || errorMessage.includes('abort')) {
-        log('Request was cancelled');
+        log.log('Request was cancelled');
         // Clear loading delay timeout and hide loading indicator
         if (loadingDelayTimeoutRef.current) {
           clearTimeout(loadingDelayTimeoutRef.current);
@@ -376,17 +376,17 @@ const GhostWriter: React.FC = React.memo(() => {
       
       // Implement progressive retry strategy
       const retryCount = retryCountRef.current;
-      log('Error occurred, retry count:', retryCount);
+      log.log('Error occurred, retry count:', retryCount);
       
       if (retryCount === 0) {
         // First failure: Show immediate retry button
-        log('First failure - showing immediate retry');
+        log.log('First failure - showing immediate retry');
         hapticError(); // Trigger error vibration
         ghostState.setError(errorObj);
         announce(`Error: ${errorObj.message}`);
       } else if (retryCount === 1) {
         // Second failure: Wait 5s before allowing retry
-        log('Second failure - waiting 5s before retry');
+        log.log('Second failure - waiting 5s before retry');
         hapticError(); // Trigger error vibration
         ghostState.setError({
           ...errorObj,
@@ -407,12 +407,12 @@ const GhostWriter: React.FC = React.memo(() => {
         
         // Schedule automatic retry after 5s
         retryTimeoutRef.current = setTimeout(() => {
-          log('Auto-retrying after 5s delay');
+          log.log('Auto-retrying after 5s delay');
           handleRetry();
         }, 5000);
       } else if (retryCount >= 2) {
         // Third+ failure: Suggest checking settings
-        log('Third+ failure - suggesting settings check');
+        log.log('Third+ failure - suggesting settings check');
         hapticError(); // Trigger error vibration
         const settingsMessage = errorObj.type === 'INVALID_KEY_ERROR'
           ? 'Please check your API key in settings'
@@ -434,7 +434,7 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle suggestion acceptance
   const handleSuggestionAccept = useCallback((suggestion: GhostSuggestionType) => {
-    log('Accepting suggestion');
+    log.log('Accepting suggestion');
     
     // Trigger haptic feedback on mobile devices
     hapticSuccess();
@@ -504,7 +504,7 @@ const GhostWriter: React.FC = React.memo(() => {
   const handleUndo = useCallback(() => {
     if (!lastAcceptedSuggestion) return;
     
-    log('Undoing last accepted suggestion');
+    log.log('Undoing last accepted suggestion');
     
     // Get current text from editor
     if (editorRef.current) {
@@ -534,7 +534,7 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle suggestion regeneration
   const handleSuggestionRegenerate = useCallback(() => {
-    log('Regenerating suggestion');
+    log.log('Regenerating suggestion');
     
     // Announce to screen readers
     announce('Regenerating suggestion');
@@ -555,7 +555,7 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle cancel during generation
   const handleCancelGeneration = useCallback(() => {
-    log('Cancelling suggestion generation');
+    log.log('Cancelling suggestion generation');
     
     // Abort the request
     if (abortControllerRef.current) {
@@ -580,7 +580,7 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle retry after error with progressive backoff
   const handleRetry = useCallback(() => {
-    log('Retrying suggestion generation, attempt:', retryCountRef.current + 1);
+    log.log('Retrying suggestion generation, attempt:', retryCountRef.current + 1);
     
     // Increment retry count
     retryCountRef.current += 1;
@@ -614,14 +614,14 @@ const GhostWriter: React.FC = React.memo(() => {
 
   // Handle error dismissal
   const handleDismissError = useCallback(() => {
-    log('Dismissing error');
+    log.log('Dismissing error');
     ghostState.reset();
   }, [ghostState]);
 
   // Accept first suggestion (for double-tab shortcut)
   const acceptFirstSuggestion = useCallback(() => {
     if (suggestions.length > 0) {
-      log('Accepting first suggestion via double-tab');
+      log.log('Accepting first suggestion via double-tab');
       handleSuggestionAccept(suggestions[0]);
       return true;
     }
@@ -631,7 +631,7 @@ const GhostWriter: React.FC = React.memo(() => {
   // Set up double-Tab shortcut to summon Ghost Writer
   useDoubleTab({
     onDoubleTab: () => {
-      log('Double-Tab detected - summoning Ghost Writer');
+      log.log('Double-Tab detected - summoning Ghost Writer');
       
       // If there are suggestions, accept the first one
       if (acceptFirstSuggestion()) {
@@ -644,11 +644,11 @@ const GhostWriter: React.FC = React.memo(() => {
         const position = editorRef.current.getCursorPosition();
         
         if (context && context.trim().length >= MIN_CONTEXT_LENGTH) {
-          log('Generating new suggestion via double-Tab (manual) - will auto-accept');
+          log.log('Generating new suggestion via double-Tab (manual) - will auto-accept');
           setAutoAcceptNext(true); // Flag to auto-accept when suggestion arrives
           handleTextChange('', context, position, true); // Manual generation
         } else {
-          log('Context too short for suggestion');
+          log.log('Context too short for suggestion');
           setShowHint(true);
           if (hintTimeoutRef.current) {
             clearTimeout(hintTimeoutRef.current);
@@ -683,7 +683,7 @@ const GhostWriter: React.FC = React.memo(() => {
         if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
-          log('Keyboard shortcut: Accept (Enter)');
+          log.log('Keyboard shortcut: Accept (Enter)');
           handleSuggestionAccept(suggestions[currentSuggestionIndex]);
         }
       }
@@ -693,7 +693,7 @@ const GhostWriter: React.FC = React.memo(() => {
         if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
-          log('Keyboard shortcut: Reject (Esc)');
+          log.log('Keyboard shortcut: Reject (Esc)');
           handleSuggestionDismiss(suggestions[0].id);
         }
       }
@@ -703,7 +703,7 @@ const GhostWriter: React.FC = React.memo(() => {
         if (focusInSuggestion) {
           event.preventDefault();
           event.stopPropagation();
-          log('Keyboard shortcut: Regenerate (Ctrl+R)');
+          log.log('Keyboard shortcut: Regenerate (Ctrl+R)');
           handleSuggestionRegenerate();
         }
       }
@@ -715,7 +715,7 @@ const GhostWriter: React.FC = React.memo(() => {
           event.stopPropagation();
           const index = parseInt(event.key, 10) - 1;
           if (index < suggestions.length) {
-            log(`Keyboard shortcut: Select variant ${index + 1} (Alt+${event.key})`);
+            log.log(`Keyboard shortcut: Select variant ${index + 1} (Alt+${event.key})`);
             setCurrentSuggestionIndex(index);
             announce(`Switched to suggestion ${index + 1} of ${suggestions.length}`);
           }

@@ -1,0 +1,231 @@
+.fragmentRestorer {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(0, 255, 0, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.fragmentHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.fragmentTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #00ff00;
+  margin: 0;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.fragmentType {
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #88ff88;
+}
+
+.fragmentDifficulty {
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 170, 0, 0.1);
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #ffaa88;
+}
+
+.fragmentContent {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.corruptedText {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+}
+
+.normalText {
+  color: #00ff00;
+}
+
+.missingText {
+  color: #ff4444;
+  font-weight: bold;
+  animation: glitch 0.3s infinite;
+  text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+  position: relative;
+}
+
+.missingText[data-glitch]::before,
+.missingText[data-glitch]::after {
+  content: '[MISSING]';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.missingText[data-glitch]::before {
+  animation: glitch-top 0.3s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  color: #00ffff;
+}
+
+.missingText[data-glitch]::after {
+  animation: glitch-bottom 0.3s infinite;
+  clip-path: polygon(0 66%, 100% 66%, 100% 100%, 0 100%);
+  color: #ff00ff;
+}
+
+@keyframes glitch {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes glitch-top {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-1px, 1px);
+  }
+  40% {
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes glitch-bottom {
+  0%, 100% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(1px, -1px);
+  }
+  40% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+.progressBar {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #88ff88);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  transition: width 0.3s ease;
+  animation: progress-glow 2s ease-in-out infinite;
+}
+
+@keyframes progress-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+  }
+}
+
+.progressText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.75rem;
+  color: #00ff00;
+  text-shadow: 0 0 4px rgba(0, 255, 0, 0.8);
+  font-weight: bold;
+}
+
+.restoredText {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  border-radius: 4px;
+}
+
+.restoredLabel {
+  font-size: 0.75rem;
+  color: #88ff88;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.restoredContent {
+  color: #88ff88;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-shadow: 0 0 8px rgba(136, 255, 136, 0.5);
+}
+
+.restoreActions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.restoreButton {
+  padding: 0.75rem 1.5rem;
+  background: rgba(0, 255, 0, 0.1);
+  border: 2px solid rgba(0, 255, 0, 0.5);
+  border-radius: 4px;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.restoreButton:hover:not(:disabled) {
+  background: rgba(0, 255, 0, 0.2);
+  border-color: rgba(0, 255, 0, 0.8);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+  transform: translateY(-2px);
+}
+
+.restoreButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

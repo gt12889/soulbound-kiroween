@@ -6,6 +6,9 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAuth } from './AuthContext';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebaseService';
+import { createScopedLogger } from '../utils/logger';
+
+const logger = createScopedLogger('[Theme]');
 
 /**
  * ThemeContext - Manages theme state and switching
@@ -56,13 +59,12 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           const data = settingsDoc.data();
           if (data.theme && themes[data.theme as ThemeId]) {
             setThemeId(data.theme as ThemeId);
-            console.log('Theme loaded from cloud:', data.theme);
           }
         }
         
         setCloudSyncEnabled(true);
       } catch (error) {
-        console.error('Failed to load theme from cloud:', error);
+        logger.error('Failed to load theme from cloud:', error);
         setCloudSyncEnabled(false);
       }
     };
@@ -125,7 +127,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
           theme: themeId,
           updatedAt: new Date(),
         }, { merge: true });
-        console.log('Theme synced to cloud:', themeId);
       } catch (error) {
         console.error('Failed to sync theme to cloud:', error);
       }

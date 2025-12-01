@@ -1,0 +1,219 @@
+/**
+ * HeatmapDay Component Styles
+ * Requirements: Task 2.2 - Theme-aware colors, hover effects, accessibility
+ */
+
+/* Day Cell */
+.day {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid var(--border-secondary, #1a1a1a);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Activity Levels - Theme-aware colors */
+.day[data-level="0"] {
+  background: var(--bg-tertiary, #242424);
+}
+
+.day[data-level="1"] {
+  background: rgba(74, 45, 110, 0.2);
+}
+
+.day[data-level="2"] {
+  background: rgba(74, 45, 110, 0.4);
+}
+
+.day[data-level="3"] {
+  background: rgba(74, 45, 110, 0.7);
+}
+
+.day[data-level="4"] {
+  background: rgba(74, 45, 110, 1.0);
+  box-shadow: 0 0 4px var(--glow-purple, rgba(74, 45, 110, 0.6));
+}
+
+/* Hover Effects */
+.day:hover {
+  transform: scale(1.3);
+  border-color: var(--accent-purple-light, #4a2d6e);
+  z-index: 10;
+}
+
+.day[data-level="0"]:hover {
+  background: var(--bg-secondary, #1a1a1a);
+}
+
+.day[data-level="1"]:hover {
+  background: rgba(74, 45, 110, 0.3);
+}
+
+.day[data-level="2"]:hover {
+  background: rgba(74, 45, 110, 0.5);
+}
+
+.day[data-level="3"]:hover {
+  background: rgba(74, 45, 110, 0.8);
+}
+
+.day[data-level="4"]:hover {
+  background: rgba(74, 45, 110, 1.0);
+  box-shadow: 0 0 8px var(--glow-purple, rgba(74, 45, 110, 0.9));
+}
+
+/* Focus State for Accessibility */
+.day:focus {
+  outline: 2px solid var(--accent-purple-light, #4a2d6e);
+  outline-offset: 2px;
+  z-index: 10;
+}
+
+/* Keyboard Navigation Focus State */
+.focused {
+  outline: 3px solid var(--accent-purple, #6b46c1);
+  outline-offset: 2px;
+  z-index: 10;
+  box-shadow: 0 0 12px var(--glow-purple, rgba(107, 70, 193, 0.6));
+  transform: scale(1.3);
+}
+
+/* Empty Cell (padding) */
+.empty {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+/* Touch State - Active touch feedback */
+.touching {
+  transform: scale(1.2);
+  opacity: 0.9;
+  z-index: 10;
+}
+
+/* Touch Targets for Mobile */
+@media (max-width: 768px) {
+  .day {
+    /* Increase size for better touch targets (44px minimum recommended) */
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    /* Improve touch responsiveness */
+    touch-action: manipulation;
+    /* Prevent text selection on touch */
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .empty {
+    width: 14px;
+    height: 14px;
+  }
+  
+  /* Optimize hover for touch devices */
+  .day:hover {
+    /* Reduce scale on mobile to prevent overlap */
+    transform: scale(1.15);
+  }
+  
+  /* Add active state for touch feedback */
+  .day:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  
+  /* Enhanced touch state on mobile */
+  .touching {
+    transform: scale(1.25);
+    opacity: 0.95;
+    box-shadow: 0 0 8px var(--glow-purple, rgba(74, 45, 110, 0.6));
+  }
+}
+
+@media (max-width: 480px) {
+  .day {
+    /* Even larger touch targets on small screens */
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+  }
+  
+  .empty {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .day {
+    transition: none;
+  }
+  
+  .day:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .day {
+    border-width: 2px;
+    border-color: var(--text-primary, #e0e0e0);
+  }
+  
+  .day[data-level="0"] {
+    background: var(--bg-primary, #0d0d0d);
+  }
+  
+  .day[data-level="1"] {
+    background: rgba(74, 45, 110, 0.4);
+  }
+  
+  .day[data-level="2"] {
+    background: rgba(74, 45, 110, 0.6);
+  }
+  
+  .day[data-level="3"] {
+    background: rgba(74, 45, 110, 0.8);
+  }
+  
+  .day[data-level="4"] {
+    background: rgba(74, 45, 110, 1.0);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .day {
+    border-color: #000;
+  }
+  
+  .day[data-level="0"] {
+    background: #fff;
+  }
+  
+  .day[data-level="1"] {
+    background: #ddd;
+  }
+  
+  .day[data-level="2"] {
+    background: #999;
+  }
+  
+  .day[data-level="3"] {
+    background: #666;
+  }
+  
+  .day[data-level="4"] {
+    background: #333;
+  }
+}

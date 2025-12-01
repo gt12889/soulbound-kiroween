@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
+import { logger } from '../../utils/logger';
 import styles from './ErrorBoundary.module.css';
 
 interface ErrorBoundaryProps {
@@ -37,8 +38,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log error to console for debugging (Requirement: 3.5)
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // Log error using logger utility (Requirement: 3.5)
+    logger.error('ErrorBoundary caught an error:', error, errorInfo);
     
     // Store error info in state
     this.setState({

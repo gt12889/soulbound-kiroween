@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { SessionType, TimerSettings, TimerStats } from '../types/timer';
 import { DEFAULT_TIMER_SETTINGS } from '../types/timer';
+import { useStreak } from './StreakContext';
 
 interface TimerState {
   isActive: boolean;
@@ -54,6 +55,7 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<TimerSettings>(DEFAULT_TIMER_SETTINGS);
   const [stats, setStats] = useState<TimerStats>(initialStats);
   const intervalRef = useRef<number | null>(null);
+  const { recordActivity } = useStreak();
 
   // Load persisted state on mount
   useEffect(() => {
@@ -189,9 +191,15 @@ export function TimerProvider({ children }: { children: React.ReactNode }) {
       todaySessions: prev.todaySessions + 1,
     }));
 
+    // Record focus activity for streak tracking
+    // Requirements: Task 1.6 - Integration with Existing Contexts
+    if (sessionType === 'focus') {
+      recordActivity('focus', { minutes: timer.duration });
+    }
+
     // Trigger notifications (handled by useTimerNotifications hook)
     window.dispatchEvent(new CustomEvent('timer-complete', { detail: { sessionType } }));
-  }, [timer.duration]);
+  }, [timer.duration, recordActivity]);
 
   const startTimer = useCallback((duration: number, type: SessionType) => {
     if (duration <= 0) {

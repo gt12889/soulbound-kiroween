@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { streakStorageService } from '../services/streakStorageService';
@@ -14,6 +14,8 @@ import {
   getDayDifference,
   checkMilestone,
   createEmptyActivityRecord,
+  detectMilestoneReached,
+  awardTokensForMilestone,
 } from '../services/streakService';
 import type {
   StreakData,
@@ -127,6 +129,9 @@ export function StreakProvider({ children }: StreakProviderProps) {
   // Streak goals/settings
   const [streakGoals, setStreakGoals] = useState<StreakGoals>(createDefaultStreakGoals());
   
+  // Track if we've recorded initial login
+  const hasRecordedInitialLogin = useRef(false);
+  
   /**
    * Load streak data on mount
    * Requirements: Task 1.4 - Integrate with storage service
@@ -151,11 +156,12 @@ export function StreakProvider({ children }: StreakProviderProps) {
           }
         }
       } catch (error) {
-        console.error('Failed to load streak data:', error);
         // Initialize with default data on error
         setStreaks(createDefaultStreakData());
       } finally {
         setLoading(false);
+        // Mark that we should record login on next render
+        hasRecordedInitialLogin.current = false;
       }
     };
     
@@ -268,6 +274,9 @@ export function StreakProvider({ children }: StreakProviderProps) {
     const streakInfo = getStreakInfo(updatedStreaks, streakType);
     
     if (shouldIncrementStreak(streakInfo, currentDate, updatedStreaks.activityHistory, streakType, updatedStreaks)) {
+      // Store previous streak count for milestone detection
+      const previousStreak = streakInfo.current;
+      
       // Increment streak
       streakInfo.current += 1;
       streakInfo.lastActivityDate = dateString;
@@ -277,8 +286,8 @@ export function StreakProvider({ children }: StreakProviderProps) {
         streakInfo.longest = streakInfo.current;
       }
       
-      // Check for milestone achievement
-      const milestone = checkMilestone(streakInfo.current);
+      // Detect if a milestone was reached
+      const milestone = detectMilestoneReached(previousStreak, streakInfo.current);
       if (milestone) {
         // Mark milestone as achieved
         if (!updatedStreaks.milestones[milestone]) {
@@ -288,22 +297,8 @@ export function StreakProvider({ children }: StreakProviderProps) {
             rewardClaimed: false,
           };
           
-          // Award tokens for specific milestones
-          if (milestone === 30) {
-            updatedStreaks.tokens.available += 1;
-            updatedStreaks.tokens.earned += 1;
-          } else if (milestone === 100) {
-            updatedStreaks.tokens.available += 2;
-            updatedStreaks.tokens.earned += 2;
-          } else if (milestone === 365) {
-            updatedStreaks.tokens.available += 3;
-            updatedStreaks.tokens.earned += 3;
-          }
-          
-          // Ensure we don't exceed max tokens
-          if (updatedStreaks.tokens.available > 3) {
-            updatedStreaks.tokens.available = 3;
-          }
+          // Award tokens using the token economy system
+          updatedStreaks.tokens = awardTokensForMilestone(updatedStreaks, milestone);
         }
       }
     }
@@ -473,12 +468,14 @@ export function StreakProvider({ children }: StreakProviderProps) {
   
   /**
    * Record login activity on mount
+   * Only runs once after initial load to avoid duplicate login records
    */
   useEffect(() => {
-    if (streaks && !loading) {
+    if (streaks && !loading && !hasRecordedInitialLogin.current) {
+      hasRecordedInitialLogin.current = true;
       recordActivity('login');
     }
-  }, [loading]); // Only run once after initial load
+  }, [streaks, loading, recordActivity]); // Run when loading completes and streaks are available
   
   const value: StreakContextType = {
     // State

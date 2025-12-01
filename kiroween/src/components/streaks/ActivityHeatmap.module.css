@@ -1,0 +1,472 @@
+/**
+ * ActivityHeatmap Component Styles
+ * Requirements: Task 2.2 - Style with theme-aware colors, responsive grid layout
+ * Requirements: Task 2.4 - Add screen reader descriptions
+ */
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Container */
+.container {
+  position: relative;
+  background: var(--bg-secondary, #1a1a1a);
+  border: 2px solid var(--border-primary, #2d1b4e);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Filter Container */
+.filterContainer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
+.filterButton {
+  padding: 0.5rem 1rem;
+  background: var(--bg-tertiary, #242424);
+  border: 2px solid var(--border-secondary, #2d1b4e);
+  border-radius: 8px;
+  color: var(--text-secondary, #b0b0b0);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.filterButton:hover {
+  background: var(--bg-secondary, #1a1a1a);
+  border-color: var(--accent-purple-light, #4a2d6e);
+  color: var(--text-primary, #e0e0e0);
+  transform: translateY(-1px);
+}
+
+.filterButton:active {
+  transform: translateY(0);
+}
+
+.filterButton.active {
+  background: var(--accent-purple, #6b46c1);
+  border-color: var(--accent-purple-light, #8b5cf6);
+  color: var(--text-primary, #ffffff);
+  box-shadow: 0 0 12px rgba(107, 70, 193, 0.4);
+}
+
+.filterButton:focus-visible {
+  outline: 2px solid var(--accent-purple-light, #8b5cf6);
+  outline-offset: 2px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  font-family: 'Cinzel', serif;
+  margin: 0;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.legendLabel {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #808080);
+  margin: 0 0.25rem;
+}
+
+.legendSquare {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid var(--border-secondary, #1a1a1a);
+}
+
+.legendSquare[data-level="0"] {
+  background: var(--bg-tertiary, #242424);
+}
+
+.legendSquare[data-level="1"] {
+  background: rgba(74, 45, 110, 0.2);
+}
+
+.legendSquare[data-level="2"] {
+  background: rgba(74, 45, 110, 0.4);
+}
+
+.legendSquare[data-level="3"] {
+  background: rgba(74, 45, 110, 0.7);
+}
+
+.legendSquare[data-level="4"] {
+  background: rgba(74, 45, 110, 1.0);
+}
+
+/* Heatmap Wrapper */
+.heatmapWrapper {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 2rem;
+}
+
+/* Mobile scroll optimization */
+.mobileScroll {
+  /* Enable smooth momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Snap to grid columns for better UX */
+  scroll-snap-type: x proximity;
+  /* Hide scrollbar on mobile for cleaner look */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  /* Add subtle gradient to indicate scrollability */
+  position: relative;
+  /* Optimize touch scrolling performance */
+  overscroll-behavior-x: contain;
+  /* Prevent pull-to-refresh on mobile browsers */
+  overscroll-behavior-y: none;
+  /* Improve scroll performance */
+  will-change: scroll-position;
+}
+
+.mobileScroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Scroll indicator shadows on mobile */
+.mobileScroll::before,
+.mobileScroll::after {
+  content: '';
+  position: absolute;
+  top: 2rem;
+  bottom: 0;
+  width: 20px;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+/* Left shadow (indicates more content to the left) */
+.mobileScroll::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg-secondary, #1a1a1a), transparent);
+}
+
+/* Right shadow (indicates more content to the right) */
+.mobileScroll::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg-secondary, #1a1a1a), transparent);
+}
+
+/* Mobile note in title */
+.mobileNote {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-tertiary, #808080);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Month Labels */
+.monthLabels {
+  position: absolute;
+  top: 0;
+  left: 3rem;
+  right: 0;
+  display: grid;
+  grid-template-columns: repeat(53, 12px);
+  gap: 3px;
+  height: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.monthLabel {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #808080);
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* Day Labels */
+.dayLabels {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 2.5rem;
+}
+
+.dayLabel {
+  height: 12px;
+  font-size: 0.65rem;
+  color: var(--text-tertiary, #808080);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+}
+
+/* Grid - CSS Grid Layout (7 rows × 53 columns) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(53, 12px);
+  grid-template-rows: repeat(7, 12px);
+  gap: 3px;
+  margin-left: 3rem;
+  min-width: fit-content;
+  grid-auto-flow: column;
+  /* Optimize rendering during scroll */
+  contain: layout style paint;
+}
+
+/* Grid focus state for keyboard navigation */
+.grid:focus {
+  outline: 2px solid var(--accent-purple-light, #8b5cf6);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.week {
+  /* Week container no longer needed with CSS Grid, but kept for compatibility */
+  display: contents;
+}
+
+/* Scrolling state - reduce interactivity during scroll */
+.scrolling .grid {
+  pointer-events: none;
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-primary, #0d0d0d);
+  border: 2px solid var(--accent-purple-light, #4a2d6e);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px var(--shadow-heavy, rgba(0, 0, 0, 0.8));
+  z-index: 1000;
+  min-width: 200px;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltipDate {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  margin-bottom: 0.75rem;
+  font-family: 'Cinzel', serif;
+}
+
+.tooltipStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tooltipStat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #b0b0b0);
+}
+
+.tooltipIcon {
+  font-size: 1rem;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.tooltipEmpty {
+  font-size: 0.875rem;
+  color: var(--text-muted, #606060);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1.125rem;
+  }
+  
+  .filterContainer {
+    width: 100%;
+  }
+  
+  .filterButton {
+    flex: 1;
+    justify-content: center;
+    min-width: 0;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  .heatmapWrapper {
+    /* Optimize for touch scrolling */
+    -webkit-overflow-scrolling: touch;
+    /* Add padding for better touch targets */
+    padding-bottom: 0.5rem;
+  }
+  
+  /* Increase touch target size on mobile */
+  .grid {
+    grid-template-columns: repeat(auto-fit, 14px);
+    grid-template-rows: repeat(7, 14px);
+    gap: 4px;
+  }
+  
+  .tooltip {
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    min-width: auto;
+    /* Position above the heatmap on mobile */
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  @keyframes tooltipFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-50%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1rem;
+  }
+  
+  .dayLabels {
+    width: 2rem;
+  }
+  
+  .dayLabel {
+    font-size: 0.6rem;
+    padding-right: 0.25rem;
+  }
+  
+  .grid {
+    margin-left: 2.25rem;
+    /* Larger touch targets on small screens */
+    grid-template-columns: repeat(auto-fit, 16px);
+    grid-template-rows: repeat(7, 16px);
+    gap: 4px;
+  }
+  
+  .monthLabels {
+    left: 2.25rem;
+    grid-template-columns: repeat(auto-fit, 16px);
+    gap: 4px;
+  }
+  
+  .legend {
+    /* Stack legend vertically on very small screens */
+    flex-wrap: wrap;
+  }
+  
+  .tooltipStats {
+    font-size: 0.8rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    animation: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .container {
+    border-width: 3px;
+  }
+  
+  .legendSquare {
+    border-width: 2px;
+  }
+  
+  .tooltip {
+    border-width: 3px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .tooltip {
+    display: none;
+  }
+  
+  .heatmapWrapper {
+    overflow: visible;
+  }
+}

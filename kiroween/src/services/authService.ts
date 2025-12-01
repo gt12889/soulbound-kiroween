@@ -7,7 +7,6 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   GithubAuthProvider,
-  AuthError,
 } from 'firebase/auth';
 import type { User as FirebaseUser, UserCredential } from 'firebase/auth';
 import { auth } from './firebaseService';
@@ -15,8 +14,14 @@ import type { User } from '../types';
 
 /**
  * Type guard to check if an error is a Firebase Auth error
+ * Firebase Auth errors have a 'code' property that starts with 'auth/'
  */
-function isFirebaseAuthError(error: unknown): error is AuthError {
+interface FirebaseAuthError {
+  code: string;
+  message?: string;
+}
+
+function isFirebaseAuthError(error: unknown): error is FirebaseAuthError {
   return (
     typeof error === 'object' &&
     error !== null &&

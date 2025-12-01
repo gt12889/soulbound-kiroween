@@ -5,6 +5,9 @@ import { useAuth } from './AuthContext';
 import { cloudSyncService } from '../services/cloudSyncService';
 import type { AppSettings, ModuleName } from '../types';
 import type { CompanionType } from '../types/companion';
+import { createScopedLogger } from '../utils/logger';
+
+const logger = createScopedLogger('[AppContext]');
 
 export type SidebarMode = 'expanded' | 'collapsed' | 'hidden';
 
@@ -148,10 +151,9 @@ export function AppProvider({ children }: AppProviderProps) {
             audioVolume: cloudSettings.audioVolume ?? prev.audioVolume,
             lastModule: cloudSettings.lastModule ?? prev.lastModule,
           }));
-          console.log('Settings loaded from cloud successfully');
         }
       } catch (error) {
-        console.error('Failed to load settings from cloud:', error);
+        logger.error('Failed to load settings from cloud:', error);
       }
     };
 
@@ -194,11 +196,11 @@ export function AppProvider({ children }: AppProviderProps) {
           });
         } else if (isValidCloudType === false && cloudType) {
           // Invalid cloud type - log warning
-          console.warn('Invalid companion type from cloud:', cloudType);
+          logger.warn('Invalid companion type from cloud:', cloudType);
         }
         // If both are null, no action needed
       } catch (error) {
-        console.error('Failed to sync companion type:', error);
+        logger.error('Failed to sync companion type:', error);
       }
     };
 
@@ -220,16 +222,15 @@ export function AppProvider({ children }: AppProviderProps) {
           if (['shadow', 'forest', 'ember'].includes(cloudType)) {
             // Only update if different from current local state
             if (cloudType !== companionType) {
-              console.log('Real-time sync: Updating companion type from Firebase:', cloudType);
               setCompanionTypeState(cloudType);
             }
           } else {
-            console.warn('Invalid companion type from real-time update:', cloudType);
+            logger.warn('Invalid companion type from real-time update:', cloudType);
           }
         }
       },
       (error) => {
-        console.error('Error in companion data real-time sync:', error);
+        logger.error('Error in companion data real-time sync:', error);
       }
     );
 
@@ -253,7 +254,6 @@ export function AppProvider({ children }: AppProviderProps) {
         localStorage.getItem('settings') !== null;
 
       if (hasExistingData) {
-        console.log('Migrating existing user to Shadow Spirit companion');
         await setCompanionType('shadow');
       }
     };
@@ -272,9 +272,8 @@ export function AppProvider({ children }: AppProviderProps) {
           audioVolume: settings.audioVolume,
           lastModule: settings.lastModule,
         });
-        console.log('Settings synced to cloud successfully');
       } catch (error) {
-        console.error('Failed to sync settings to cloud:', error);
+        logger.error('Failed to sync settings to cloud:', error);
       }
     };
 

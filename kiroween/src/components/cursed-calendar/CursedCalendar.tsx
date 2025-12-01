@@ -2,7 +2,10 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTasks } from '../../contexts/TasksContext';
 import { MoonPhaseCalendar } from '../graveyard-dashboard/MoonPhaseCalendar';
 import type { Task } from '../../types';
+import { createScopedLogger } from '../../utils/logger';
 import styles from './CursedCalendar.module.css';
+
+const logger = createScopedLogger('[CursedCalendar]');
 
 export function CursedCalendar() {
   const { tasks, toggleTaskCompletion } = useTasks();
@@ -50,7 +53,7 @@ export function CursedCalendar() {
           }
           map.get(dateKey)!.push(task);
         } catch (error) {
-          console.warn(`Invalid date for task ${task.id}:`, task.dueDate);
+          logger.warn(`Invalid date for task ${task.id}:`, task.dueDate);
         }
       }
     });

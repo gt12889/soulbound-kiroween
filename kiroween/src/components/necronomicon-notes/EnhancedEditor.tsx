@@ -1,6 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import type { ContentBlock } from '../../types';
 import { useEditorState } from '../../hooks/useEditorState';
+import { PaperTexture } from '../ghost-writer/PaperTexture';
+import { GhostlyCursor } from '../ghost-writer/GhostlyCursor';
+import { InkSplotch } from '../ghost-writer/InkSplotch';
 import BlockRenderer from './BlockRenderer';
 import styles from './EnhancedEditor.module.css';
 
@@ -34,6 +37,11 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
     canUndo,
     canRedo,
   } = useEditorState(initialBlocks);
+  
+  const [isTyping, setIsTyping] = useState(false);
+  const [inkSplotches, setInkSplotches] = useState<Array<{ id: number; x: number; y: number; size: 'small' | 'medium' | 'large' }>>([]);
+  const splotchIdCounter = useRef(0);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Auto-save with debouncing
   useEffect(() => {
@@ -45,6 +53,31 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
 
     return () => clearTimeout(timeoutId);
   }, [blocks, onChange, autoSave, autoSaveDelay]);
+
+  // Track typing state
+  useEffect(() => {
+    setIsTyping(true);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 500);
+
+    // Add ink splotch occasionally
+    if (Math.random() < 0.01) {
+      const size = Math.random() < 0.7 ? 'small' : Math.random() < 0.9 ? 'medium' : 'large';
+      setInkSplotches((prev) => [
+        ...prev,
+        {
+          id: splotchIdCounter.current++,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size,
+        },
+      ]);
+    }
+  }, [blocks]);
 
   // Handle block operations
   const handleBlockUpdate = useCallback(
@@ -94,7 +127,15 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
   }, [undo, redo]);
 
   return (
-    <div className={styles.enhancedEditor} role="textbox" aria-label="Note content editor" aria-multiline="true">
+    <PaperTexture className={styles.enhancedEditor}>
+      <GhostlyCursor isTyping={isTyping} enabled={true} />
+      <InkSplotch 
+        splotches={inkSplotches} 
+        onSplotchComplete={(id) => {
+          setInkSplotches((prev) => prev.filter((s) => s.id !== id));
+        }} 
+      />
+      <div role="textbox" aria-label="Note content editor" aria-multiline="true">
       {/* Editor toolbar - placeholder for future enhancements */}
       <div className={styles.editorToolbar}>
         <button
@@ -140,7 +181,8 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
           {blocks.length} {blocks.length === 1 ? 'block' : 'blocks'}
         </span>
       </div>
-    </div>
+      </div>
+    </PaperTexture>
   );
 };
 

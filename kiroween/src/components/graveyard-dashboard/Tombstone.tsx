@@ -1,7 +1,8 @@
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, memo, useRef } from 'react';
 import type { Task } from '../../types';
 import { useAudio } from '../../hooks/useAudio';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import { ParticleSystem } from './ParticleSystem';
 import styles from './Tombstone.module.css';
 
 interface TombstoneProps {
@@ -9,6 +10,7 @@ interface TombstoneProps {
   onToggleComplete: (id: string) => void;
   onDelete: (id: string) => void;
   onArchive?: (id: string) => void;
+  onDigUp?: (task: Task) => void;
   isDragging?: boolean;
   isArchived?: boolean;
   isSelected?: boolean;
@@ -25,7 +27,8 @@ function TombstoneComponent({
   task, 
   onToggleComplete, 
   onDelete, 
-  onArchive, 
+  onArchive,
+  onDigUp,
   isDragging = false, 
   isArchived = false,
   isSelected = false,
@@ -37,6 +40,10 @@ function TombstoneComponent({
   const [animationType, setAnimationType] = useState<'sink' | 'deepSink' | 'restore' | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDigging, setIsDigging] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const containerRef = useRef<HTMLButtonElement>(null);
   const { playTombstoneRise, playTombstoneSink } = useAudio();
 
   // Play rise sound when tombstone is first created (not completed)
@@ -53,8 +60,10 @@ function TombstoneComponent({
     if (task.completed) {
       setAnimationType('restore');
       playTombstoneRise(); // Rising back up when uncompleting
+      setIsCompleting(false);
     } else {
       setAnimationType('sink');
+      setIsCompleting(true); // Trigger soul release
       playTombstoneSink(); // Sinking when completing
     }
     
@@ -63,6 +72,7 @@ function TombstoneComponent({
       onToggleComplete(task.id);
       setIsAnimating(false);
       setAnimationType(null);
+      setIsCompleting(false);
     }, task.completed ? 0 : 1200); // Sink animation duration
   };
 
@@ -113,12 +123,31 @@ function TombstoneComponent({
     isAnimating && animationType === 'deepSink' ? styles.deepSinking : '',
     isAnimating && animationType === 'restore' ? styles.restoring : '',
     !task.completed && !isAnimating ? styles.rising : '',
+    isDigging ? styles.digging : '',
   ].filter(Boolean).join(' ');
 
+  const handleDigUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDigUp) {
+      setIsDigging(true);
+      setTimeout(() => {
+        onDigUp(task);
+        setIsDigging(false);
+      }, 300);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isArchived && (e.key === 'Enter' || e.key === ' ')) {
-      e.preventDefault();
-      handleToggleComplete();
+    if (!isArchived) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleToggleComplete();
+      } else if (e.key === 'd' || e.key === 'D') {
+        e.preventDefault();
+        if (onDigUp) {
+          handleDigUp(e as any);
+        }
+      }
     }
   };
 
@@ -135,12 +164,24 @@ function TombstoneComponent({
 
   return (
     <button
+      ref={containerRef}
       className={tombstoneClasses}
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      onMouseEnter={() => {
+        setShowTooltip(true);
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        setShowTooltip(false);
+        setIsHovered(false);
+      }}
       onClick={isArchived ? undefined : handleToggleComplete}
+      onDoubleClick={(e) => {
+        if (!isArchived && onDigUp) {
+          handleDigUp(e);
+        }
+      }}
       onKeyDown={handleKeyDown}
-      aria-label={`${task.title} - ${task.completed ? 'Completed' : 'Active'} task. Press Enter or Space to ${task.completed ? 'restore' : 'complete'}.`}
+      aria-label={`${task.title} - ${task.completed ? 'Completed' : 'Active'} task. Press Enter or Space to ${task.completed ? 'restore' : 'complete'}. Double-click or press D to dig up details.`}
     >
       {/* Bulk selection checkbox - Requirement 9.1 */}
       {showCheckbox && onToggleSelection && (
@@ -173,6 +214,13 @@ function TombstoneComponent({
       
       {/* Ground base */}
       <div className={styles.ground}></div>
+
+      {/* Particle system */}
+      <ParticleSystem
+        task={task}
+        isHovered={isHovered}
+        isCompleting={isCompleting}
+      />
 
       {/* Ghostly tooltip on hover */}
       {showTooltip && (

@@ -18,6 +18,88 @@
   display: none;
 }
 
+/* Fog overlay that parts on tombstone hover */
+.fogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.fogLayer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at var(--fog-x, 50%) var(--fog-y, 50%),
+    rgba(77, 45, 110, 0.3) 0%,
+    rgba(45, 27, 78, 0.2) 30%,
+    transparent 60%
+  );
+  transition: background 0.5s ease;
+}
+
+.fogLayer1 {
+  animation: fogDrift1 20s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.fogLayer2 {
+  animation: fogDrift2 25s ease-in-out infinite;
+  opacity: 0.3;
+  animation-delay: -10s;
+}
+
+.fogLayer3 {
+  animation: fogDrift3 30s ease-in-out infinite;
+  opacity: 0.25;
+  animation-delay: -20s;
+}
+
+@keyframes fogDrift1 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -30px);
+  }
+}
+
+@keyframes fogDrift2 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-25px, 20px);
+  }
+}
+
+@keyframes fogDrift3 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(15px, 25px);
+  }
+}
+
+/* Fog parts when hovering over tombstone */
+.fogParting {
+  background: radial-gradient(
+    ellipse at var(--fog-x, 50%) var(--fog-y, 50%),
+    rgba(77, 45, 110, 0.05) 0%,
+    rgba(45, 27, 78, 0.02) 15%,
+    transparent 35%
+  ) !important;
+  opacity: 0.15 !important;
+  transition: background 0.6s ease, opacity 0.6s ease;
+}
+
 .header {
   text-align: center;
   margin-bottom: 2rem;

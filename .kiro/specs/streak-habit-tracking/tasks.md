@@ -217,10 +217,37 @@
 
 
 
-- [ ] Update NotesContext to call `recordActivity('note')`
-- [ ] Update TimerContext to call `recordActivity('focus')`
-- [ ] Add login tracking on App mount
-- [ ] Test all integration points
+- [x] Update NotesContext to call `recordActivity('note')`
+
+
+
+
+
+
+
+-
+
+- [x] Update TimerContext to call `recordActivity('focus')`
+
+
+
+
+
+
+
+- [x] Add login tracking on App mount
+
+
+- [x] Test all integration points
+
+
+
+
+
+
+
+
+
 
 **Acceptance:**
 - Completing task increments task streak
@@ -233,12 +260,46 @@
 ## Phase 2: Activity Heatmap (Week 2)
 
 ### Task 2.1: Heatmap Data Processing
+
+
+
 **Priority:** P1 | **Estimate:** 3h
-- [ ] Create `src/hooks/useActivityHeatmap.ts`
-- [ ] Implement activity level calculation
-- [ ] Generate 365-day data array
-- [ ] Add memoization for performance
-- [ ] Handle missing data gracefully
+- [x] Create `src/hooks/useActivityHeatmap.ts`
+
+
+
+
+
+
+
+
+- [x] Implement activity level calculation
+
+
+
+
+
+
+
+
+- [x] Generate 365-day data array
+
+
+
+- [x] Add memoization for performance
+
+
+
+
+
+
+- [x] Handle missing data gracefully
+
+
+
+
+
+
 
 **Acceptance:**
 - Generates correct activity levels (0-4)
@@ -249,13 +310,32 @@
 ---
 
 ### Task 2.2: Heatmap Component
-**Priority:** P1 | **Estimate:** 5h
-- [ ] Create `src/components/streaks/ActivityHeatmap.tsx`
-- [ ] Implement CSS Grid layout (7×53)
-- [ ] Create `HeatmapDay.tsx` cell component
-- [ ] Add hover tooltips with day details
-- [ ] Style with theme-aware colors
-- [ ] Add month labels
+**P-iority:** P1 | **Estimate:** 5h
+
+- [x] Create `src/components/streaks/ActivityHeatmap.tsx`
+
+-
+
+- [x] Implement CSS Grid layout (7×53)
+
+
+
+
+
+
+- [x] Create `HeatmapDay.tsx` cell component
+
+
+
+
+
+
+
+
+
+- [x] Add hover tooltips with day details
+- [x] Style with theme-aware colors
+- [x] Add month labels
 
 **Acceptance:**
 - Displays 365 days correctly
@@ -267,11 +347,64 @@
 
 ### Task 2.3: Heatmap Mobile Optimization
 **Priority:** P1 | **Estimate:** 3h
-- [ ] Implement virtualization for mobile
-- [ ] Show last 90 days on small screens
-- [ ] Add horizontal scroll
-- [ ] Optimize touch interactions
-- [ ] Test on various screen sizes
+- [x] Implement virtualization for mobile
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- [x] Show last 90 days on small screens
+
+
+
+
+
+
+- [x] Show last 90 days on small screens
+- [x] Add horizontal scroll
+
+
+
+
+
+
+
+
+
+
+
+
+- [x] Optimize touch interactions
+
+
+
+
+
+
+
+
+
+
+
+
+- [x] Test on various screen sizes
 
 **Acceptance:**
 - Smooth scrolling on mobile
@@ -283,11 +416,32 @@
 
 ### Task 2.4: Heatmap Interactions
 **Priority:** P2 | **Estimate:** 3h
-- [ ] Add click handler to show day details
+- [x] Add click handler to show day details
+
+
+
+
+
+- [x] Create day detail modal/popover
+
+
+
 - [ ] Create day detail modal/popover
-- [ ] Add filter by activity type
-- [ ] Implement keyboard navigation
+- [x] Add filter by activity type
+
+
+
+
+
+- [x] Implement keyboard navigation
+
+
+- [x] Add screen reader descriptions
+
+
+
 - [ ] Add screen reader descriptions
+
 
 **Acceptance:**
 - Click shows detailed breakdown
@@ -300,12 +454,32 @@
 ## Phase 3: Token System & Recovery (Week 3)
 
 ### Task 3.1: Token Economy Logic
-**Priority:** P1 | **Estimate:** 3h
-- [ ] Implement token earning rules
-- [ ] Add milestone detection
-- [ ] Implement token usage validation
-- [ ] Add 48-hour recovery window check
-- [ ] Enforce 3-token maximum
+- [x] Implement token earning rules
+
+
+- [x] Implement token earning rules
+
+- [x] Add milestone detection
+
+
+
+
+- [x] Implement token usage validation
+
+
+
+
+
+
+
+
+-
+
+- [x] Add 48-hour recovery window check
+
+
+
+- [x] Enforce 3-token maximum
 
 **Acceptance:**
 - Tokens earned at correct milestones
@@ -317,12 +491,41 @@
 
 ### Task 3.2: Streak Recovery Modal
 **Priority:** P1 | **Estimate:** 4h
-- [ ] Create `src/components/streaks/StreakRecoveryModal.tsx`
-- [ ] Show broken streak info
-- [ ] Display available tokens
-- [ ] Add confirmation flow
-- [ ] Show success/error states
-- [ ] Style with mystical theme
+- [x] Create `src/components/streaks/StreakRecoveryModal.tsx`
+
+
+
+
+
+- [x] Show broken streak info
+
+
+
+- [x] Display available tokens
+
+
+
+
+- [x] Add confiyrmation flow
+
+
+
+- [x] Show success/error states
+
+
+
+
+
+- [x] Style with mystical theme
+
+
+
+
+
+
+
+
+
 
 **Acceptance:**
 - Modal appears when streak broken
@@ -334,11 +537,31 @@
 
 ### Task 3.3: Token Display UI
 **Priority:** P1 | **Estimate:** 2h
-- [ ] Create `src/components/streaks/StreakTokens.tsx`
-- [ ] Show token count (●●○ style)
-- [ ] Add tooltip explaining tokens
-- [ ] Show next token milestone
-- [ ] Animate token earning
+- [x] Create `src/components/streaks/StreakTokens.tsx`
+
+
+
+
+- [x] Show token count (●●○ style)
+
+
+
+-
+
+- [x] Add tooltip explaining tokens
+
+
+-
+
+- [x] Show next token milestone
+
+
+
+- [x] Animate token earning
+
+
+
+
 
 **Acceptance:**
 - Visual representation clear
@@ -349,13 +572,24 @@
 ---
 
 ### Task 3.4: Notification System
-**Priority:** P1 | **Estimate:** 4h
-- [ ] Create `src/hooks/useStreakNotifications.ts`
-- [ ] Implement warning notifications (8pm)
-- [ ] Add milestone notifications
-- [ ] Add weekly summary
-- [ ] Integrate with companion dialogue
-- [ ] Add notification settings
+**P-iority:** P1 | **Estimate:** 4h
+
+- [x] Create `src/hooks/useStreakNotifications.ts`
+
+
+
+
+
+-
+
+- [x] Implement warning notifications (8pm)
+
+
+
+- [x] Add milestone notifications
+- [x] Add weekly summary
+- [x] Integrate with companion dialogue
+- [x] Add notification settings
 
 **Acceptance:**
 - Notifications fire at correct times
@@ -369,12 +603,35 @@
 
 ### Task 4.1: Streak Dashboard Page
 **Priority:** P1 | **Estimate:** 4h
-- [ ] Create `src/components/streaks/StreakDashboard.tsx`
-- [ ] Layout all streak cards
-- [ ] Add activity heatmap
-- [ ] Show token display
-- [ ] Add milestone progress
-- [ ] Create navigation route
+- [x] Create `src/components/streaks/StreakDashboard.tsx`
+
+
+
+
+
+- [x] Layout all streak cards
+
+
+
+-
+
+- [-] Add activity heatmap
+
+
+
+
+
+
+- [x] Show token display
+
+
+- [x] Add milestone progress
+
+
+
+
+- [x] Create navigation route
+
 
 **Acceptance:**
 - All components integrated
@@ -387,6 +644,7 @@
 ### Task 4.2: Streak Indicator in Nav
 **Priority:** P2 | **Estimate:** 2h
 - [ ] Create `src/components/common/StreakIndicator.tsx`
+
 - [ ] Show mini fire icon with number
 - [ ] Add tooltip with all streaks
 - [ ] Pulse animation when at risk

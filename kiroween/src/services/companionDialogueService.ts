@@ -67,6 +67,16 @@ const DIALOGUE_DATABASE = {
         'Knowledge is power. Record it well.',
         'Your notes will outlast memory.',
         'Wisdom preserved is wisdom multiplied.'
+      ],
+      'tarot': [
+        'The cards reveal hidden truths.',
+        'Let the mysteries of your code be unveiled.',
+        'The future of your project lies in these readings.'
+      ],
+      'graveyard': [
+        'Each completed task rests peacefully here.',
+        'The graveyard holds your accomplishments.',
+        'Your finished work finds eternal rest in this place.'
       ]
     },
     mood: {
@@ -154,6 +164,16 @@ const DIALOGUE_DATABASE = {
         'Knowledge grows like a mighty oak.',
         'Each note is a leaf on your tree of wisdom.',
         'Cultivate your thoughts with care.'
+      ],
+      'tarot': [
+        'The cards bloom like flowers, revealing growth patterns.',
+        'Nature\'s wisdom guides your code\'s journey.',
+        'The forest sees patterns in your commits.'
+      ],
+      'graveyard': [
+        'Completed tasks return to the earth, enriching the soil.',
+        'Your finished work nourishes future growth.',
+        'The graveyard is a garden of accomplishments.'
       ]
     },
     mood: {
@@ -241,6 +261,16 @@ const DIALOGUE_DATABASE = {
         'Knowledge is the fuel for your inner fire.',
         'Record your burning insights.',
         'Let your notes spark inspiration.'
+      ],
+      'tarot': [
+        'The cards burn with prophetic fire!',
+        'Let the flames reveal your code\'s destiny.',
+        'The embers glow with insights from your commits.'
+      ],
+      'graveyard': [
+        'Completed tasks fuel the eternal flame.',
+        'Your finished work keeps the fire burning bright.',
+        'The graveyard is a pyre of accomplishments.'
       ]
     },
     mood: {

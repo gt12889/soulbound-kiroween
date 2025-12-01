@@ -1,5 +1,8 @@
 import { useRef, useEffect, useCallback, useState, forwardRef, useImperativeHandle } from 'react';
 import GhostWriterModal from './GhostWriterModal';
+import { PaperTexture } from './PaperTexture';
+import { GhostlyCursor } from './GhostlyCursor';
+import { InkSplotch } from './InkSplotch';
 import styles from './WritingEditor.module.css';
 
 interface WritingEditorProps {
@@ -24,7 +27,11 @@ const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onT
   const editorRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentText, setCurrentText] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [inkSplotches, setInkSplotches] = useState<Array<{ id: number; x: number; y: number; size: 'small' | 'medium' | 'large' }>>([]);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const splotchIdCounter = useRef(0);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Extract current sentence or paragraph context
   const extractContext = useCallback((text: string, position: number): string => {
@@ -92,6 +99,30 @@ const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onT
     setCurrentText(text);
     const position = getCursorPosition();
     const context = extractContext(text, position);
+    
+    // Track typing state
+    setIsTyping(true);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 500);
+
+    // Add ink splotch occasionally (1% chance per character)
+    if (Math.random() < 0.01 && editorRef.current) {
+      const rect = editorRef.current.getBoundingClientRect();
+      const size = Math.random() < 0.7 ? 'small' : Math.random() < 0.9 ? 'medium' : 'large';
+      setInkSplotches((prev) => [
+        ...prev,
+        {
+          id: splotchIdCounter.current++,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size,
+        },
+      ]);
+    }
     
     if (onTextChange) {
       onTextChange(text, context, position);
@@ -212,7 +243,14 @@ const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onT
   }, [currentText]);
 
   return (
-    <div className={styles.editorContainer}>
+    <PaperTexture className={styles.editorContainer}>
+      <GhostlyCursor isTyping={isTyping} enabled={true} />
+      <InkSplotch 
+        splotches={inkSplotches} 
+        onSplotchComplete={(id) => {
+          setInkSplotches((prev) => prev.filter((s) => s.id !== id));
+        }} 
+      />
       <div className={styles.toolbar} role="toolbar" aria-label="Writing tools">
         <button
           className={`${styles.ghostButton} button-primary`}
@@ -244,7 +282,7 @@ const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onT
         currentText={currentText}
         onInsertText={insertSuggestion}
       />
-    </div>
+    </PaperTexture>
   );
 });
 

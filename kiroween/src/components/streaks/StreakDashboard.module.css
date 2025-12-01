@@ -1,0 +1,334 @@
+/* StreakDashboard.module.css */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--bg-secondary);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header */
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.titleIcon {
+  font-size: 2.5rem;
+  animation: flicker 3s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 0, 0.6));
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.8));
+  }
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Section Titles */
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Token Section */
+.tokenSection {
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* Streaks Section */
+.streaksSection {
+  margin-bottom: 3rem;
+}
+
+.streaksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Milestone Section */
+.milestoneSection {
+  margin-bottom: 3rem;
+}
+
+.milestoneCard {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.milestoneHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.milestoneIcon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+}
+
+.milestoneInfo {
+  flex: 1;
+}
+
+.milestoneTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.milestoneSubtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Milestone Progress Bar */
+.milestoneProgress {
+  margin-bottom: 2rem;
+}
+
+.milestoneProgressBar {
+  width: 100%;
+  height: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.milestoneProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  border-radius: 6px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.5);
+}
+
+.milestoneProgressLabel {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* All Milestones List */
+.allMilestones {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.allMilestonesTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.milestonesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.milestoneItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.milestoneItem.achieved {
+  background: rgba(var(--accent-rgb), 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.milestoneItem.current {
+  background: rgba(var(--accent-rgb), 0.15);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.3);
+}
+
+.milestoneItemIcon {
+  font-size: 1rem;
+}
+
+.milestoneItemLabel {
+  white-space: nowrap;
+}
+
+/* Heatmap Section */
+.heatmapSection {
+  margin-bottom: 3rem;
+}
+
+/* Screen Reader Only */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .titleIcon {
+    font-size: 2rem;
+  }
+  
+  .streaksGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .milestoneCard {
+    padding: 1.5rem;
+  }
+  
+  .milestoneHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .milestoneIcon {
+    font-size: 2rem;
+  }
+  
+  .milestoneTitle {
+    font-size: 1.25rem;
+  }
+  
+  .milestonesList {
+    gap: 0.5rem;
+  }
+  
+  .milestoneItem {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .milestoneCard {
+    padding: 1rem;
+  }
+  
+  .milestonesList {
+    justify-content: center;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .milestoneCard {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .titleIcon {
+    animation: none;
+  }
+  
+  .milestoneProgressFill {
+    transition: none;
+  }
+  
+  .loadingSpinner {
+    animation: none;
+    border-top-color: transparent;
+  }
+}

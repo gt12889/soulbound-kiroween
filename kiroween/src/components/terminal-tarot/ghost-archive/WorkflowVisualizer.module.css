@@ -1,0 +1,88 @@
+.workflowVisualizer {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 136, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.visualizerTitle {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #ff88ff;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(255, 136, 255, 0.5);
+}
+
+.workflowItem {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 136, 255, 0.1);
+  border-radius: 4px;
+}
+
+.workflowItem:last-child {
+  margin-bottom: 0;
+}
+
+.workflowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.workflowName {
+  font-weight: bold;
+  color: #ff88ff;
+  text-shadow: 0 0 8px rgba(255, 136, 255, 0.5);
+}
+
+.workflowStatus {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 136, 255, 0.1);
+  border: 1px solid rgba(255, 136, 255, 0.3);
+  border-radius: 4px;
+  color: #ffaaff;
+  text-transform: uppercase;
+}
+
+.progressBar {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 136, 255, 0.3);
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff88ff, #ffaaff);
+  box-shadow: 0 0 10px rgba(255, 136, 255, 0.5);
+  transition: width 0.3s ease;
+  animation: workflow-glow 2s ease-in-out infinite;
+}
+
+@keyframes workflow-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(255, 136, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 136, 255, 0.8);
+  }
+}
+
+.currentStep {
+  font-size: 0.75rem;
+  color: #ffaaff;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}
+
