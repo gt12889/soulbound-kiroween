@@ -23,19 +23,25 @@ export const GhostlyCursor: React.FC<GhostlyCursorProps> = ({
 
     const handleMouseMove = (e: MouseEvent) => {
       targetPosition.current = { x: e.clientX, y: e.clientY };
-    };
-
-    const handleMouseEnter = () => {
-      setCursorState('hover');
-    };
-
-    const handleMouseLeave = () => {
-      setCursorState('default');
+      
+      // Check if hovering over an interactive element
+      const target = e.target as HTMLElement;
+      if (target) {
+        const isInteractive = 
+          target.tagName === 'BUTTON' ||
+          target.tagName === 'A' ||
+          target.closest('button') !== null ||
+          target.closest('a') !== null ||
+          target.closest('[role="button"]') !== null ||
+          target.closest('[onclick]') !== null ||
+          target.style.cursor === 'pointer' ||
+          window.getComputedStyle(target).cursor === 'pointer';
+        
+        setCursorState(isInteractive ? 'hover' : 'default');
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseenter', handleMouseEnter);
-    document.addEventListener('mouseleave', handleMouseLeave);
 
     // Smooth cursor animation
     const animate = () => {
@@ -55,8 +61,6 @@ export const GhostlyCursor: React.FC<GhostlyCursorProps> = ({
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-      document.removeEventListener('mouseleave', handleMouseLeave);
       cancelAnimationFrame(animationId);
     };
   }, [enabled, position]);

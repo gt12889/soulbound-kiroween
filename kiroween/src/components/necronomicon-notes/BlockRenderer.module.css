@@ -33,6 +33,11 @@
   transition: background 0.15s ease;
   word-wrap: break-word;
   white-space: pre-wrap;
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  text-align: left !important;
 }
 
 .blockContent:focus {

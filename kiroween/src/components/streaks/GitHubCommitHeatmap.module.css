@@ -1,0 +1,139 @@
+.container {
+  margin-bottom: 3rem;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.subtitle strong {
+  color: var(--accent-purple-light);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--bg-secondary);
+  border-top-color: var(--accent-purple);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorContainer {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid var(--accent-orange, #f97316);
+  border-radius: 6px;
+}
+
+.errorMessage {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--accent-orange, #f97316);
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.errorHint {
+  font-family: 'Lora', serif;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+.emptyState {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: 'Lora', serif;
+}
+
+.emptyState p {
+  margin: 0.5rem 0;
+}
+
+.emptyHint {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.yearSelector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.yearLabel {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.yearSelect {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yearSelect:hover {
+  border-color: var(--accent-purple);
+  background: var(--bg-tertiary);
+}
+
+.yearSelect:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+

@@ -536,6 +536,12 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({
               <span className={styles.tooltipIcon}>⏱️</span>
               <span>{hoveredDay.activities.focusMinutes} min focus</span>
             </div>
+            {hoveredDay.activities.commits !== undefined && hoveredDay.activities.commits > 0 && (
+              <div className={styles.tooltipStat}>
+                <span className={styles.tooltipIcon}>🐙</span>
+                <span>{hoveredDay.activities.commits} commits</span>
+              </div>
+            )}
           </div>
           {hoveredDay.level === 0 && (
             <div className={styles.tooltipEmpty}>No activity</div>

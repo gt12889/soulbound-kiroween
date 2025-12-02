@@ -65,14 +65,8 @@ service cloud.firestore {
         && data.completed is bool;
     }
     
-    // Helper function to validate settings data
-    function isValidSettings() {
-      let data = request.resource.data;
-      return (data.audioEnabled == null || data.audioEnabled is bool)
-        && (data.audioVolume == null || (data.audioVolume is number && data.audioVolume >= 0 && data.audioVolume <= 100))
-        && (data.theme == null || data.theme is string)
-        && (data.keyboardShortcuts == null || data.keyboardShortcuts is list);
-    }
+    // Note: Settings validation removed - using permissive rules instead
+    // This allows flexible settings structure including GitHub connection data
     
     // User profile rules
     match /users/{userId}/profile/{document=**} {
@@ -113,9 +107,11 @@ service cloud.firestore {
     }
     
     // Settings rules
+    // Allow any settings document structure for flexibility (GitHub, preferences, etc.)
     match /users/{userId}/settings/{document=**} {
       allow read: if isOwner(userId);
-      allow write: if isOwner(userId) && isValidSettings();
+      // More permissive: allow any settings data structure as long as user owns it
+      allow write: if isOwner(userId);
     }
     
     // Companion data rules

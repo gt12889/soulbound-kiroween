@@ -132,16 +132,10 @@ export const COMPANION_TYPES: Record<CompanionType, CompanionDefinition> = {
         requiredPoints: 50,
       },
       {
-        name: 'Lich Companion',
-        emoji: '👑',
-        description: 'Eternal wisdom',
-        requiredPoints: 100,
-      },
-      {
         name: 'Death Lord',
         emoji: '☠️',
         description: 'Master of undeath',
-        requiredPoints: 200,
+        requiredPoints: 100,
       },
     ],
   },

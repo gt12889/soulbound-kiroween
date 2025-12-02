@@ -16,6 +16,15 @@ import type { WorkItem } from '../services/testGenerationService';
 import { codebaseReviewService } from '../services/codebaseReviewService';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAudio } from '../hooks/useAudio';
+import { isQuestion, detectQuestionIntent, isCommand, detectInputType } from '../utils/questionDetection';
+import { terminalGuideService } from '../services/terminalGuideService';
+import type { GuideState } from '../services/terminalGuideService';
+
+export interface TerminalOption {
+  number: number;
+  command: string;
+  description: string;
+}
 
 interface GhostArchiveContextType {
   // State
@@ -27,6 +36,7 @@ interface GhostArchiveContextType {
   loreEvents: LoreEvent[];
   workflows: Record<string, WorkflowResult>;
   commandHistory: string[];
+  availableOptions: TerminalOption[];
   
   // Actions
   connectAgent: (agentId: string) => Promise<void>;
@@ -37,6 +47,8 @@ interface GhostArchiveContextType {
   clearTerminal: () => void;
   getPersonalities: () => Agent[];
   getPersonality: (id: string) => Agent | undefined;
+  setAvailableOptions: (options: TerminalOption[]) => void;
+  getOptionByNumber: (number: number) => TerminalOption | undefined;
 }
 
 const GhostArchiveContext = createContext<GhostArchiveContextType | undefined>(undefined);
@@ -82,6 +94,56 @@ export const GhostArchiveProvider: React.FC<GhostArchiveProviderProps> = ({ chil
   const [loreEvents, setLoreEvents] = useState<LoreEvent[]>([]);
   const [workflows, setWorkflows] = useState<Record<string, WorkflowResult>>({});
   const [commandHistory, setCommandHistory] = useLocalStorage<string[]>('ghost-archive-history', []);
+  const [availableOptions, setAvailableOptions] = useState<TerminalOption[]>([]);
+  const [guideState, setGuideState] = useLocalStorage<GuideState>('ghost-archive-guide-state', {
+    stage: 'new',
+    featuresDiscovered: [],
+    interactionCount: 0,
+    lastInteraction: Date.now(),
+  });
+
+  // Clean up terminal output on mount - filter out old lore events and limit history
+  useEffect(() => {
+    const now = Date.now();
+    const oneHourAgo = now - 3600000; // 1 hour ago
+    
+    setTerminalOutput(prev => {
+      // Filter out old lore events (type 'agent' that are older than 1 hour)
+      const filtered = prev.filter(output => {
+        // Keep all non-agent outputs
+        if (output.type !== 'agent') return true;
+        
+        // Keep agent outputs that are recent (within 1 hour)
+        if (output.timestamp > oneHourAgo) return true;
+        
+        // Filter out old lore events (but keep actual agent interactions)
+        // Lore events typically don't have agentName or have generic messages
+        const isLoreEvent = !output.agentName || 
+          output.content.includes('SYSTEM ERROR') ||
+          output.content.includes('CORRUPTION') ||
+          output.content.includes('Ancient text') ||
+          output.content.includes('A chill runs') ||
+          output.content.includes('The terminal seems') ||
+          output.content.includes('Strange symbols') ||
+          output.content.includes('A faint whisper') ||
+          output.content.includes('The screen flickers') ||
+          output.content.includes('A lost document') ||
+          output.content.includes('A new fragment') ||
+          output.content.includes('The boundaries') ||
+          output.content.includes('REALITY.GLITCH');
+        
+        // Remove old lore events, keep old agent interactions
+        if (isLoreEvent && output.timestamp < oneHourAgo) {
+          return false;
+        }
+        
+        return true;
+      });
+      
+      // Limit to last 100 outputs to keep history manageable
+      return filtered.slice(-100);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load fragments on mount
   useEffect(() => {
@@ -93,32 +155,79 @@ export const GhostArchiveProvider: React.FC<GhostArchiveProviderProps> = ({ chil
     });
   }, [setFragments]);
 
+  // Define addOutput before it's used in useEffects
   const addOutput = useCallback((output: Omit<TerminalOutput, 'id' | 'timestamp'>) => {
     const newOutput: TerminalOutput = {
       ...output,
       id: `output-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
     };
-    setTerminalOutput(prev => [...prev, newOutput]);
+    setTerminalOutput(prev => {
+      const updated = [...prev, newOutput];
+      // Limit to last 200 outputs to prevent infinite growth
+      return updated.slice(-200);
+    });
   }, [setTerminalOutput]);
 
-  // Random lore events
+  // Add welcome message and guided options on first load
   useEffect(() => {
+    if (terminalOutput.length === 0 && commandHistory.length === 0) {
+      const welcomeOptions: TerminalOption[] = [
+        { number: 1, command: 'list', description: 'Browse available personalities' },
+        { number: 2, command: 'workflows', description: 'See available workflows' },
+        { number: 3, command: 'help', description: 'View all commands' },
+      ];
+      setAvailableOptions(welcomeOptions);
+      addOutput({
+        type: 'output',
+        content: `👻 Welcome to the Ghost Archive Terminal
+
+Connect with historical personalities and explore their knowledge.
+
+Quick Start:
+  1. Browse personalities    - Connect with historical figures
+  2. See workflows          - Execute predefined workflows
+  3. View all commands      - Get help with commands
+
+💡 You can also:
+  • Ask questions naturally (no "ask" command needed)
+  • Type numbers to select options
+  • Use "help" anytime for guidance
+
+What would you like to explore?`,
+      });
+    }
+  }, [terminalOutput.length, commandHistory.length, setAvailableOptions, addOutput]);
+
+  // Random lore events - reduced frequency and only when agents are active
+  useEffect(() => {
+    // Only generate lore events if there are active agents or user is actively using terminal
+    // Increase interval to 3 minutes and only if terminal has recent activity
     const interval = setInterval(() => {
-      const event = loreEventService.generateEvent(activeAgents);
-      if (event) {
-        setLoreEvents(prev => [...prev, event]);
-        playLoreEvent(); // Play lore event sound
-        addOutput({
-          type: 'agent',
-          content: event.message,
-          agentId: event.agentId,
-        });
+      // Only show lore events if there are active agents or terminal has been used recently
+      const hasRecentActivity = terminalOutput.length > 0 && 
+        terminalOutput[terminalOutput.length - 1]?.timestamp > Date.now() - 300000; // 5 minutes
+      
+      if (activeAgents.length > 0 || hasRecentActivity) {
+        const event = loreEventService.generateEvent(activeAgents);
+        if (event) {
+          setLoreEvents(prev => {
+            const updated = [...prev, event];
+            // Limit lore events history to 50
+            return updated.slice(-50);
+          });
+          playLoreEvent(); // Play lore event sound
+          addOutput({
+            type: 'agent',
+            content: event.message,
+            agentId: event.agentId,
+          });
+        }
       }
-    }, 60000); // Check every minute
+    }, 180000); // Check every 3 minutes instead of 1 minute
 
     return () => clearInterval(interval);
-  }, [activeAgents, playLoreEvent, addOutput]);
+  }, [activeAgents, playLoreEvent, addOutput, terminalOutput]);
 
   const connectAgent = useCallback(async (agentId: string) => {
     try {
@@ -134,13 +243,32 @@ export const GhostArchiveProvider: React.FC<GhostArchiveProviderProps> = ({ chil
         agentId,
         agentName: agent?.name,
       });
+      
+      // Show contextual options after connecting
+      const connectionOptions = terminalGuideService.generateSuggestions(guideState, {
+        connectedAgent: agentId,
+        justConnected: true,
+      });
+      
+      setAvailableOptions(connectionOptions);
+      addOutput({
+        type: 'output',
+        content: `\n💡 You're now connected to ${agent?.name}! Try asking them questions naturally, or choose from the options above.`,
+      });
+      
+      // Update guide state
+      setGuideState(prev => ({
+        ...prev,
+        stage: 'connected',
+        featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'connect'])],
+      }));
     } catch (error) {
       addOutput({
         type: 'error',
         content: `Failed to connect to ${agentId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
-  }, [addOutput, playTerminalConnect]);
+  }, [addOutput, playTerminalConnect, setAvailableOptions]);
 
   const disconnectAgent = useCallback(() => {
     if (connectedAgent) {
@@ -221,6 +349,50 @@ Kiroween Codebase Structure:
       });
     }
   }, [addOutput]);
+
+  // Define clearTerminal before it's used in executeCommand
+  const clearTerminal = useCallback(() => {
+    setTerminalOutput([]);
+    setAvailableOptions([]);
+  }, [setTerminalOutput]);
+
+  // Define startFragmentRestoration before it's used in executeCommand
+  const startFragmentRestoration = useCallback(async (fragmentId: string) => {
+    const fragment = fragments.find(f => f.id === fragmentId);
+    if (!fragment) {
+      addOutput({ type: 'error', content: `Fragment ${fragmentId} not found` });
+      return;
+    }
+
+    setActiveFragment(fragmentId);
+    addOutput({
+      type: 'output',
+      content: `Starting restoration of: ${fragment.title}\n\n${fragment.corruptedText}`,
+    });
+
+    try {
+      const result = await workflowEngine.executeWorkflow('fragment-restoration', { fragment });
+      setWorkflows(prev => ({ ...prev, [fragmentId]: result }));
+      
+      if (result.success) {
+        playWorkflowComplete(); // Play workflow completion sound
+        addOutput({
+          type: 'output',
+          content: `Restoration suggestions:\n${JSON.stringify(result.result, null, 2)}`,
+        });
+      } else {
+        addOutput({
+          type: 'error',
+          content: `Restoration failed: ${result.error}`,
+        });
+      }
+    } catch (error) {
+      addOutput({
+        type: 'error',
+        content: `Restoration error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
+  }, [fragments, addOutput, playWorkflowComplete]);
 
   // Define executeTestGeneration before executeCommand so it can be used in dependencies
   const executeTestGeneration = useCallback(async (args: string[]) => {
@@ -320,6 +492,13 @@ Kiroween Codebase Structure:
     const trimmed = command.trim();
     if (!trimmed) return;
 
+    // Update guide state
+    setGuideState(prev => ({
+      ...prev,
+      interactionCount: prev.interactionCount + 1,
+      lastInteraction: Date.now(),
+    }));
+
     // Add to command history
     setCommandHistory(prev => {
       const newHistory = [...prev, trimmed];
@@ -337,6 +516,102 @@ Kiroween Codebase Structure:
     const args = parts.slice(1);
 
     try {
+      // Detect input type for conversational routing
+      const inputType = detectInputType(trimmed);
+
+      // Handle greetings
+      if (inputType === 'greeting') {
+        const isFirstTime = commandHistory.length === 0;
+        const greetingResponse = terminalGuideService.getGreetingResponse(isFirstTime);
+        const suggestions = terminalGuideService.generateSuggestions(guideState, {
+          availablePersonalities: ghostArchiveService.getPersonalities().map(p => p.id),
+        });
+        
+        addOutput({ type: 'output', content: greetingResponse });
+        setAvailableOptions(suggestions);
+        return;
+      }
+
+      // Handle farewells
+      if (inputType === 'farewell') {
+        const farewellMessage = terminalGuideService.getFarewellMessage();
+        addOutput({ type: 'output', content: farewellMessage });
+        setAvailableOptions([]);
+        return;
+      }
+
+      // Handle exploration phrases
+      if (inputType === 'exploration') {
+        const guidance = terminalGuideService.getExplorationGuidance(trimmed);
+        const suggestions = terminalGuideService.generateSuggestions(guideState, {
+          connectedAgent,
+        });
+        
+        addOutput({ type: 'output', content: guidance });
+        setAvailableOptions(suggestions);
+        return;
+      }
+
+      // Handle casual conversation
+      if (inputType === 'casual') {
+        const response = terminalGuideService.getCasualResponse(trimmed, { 
+          connectedAgent,
+          hasActiveAgents: activeAgents.length > 0,
+        });
+        const suggestions = terminalGuideService.generateSuggestions(guideState, {
+          connectedAgent,
+        });
+        
+        addOutput({ type: 'output', content: response });
+        setAvailableOptions(suggestions);
+        return;
+      }
+
+      // Natural language question detection - route questions automatically
+      if (inputType === 'question' && !isCommand(trimmed)) {
+        const intent = detectQuestionIntent(trimmed);
+        
+        if (intent === 'question' || intent === 'reasoning' || intent === 'collaboration') {
+          // Show contextual options for question handling
+          const questionOptions: TerminalOption[] = [
+            { number: 1, command: trimmed, description: 'Ask directly' },
+            { number: 2, command: `reason ${trimmed}`, description: 'Get detailed reasoning' },
+            { number: 3, command: `collaborate ${trimmed}`, description: 'Get multiple perspectives' },
+          ];
+          
+          // Auto-execute based on detected intent, but show options for user awareness
+          if (intent === 'reasoning') {
+            addOutput({ type: 'output', content: '🔍 Analyzing with multi-step reasoning...' });
+            const reasonedAnswer = await ghostArchiveService.ask(trimmed, undefined, 'multi');
+            setAvailableOptions(questionOptions);
+            addOutput({ 
+              type: 'output', 
+              content: `${reasonedAnswer}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+            });
+            return;
+          } else if (intent === 'collaboration') {
+            addOutput({ type: 'output', content: '👥 Engaging multiple agents...' });
+            const collaboration = await ghostArchiveService.ask(trimmed, undefined, 'collaborative');
+            setAvailableOptions(questionOptions);
+            addOutput({ 
+              type: 'output', 
+              content: `${collaboration}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+            });
+            return;
+          } else {
+            // Regular question - ask directly but show options
+            addOutput({ type: 'output', content: '💭 Thinking...' });
+            const answer = await ghostArchiveService.ask(trimmed);
+            setAvailableOptions(questionOptions);
+            addOutput({ 
+              type: 'output', 
+              content: `${answer}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+            });
+            return;
+          }
+        }
+      }
+
       switch (cmd) {
         case 'connect':
           if (args.length === 0) {
@@ -347,36 +622,53 @@ Kiroween Codebase Structure:
           break;
 
         case 'disconnect':
+          setAvailableOptions([]);
           disconnectAgent();
           break;
 
         case 'list':
           const personalities = ghostArchiveService.getPersonalities();
+          const personalityOptions: TerminalOption[] = personalities.map((p, index) => ({
+            number: index + 1,
+            command: `connect ${p.id}`,
+            description: `${p.name} (${p.era})`,
+          }));
+          setAvailableOptions(personalityOptions);
           addOutput({
             type: 'output',
-            content: `Available personalities:\n${personalities.map(p => `  - ${p.id}: ${p.name} (${p.era})`).join('\n')}`,
+            content: `Available personalities:\n${personalities.map((p, index) => `  ${index + 1}. ${p.id}: ${p.name} (${p.era})`).join('\n')}\n\n💡 Tip: Type a number to connect to that personality\n💡 Or ask: "Tell me about [personality name]"`,
           });
           break;
 
         case 'help':
+          const helpOptions: TerminalOption[] = [
+            { number: 1, command: 'list', description: 'List available personalities' },
+            { number: 2, command: 'workflows', description: 'List available workflows' },
+            { number: 3, command: 'agents', description: 'Show active agents and their status' },
+            { number: 4, command: 'history', description: 'Show command history' },
+            { number: 5, command: 'clear', description: 'Clear terminal' },
+          ];
+          setAvailableOptions(helpOptions);
           addOutput({
             type: 'output',
             content: `Available commands:
+  1. list                   - List available personalities
+  2. workflows              - List available workflows
+  3. agents                 - Show active agents and their status
+  4. history                - Show command history
+  5. clear                  - Clear terminal
   connect <personality>  - Connect to a historical personality
   disconnect             - Disconnect from current personality
-  list                   - List available personalities
   ask <question>         - Ask question to orchestrator
   reason <question>      - Get multi-reasoning analysis
   collaborate <task>     - Engage multiple agents on a task
   workflow <name>       - Execute a predefined workflow
-  workflows              - List available workflows
   restore                - Start fragment restoration workflow
   generate-tests <id>   - 🦇 Generate AI-powered test cases
   review-codebase       - 🔍 Review codebase (--focus=security|performance|architecture|code-quality|all, --depth=quick|standard|deep, --agent=<id>)
-  agents                 - Show active agents and their status
-  clear                  - Clear terminal
-  history                - Show command history
-  help                   - Show this help message`,
+  help                   - Show this help message
+
+💡 Tip: Type a number (1-5) to execute that command`,
           });
           break;
 
@@ -433,10 +725,29 @@ Kiroween Codebase Structure:
 
         case 'workflows':
           const availableWorkflows = workflowEngine.getWorkflows();
+          if (availableWorkflows.length === 0) {
+            addOutput({
+              type: 'output',
+              content: 'No workflows available. Check back later or ask: "What workflows are available?"',
+            });
+            break;
+          }
+          const workflowOptions: TerminalOption[] = availableWorkflows.map((w, index) => ({
+            number: index + 1,
+            command: `workflow ${w.id}`,
+            description: `${w.name} - ${w.description}`,
+          }));
+          setAvailableOptions(workflowOptions);
           addOutput({
             type: 'output',
-            content: `Available workflows:\n${availableWorkflows.map(w => `  - ${w.id}: ${w.name} - ${w.description}`).join('\n')}`,
+            content: `Available workflows:\n${availableWorkflows.map((w, index) => `  ${index + 1}. ${w.id}: ${w.name} - ${w.description}`).join('\n')}\n\n💡 Tip: Type a number to execute that workflow\n💡 Or ask: "Tell me about workflow [name]"`,
           });
+          
+          // Mark workflows as discovered
+          setGuideState(prev => ({
+            ...prev,
+            featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'workflows'])],
+          }));
           break;
 
         case 'restore':
@@ -473,6 +784,7 @@ Kiroween Codebase Structure:
           break;
 
         case 'clear':
+          setAvailableOptions([]);
           clearTerminal();
           break;
 
@@ -484,7 +796,50 @@ Kiroween Codebase Structure:
           break;
 
         default:
-          addOutput({ type: 'error', content: `Unknown command: ${cmd}. Type 'help' for available commands.` });
+          // Check if it might be a question or natural language (fallback for commands that weren't caught earlier)
+          if (!isCommand(trimmed) && isQuestion(trimmed)) {
+            const intent = detectQuestionIntent(trimmed);
+            if (intent === 'reasoning') {
+              addOutput({ type: 'output', content: '🔍 Analyzing with multi-step reasoning...' });
+              const reasonedAnswer = await ghostArchiveService.ask(trimmed, undefined, 'multi');
+              addOutput({ type: 'output', content: reasonedAnswer });
+              
+              // Mark reasoning as discovered
+              setGuideState(prev => ({
+                ...prev,
+                featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'reasoning'])],
+              }));
+              return;
+            } else if (intent === 'collaboration') {
+              addOutput({ type: 'output', content: '👥 Engaging multiple agents...' });
+              const collaboration = await ghostArchiveService.ask(trimmed, undefined, 'collaborative');
+              addOutput({ type: 'output', content: collaboration });
+              
+              // Mark collaboration as discovered
+              setGuideState(prev => ({
+                ...prev,
+                featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'collaboration'])],
+              }));
+              return;
+            } else {
+              addOutput({ type: 'output', content: '💭 Thinking...' });
+              const answer = await ghostArchiveService.ask(trimmed);
+              addOutput({ type: 'output', content: answer });
+              return;
+            }
+          }
+          
+          // Generate helpful error with contextual suggestions
+          const { message, suggestions } = terminalGuideService.generateHelpfulError(trimmed, {
+            connectedAgent,
+            hasActiveAgents: activeAgents.length > 0,
+          });
+          
+          setAvailableOptions(suggestions);
+          addOutput({ 
+            type: 'output', 
+            content: message
+          });
       }
     } catch (error) {
       addOutput({
@@ -492,48 +847,7 @@ Kiroween Codebase Structure:
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
-  }, [addOutput, connectAgent, disconnectAgent, commandHistory, fragments, setCommandHistory, executeTestGeneration, executeCodebaseReview]);
-
-  const startFragmentRestoration = useCallback(async (fragmentId: string) => {
-    const fragment = fragments.find(f => f.id === fragmentId);
-    if (!fragment) {
-      addOutput({ type: 'error', content: `Fragment ${fragmentId} not found` });
-      return;
-    }
-
-    setActiveFragment(fragmentId);
-    addOutput({
-      type: 'output',
-      content: `Starting restoration of: ${fragment.title}\n\n${fragment.corruptedText}`,
-    });
-
-    try {
-      const result = await workflowEngine.executeWorkflow('fragment-restoration', { fragment });
-      setWorkflows(prev => ({ ...prev, [fragmentId]: result }));
-      
-      if (result.success) {
-        playWorkflowComplete(); // Play workflow completion sound
-        addOutput({
-          type: 'output',
-          content: `Restoration suggestions:\n${JSON.stringify(result.result, null, 2)}`,
-        });
-      } else {
-        addOutput({
-          type: 'error',
-          content: `Restoration failed: ${result.error}`,
-        });
-      }
-    } catch (error) {
-      addOutput({
-        type: 'error',
-        content: `Restoration error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      });
-    }
-  }, [fragments, addOutput, playWorkflowComplete]);
-
-  const clearTerminal = useCallback(() => {
-    setTerminalOutput([]);
-  }, [setTerminalOutput]);
+  }, [addOutput, connectAgent, disconnectAgent, commandHistory, fragments, setCommandHistory, executeTestGeneration, executeCodebaseReview, setAvailableOptions, clearTerminal, startFragmentRestoration, guideState, setGuideState, connectedAgent, activeAgents]);
 
   const getPersonalities = useCallback(() => {
     return ghostArchiveService.getPersonalities();
@@ -542,6 +856,10 @@ Kiroween Codebase Structure:
   const getPersonality = useCallback((id: string) => {
     return ghostArchiveService.getPersonality(id);
   }, []);
+
+  const getOptionByNumber = useCallback((number: number): TerminalOption | undefined => {
+    return availableOptions.find(opt => opt.number === number);
+  }, [availableOptions]);
 
   return (
     <GhostArchiveContext.Provider
@@ -554,6 +872,7 @@ Kiroween Codebase Structure:
         loreEvents,
         workflows,
         commandHistory,
+        availableOptions,
         connectAgent,
         disconnectAgent,
         addOutput,
@@ -562,6 +881,8 @@ Kiroween Codebase Structure:
         clearTerminal,
         getPersonalities,
         getPersonality,
+        setAvailableOptions,
+        getOptionByNumber,
       }}
     >
       {children}

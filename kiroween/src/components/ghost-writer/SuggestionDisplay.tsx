@@ -31,19 +31,12 @@ const SuggestionDisplay: React.FC<SuggestionDisplayProps> = ({
   isAccepting = false,
   isOptimistic = false,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Start visible to prevent flash
   const [showCheckmark, setShowCheckmark] = useState(false);
   const [checkmarkFading, setCheckmarkFading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Trigger fade-in animation on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 50);
-
-    return () => clearTimeout(timer);
-  }, []);
+  // No delay needed - component starts visible
 
   // Handle acceptance animation sequence
   useEffect(() => {

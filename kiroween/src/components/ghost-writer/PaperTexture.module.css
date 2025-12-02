@@ -1,6 +1,11 @@
 /* Paper Texture Background */
 .paperTexture {
   position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: 
     /* Aged paper base */
     #f4e8d0,
@@ -48,7 +53,7 @@
   position: relative;
 }
 
-/* Torn edge decoration */
+/* Torn edge decoration - removed diagonal lines */
 .paperTexture::before {
   content: '';
   position: absolute;
@@ -56,14 +61,7 @@
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: 
-    repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 3px,
-      rgba(139, 115, 85, 0.2) 3px,
-      rgba(139, 115, 85, 0.2) 4px
-    );
+  background: transparent;
   z-index: -1;
   border-radius: 2px;
 }

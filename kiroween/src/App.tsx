@@ -32,6 +32,7 @@ import PasswordReset from './components/auth/PasswordReset';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useUndoRedoShortcuts } from './hooks/useUndoRedoShortcuts';
 import { useSettingsInitialization, useSettingsPersistence } from './hooks/useSettingsInitialization';
+import { useDailyLoginNotification } from './hooks/useDailyLoginNotification';
 import { DEFAULT_SHORTCUTS } from './utils/keyboardShortcuts';
 import { ComposeProviders } from './utils/ComposeProviders';
 import './App.css';
@@ -91,7 +92,7 @@ const AppContent: React.FC = () => {
     'navigate-necronomicon-notes': () => navigate('/necronomicon-notes'),
     'navigate-graveyard-dashboard': () => navigate('/graveyard-dashboard'),
     'navigate-cursed-calendar': () => navigate('/cursed-calendar'),
-    'navigate-streaks': () => navigate('/streaks'),
+    'navigate-streaks': () => navigate('/achievements'),
     'navigate-achievements': () => navigate('/achievements'),
     'navigate-search': () => setShowGlobalSearch(true),
   });
@@ -110,6 +111,9 @@ const AppContent: React.FC = () => {
   // Register undo/redo keyboard shortcuts (Ctrl+Z, Ctrl+Y)
   // Requirements: 8.2, 8.3, 8.4
   useUndoRedoShortcuts();
+
+  // Show daily login streak notification
+  useDailyLoginNotification();
 
   // Bootup animation handler disabled for performance
   // const handleBootupComplete = () => {
@@ -257,15 +261,10 @@ const AppContent: React.FC = () => {
                                                         </ErrorBoundary>
                                                       } 
                                                     />
+                                                    {/* Redirect /streaks to /achievements - merged pages */}
                                                     <Route 
                                                       path="/streaks" 
-                                                      element={
-                                                        <ErrorBoundary>
-                                                          <ProtectedRoute>
-                                                            <StreakDashboard />
-                                                          </ProtectedRoute>
-                                                        </ErrorBoundary>
-                                                      } 
+                                                      element={<Navigate to="/achievements" replace />}
                                                     />
                                                     <Route path="/search" element={<Navigate to="/" replace />} />
                                                   </Routes>

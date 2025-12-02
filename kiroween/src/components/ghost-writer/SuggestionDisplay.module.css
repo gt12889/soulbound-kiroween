@@ -25,42 +25,43 @@
   /* Glassmorphism effect */
   backdrop-filter: blur(10px);
   
-  /* Initial state - hidden */
-  opacity: 0;
-  transform: translateY(10px);
+  /* Initial state - visible to prevent flash */
+  opacity: 0.9;
+  transform: translateY(0);
   
   /* Smooth transitions */
   transition: 
     opacity 0.3s ease-in-out,
-    transform 0.5s ease-in-out,
+    transform 0.3s ease-in-out,
     background 0.3s ease,
     border-color 0.3s ease,
     box-shadow 0.3s ease;
   
-  /* Prevent interaction until visible */
-  pointer-events: none;
+  /* Allow interaction */
+  pointer-events: auto;
+  
+  /* Prevent flashing during state changes */
+  will-change: auto;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
-/* Visible state - fade-in and slide-up animation */
+/* Visible state - smooth appearance animation */
 .suggestionDisplay.visible {
   opacity: 0.9;
   transform: translateY(0);
   pointer-events: auto;
-  animation: ghostAppear 0.5s ease-out forwards;
+  animation: ghostAppear 0.3s ease-out forwards;
   will-change: transform, opacity;
   backface-visibility: hidden;
   contain: layout style paint;
 }
 
-/* Ghost appearance animation - combines fade-in and slide-up */
+/* Ghost appearance animation - smooth fade-in without flash */
 @keyframes ghostAppear {
   0% {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  60% {
-    opacity: 0.95;
-    transform: translateY(-2px) scale(1.01);
+    opacity: 0.85;
+    transform: translateY(2px) scale(0.99);
   }
   100% {
     opacity: 0.9;
@@ -73,7 +74,7 @@
   /* Reduced opacity to indicate it's a placeholder */
   opacity: 0.6;
   
-  /* Subtle pulsing animation */
+  /* Subtle pulsing animation - prevent flashing */
   animation: optimisticPulse 2s ease-in-out infinite;
   
   /* Slightly muted colors */
@@ -84,6 +85,17 @@
   box-shadow: 
     0 0 15px rgba(139, 92, 246, 0.2),
     0 4px 12px rgba(0, 0, 0, 0.15);
+  
+  /* Smooth transition when replacing with real suggestion */
+  transition: 
+    opacity 0.3s ease-in-out,
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  
+  /* Prevent layout shifts */
+  will-change: opacity;
+  contain: layout style paint;
 }
 
 .suggestionDisplay.optimistic .suggestionText {

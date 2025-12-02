@@ -116,7 +116,15 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
         onBlur={onBlur}
+        dir="ltr"
         data-placeholder={block.content.length === 0 ? 'Type / for commands' : undefined}
+        style={{
+          direction: 'ltr',
+          unicodeBidi: 'normal',
+          transform: 'scaleX(1)',
+          WebkitTransform: 'scaleX(1)',
+          textAlign: 'left',
+        }}
       >
         {block.content}
       </div>

@@ -7,7 +7,6 @@ import { useNotes } from '../../contexts/NotesContext';
 import { useTasks } from '../../contexts/TasksContext';
 import { useApp } from '../../contexts/AppContext';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
-import { StreakIndicator } from './StreakIndicator';
 import SettingsModal from './SettingsModal';
 import { ExportDialog } from '../import-export/ExportDialog';
 import QuickCapture from './QuickCapture';
@@ -36,8 +35,7 @@ const Navigation: React.FC = () => {
     { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest', shortcutId: 'nav-graveyard-dashboard' },
     { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
     { path: '/cursed-calendar', label: 'Cursed Calendar', icon: '📅', description: 'Schedule your doom', shortcutId: 'nav-cursed-calendar' },
-    { path: '/streaks', label: 'Eternal Flames', icon: '🔥', description: 'Your burning streaks', shortcutId: 'nav-streaks' },
-    { path: '/achievements', label: 'Deeds & Decrees', icon: '🏆', description: 'Your legend in the woods', shortcutId: 'nav-achievements' },
+    { path: '/achievements', label: 'Deeds & Flames', icon: '🏆', description: 'Achievements & streaks', shortcutId: 'nav-achievements' },
   ];
 
   // Memoized event handlers to prevent unnecessary re-renders
@@ -108,14 +106,14 @@ const Navigation: React.FC = () => {
       );
     });
 
-    // Register quick capture shortcut (Ctrl+K)
+    // Register quick note shortcut (Ctrl+K)
     // Requirement: 13.1
     registerShortcut(
       {
         id: 'quick-capture',
         action: 'open-quick-capture',
         keys: [], // Keys are defined in DEFAULT_SHORTCUTS
-        description: 'Open quick capture',
+        description: 'Open quick note',
         category: 'actions',
         customizable: true,
       },
@@ -174,7 +172,7 @@ const Navigation: React.FC = () => {
           {navItems.map((item) => (
             <li 
               key={item.path} 
-              className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
+              className={`${styles.navItem} ${(location.pathname === item.path || (item.path === '/achievements' && location.pathname === '/streaks')) ? styles.active : ''}`}
             >
               <Link 
                 to={item.path} 
@@ -197,19 +195,16 @@ const Navigation: React.FC = () => {
           {/* Sync Status Indicator - Requirements: 17.7 */}
           <SyncStatusIndicator />
           
-          {/* Streak Indicator - Requirements: Task 4.2 */}
-          <StreakIndicator />
-          
-          {/* Quick Capture Button - Requirements: 13.1, 6.1 */}
+          {/* Quick Note Button - Compact icon-only design */}
           <button 
-            className={styles.quickCaptureButton}
+            className={styles.quickNoteButton}
             onClick={handleQuickCaptureClick}
             onMouseEnter={handleNavHover}
-            title="Quick capture (Ctrl+K)"
-            aria-label="Quick capture (Ctrl+K)"
+            title="Quick Note (Ctrl+K)"
+            aria-label="Quick Note (Ctrl+K)"
           >
-            <span className={styles.quickCaptureIcon} aria-hidden="true">⚡</span>
-            <span className={styles.quickCaptureLabel}>Quick Capture</span>
+            <span className={styles.quickNoteIcon} aria-hidden="true">📝</span>
+            {sidebarMode === 'expanded' && <span className={styles.quickNoteLabel}>Quick Note</span>}
           </button>
           
           <button 

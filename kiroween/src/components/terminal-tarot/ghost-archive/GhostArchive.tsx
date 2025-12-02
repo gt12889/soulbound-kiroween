@@ -17,6 +17,8 @@ export const GhostArchive: React.FC = () => {
     terminalOutput,
     commandHistory,
     connectedAgent,
+    activeAgents,
+    workflows,
     executeCommand,
     getPersonality,
   } = useGhostArchive();
@@ -34,12 +36,11 @@ export const GhostArchive: React.FC = () => {
     };
   }, [connectedAgent, getPersonality]);
 
-  // Add welcome message on mount
-  useEffect(() => {
-    if (terminalOutput.length === 0) {
-      executeCommand('help');
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Check if sidebar should be shown
+  const showSidebar = activeAgents.length > 0 || Object.keys(workflows).length > 0;
+
+  // Welcome message is handled by context initialization
+  // No need to call help command here
 
   return (
     <div className={styles.ghostArchive}>
@@ -53,10 +54,12 @@ export const GhostArchive: React.FC = () => {
           </div>
 
           <div className={styles.terminalWrapper}>
-            <div className={styles.sidebar}>
-              <AgentStatusPanel />
-              <WorkflowVisualizer />
-            </div>
+            {showSidebar && (
+              <div className={styles.sidebar}>
+                <AgentStatusPanel />
+                <WorkflowVisualizer />
+              </div>
+            )}
 
             <div className={styles.mainTerminal}>
               <TerminalDisplay outputs={terminalOutput} theme={theme} />

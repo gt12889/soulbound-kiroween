@@ -121,6 +121,10 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: margin-left var(--timing-normal) var(--ease-standard), opacity var(--timing-transition) var(--ease-in-out), background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .main-content.sidebar-collapsed {

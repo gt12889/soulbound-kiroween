@@ -129,6 +129,7 @@ export interface HeatmapData {
     tasks: number;
     notes: number;
     focusMinutes: number;
+    commits?: number; // GitHub commits count
   };
 }
 

@@ -258,11 +258,15 @@ const GhostWriter: React.FC = React.memo(() => {
       log.log('Showing optimistic suggestion:', optimisticText);
       
       // Only show loading indicator for manual generation (not automatic background suggestions)
-      // Delay showing loading indicator by 200ms to avoid flash for fast responses
+      // Delay showing loading indicator by 500ms to avoid flash for fast responses
+      // Only show if still generating after delay
       if (isManual) {
         loadingDelayTimeoutRef.current = setTimeout(() => {
-          setShowLoadingIndicator(true);
-        }, 200);
+          // Double-check we're still generating before showing indicator
+          if (ghostState.isGenerating && !ghostState.isReady) {
+            setShowLoadingIndicator(true);
+          }
+        }, 500);
       }
       
       log.log('Requesting suggestion for context:', context.substring(0, 50) + '...', 'isManual:', isManual);
@@ -297,12 +301,11 @@ const GhostWriter: React.FC = React.memo(() => {
         confidence: 0.8,
       };
 
-      // Replace optimistic suggestion with real one
+      // Replace optimistic suggestion with real one smoothly
       log.log('Replacing optimistic suggestion with real one:', newSuggestion);
+      // Replace immediately without delay to prevent flashing
       setSuggestions([newSuggestion]);
       setIsOptimistic(false);
-      
-      // Reset suggestion index
       setCurrentSuggestionIndex(0);
       
       // Mark as ready

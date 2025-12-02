@@ -128,7 +128,7 @@ const EnhancedEditor: React.FC<EnhancedEditorProps> = ({
 
   return (
     <PaperTexture className={styles.enhancedEditor}>
-      <GhostlyCursor isTyping={isTyping} enabled={true} />
+      <GhostlyCursor isTyping={isTyping} enabled={false} />
       <InkSplotch 
         splotches={inkSplotches} 
         onSplotchComplete={(id) => {

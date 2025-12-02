@@ -1,0 +1,254 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.loading {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.connected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.connectedActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.updateButton {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.updateButton:hover:not(:disabled) {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--accent-purple);
+}
+
+.updateButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  color: var(--highlight-green);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.text {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.text strong {
+  color: var(--accent-purple-light);
+}
+
+.connectButton,
+.disconnectButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connectButton {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
+  color: var(--bg-primary);
+  box-shadow: 0 2px 8px var(--glow-purple);
+}
+
+.connectButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--glow-purple);
+}
+
+.connectButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.disconnectButton {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.disconnectButton:hover:not(:disabled) {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-color: var(--accent-purple);
+}
+
+.disconnectButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.githubIcon {
+  font-size: 1.2rem;
+}
+
+.manualInput {
+  width: 100%;
+}
+
+.manualInputLabel {
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.manualInputGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.manualInputField {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+}
+
+.manualInputField:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.manualInputButton,
+.manualInputCancel {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.manualInputButton {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-light));
+  color: var(--bg-primary);
+  box-shadow: 0 2px 8px var(--glow-purple);
+}
+
+.manualInputButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--glow-purple);
+}
+
+.manualInputButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.manualInputCancel {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.manualInputCancel:hover:not(:disabled) {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.manualInputCancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.manualInputHint {
+  font-family: 'Lora', serif;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--accent-purple-light);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+.linkButton:hover {
+  color: var(--accent-purple);
+}
+
+@media (max-width: 768px) {
+  .connected {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .disconnectButton {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .manualInputGroup {
+    flex-direction: column;
+  }
+  
+  .manualInputField,
+  .manualInputButton,
+  .manualInputCancel {
+    width: 100%;
+  }
+}
+

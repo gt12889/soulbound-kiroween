@@ -1,23 +1,30 @@
 .ghostWriter {
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 4rem);
+  min-height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+  background: var(--bg-primary);
   overflow: hidden;
   position: relative;
-  transition: background 0.3s ease;
+  /* Prevent flashing during state changes */
+  contain: layout style paint;
+  box-sizing: border-box;
 }
 
 /* Fog layers - Requirement 3.4 */
 .fogLayer {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
+  /* Prevent edge flashing */
+  overflow: hidden;
 }
 
 .fogLayer:nth-child(1) {
@@ -45,6 +52,7 @@
 }
 
 .header {
+  flex-shrink: 0;
   padding: 2rem 0 1rem;
   text-align: center;
   position: relative;
@@ -122,12 +130,15 @@
 }
 
 .editorWrapper {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   position: relative;
   z-index: 1;
   overflow: hidden;
   /* Ensure this is the positioning context for absolutely positioned children */
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Suggestion container - positions display and actions together */
@@ -170,7 +181,19 @@
 }
 
 /* Responsive design */
+@media (max-width: 1024px) {
+  .ghostWriter {
+    height: calc(100vh - 3rem);
+    min-height: calc(100vh - 3rem);
+  }
+}
+
 @media (max-width: 768px) {
+  .ghostWriter {
+    height: calc(100vh - 2rem);
+    min-height: calc(100vh - 2rem);
+  }
+
   .header {
     padding: 1.5rem 0 0.5rem;
   }
@@ -204,6 +227,11 @@
 }
 
 @media (max-width: 480px) {
+  .ghostWriter {
+    height: calc(100vh - 1.5rem);
+    min-height: calc(100vh - 1.5rem);
+  }
+
   .title {
     font-size: 1.5rem;
   }
@@ -255,7 +283,6 @@
   background: rgba(139, 92, 246, 0.05);
   border: 1px solid rgba(139, 92, 246, 0.2);
   border-radius: 6px;
-  backdrop-filter: blur(5px);
   transition: all 0.2s ease;
 }
 

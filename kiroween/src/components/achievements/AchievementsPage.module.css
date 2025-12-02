@@ -16,7 +16,60 @@
   font-size: 1.2rem;
   color: var(--text-secondary);
   font-style: italic;
+  margin-bottom: 2rem;
+}
+
+/* Main Tabs - Achievements vs Streaks */
+.mainTabs {
+  display: flex;
+  gap: 1rem;
   margin-bottom: 3rem;
+  justify-content: center;
+  border-bottom: 2px solid var(--border-primary);
+  padding-bottom: 0;
+}
+
+.mainTab {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  margin-bottom: -2px;
+}
+
+.mainTab:hover {
+  color: var(--text-primary);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.mainTab.active {
+  color: var(--accent-purple-light);
+  border-bottom-color: var(--accent-purple);
+  text-shadow: 0 0 10px var(--glow-purple);
+}
+
+.mainTab.active .tabIcon {
+  filter: drop-shadow(0 0 8px var(--glow-purple));
+  transform: scale(1.1);
+}
+
+.tabIcon {
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.tabLabel {
+  white-space: nowrap;
 }
 
 /* Spirit Companion Section */
@@ -75,15 +128,262 @@
   margin-top: 0.5rem;
 }
 
-/* Achievements Section */
+/* Deeds & Decrees Section */
+.deedsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 3rem 0 2rem 0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .sectionTitle {
   font-family: 'Cinzel', serif;
   font-size: 2rem;
   color: var(--text-primary);
-  margin: 3rem 0 2rem 0;
+  margin: 0;
+}
+
+.deedsStats {
+  display: flex;
+  gap: 1.5rem;
+  font-family: 'Lora', serif;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.deedStat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deedStat strong {
+  color: var(--accent-purple-light);
+  font-weight: 600;
+}
+
+/* Filter Tabs */
+.filterTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filterTab:hover {
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.filterTab.active {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--bg-primary);
+  box-shadow: 0 0 15px var(--glow-purple);
+}
+
+/* Unified Deeds Grid */
+.deedsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.deedCard {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.deedCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.deedCard.unlocked::before {
+  opacity: 1;
+}
+
+.deedCard.locked {
+  opacity: 0.6;
+  filter: grayscale(80%);
+}
+
+.deedCard.unlocked {
+  border-color: var(--accent-purple);
+  box-shadow: 0 0 20px var(--glow-purple);
+}
+
+.deedCard.milestone.unlocked {
+  border-color: var(--highlight-green);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+}
+
+.deedCard.skill.unlocked {
+  border-color: var(--accent-orange, #f97316);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+}
+
+.deedCard:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px var(--shadow-heavy);
+}
+
+.deedIcon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 10px var(--glow-purple));
+  transition: transform 0.3s ease;
+}
+
+.deedCard:hover .deedIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.deedCard.locked .deedIcon {
+  filter: none;
+}
+
+.deedTypeBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid var(--accent-purple);
+  border-radius: 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  color: var(--accent-purple-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deedCard.milestone .deedTypeBadge {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: var(--highlight-green);
+  color: var(--highlight-green);
+}
+
+.deedCard.skill .deedTypeBadge {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: var(--accent-orange, #f97316);
+  color: var(--accent-orange, #f97316);
+}
+
+.deedTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
+.deedDescription {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  text-align: center;
+  flex: 1;
+}
+
+.deedRewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.rewardBadge {
+  padding: 0.4rem 0.8rem;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  font-family: 'Lora', serif;
+  font-size: 0.8rem;
+  color: var(--accent-purple-light);
+  white-space: nowrap;
+}
+
+.unlockedBadge {
+  margin-top: auto;
+  padding: 0.5rem 1rem;
+  background: var(--highlight-green);
+  color: var(--bg-primary);
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .deedsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .deedsStats {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .filterTabs {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 0.5rem;
+  }
+
+  .filterTab {
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  .deedsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .deedCard {
+    padding: 1.5rem;
+  }
+}
+
+/* Legacy class names for backward compatibility */
 .achievementsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -139,16 +439,4 @@
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1rem;
-}
-
-.unlockedBadge {
-  margin-top: auto;
-  padding: 0.5rem 1rem;
-  background: var(--highlight-green);
-  color: var(--bg-primary);
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  font-size: 0.8rem;
-  border-radius: 20px;
-  text-transform: uppercase;
 }
