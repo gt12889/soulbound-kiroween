@@ -1,0 +1,64 @@
+.optionsDisplay {
+  margin: 0;
+  padding: 1rem;
+  background: rgba(0, 255, 0, 0.05);
+  border-top: 1px solid rgba(0, 255, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  font-family: 'Courier New', 'Courier', 'Consolas', monospace;
+  flex-shrink: 0; /* Prevent options from shrinking */
+  overflow-y: auto;
+  max-height: 200px; /* Limit height if many options */
+}
+
+.optionsTitle {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  color: #00ff88;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.optionItem {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+}
+
+.optionItem:hover {
+  background: rgba(0, 255, 0, 0.1);
+  padding-left: 0.5rem;
+  margin-left: -0.5rem;
+  border-radius: 4px;
+}
+
+.optionNumber {
+  font-weight: bold;
+  color: #00ff00;
+  min-width: 2rem;
+  text-align: center;
+  background: rgba(0, 255, 0, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.optionDescription {
+  flex: 1;
+  color: #88ff88;
+  word-wrap: break-word;
+}
+
+.optionsHint {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 255, 0, 0.1);
+  font-size: 12px;
+  font-style: italic;
+  color: #66ff66;
+}
+

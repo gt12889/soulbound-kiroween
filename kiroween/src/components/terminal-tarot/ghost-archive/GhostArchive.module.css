@@ -84,6 +84,7 @@
   overflow: hidden;
   height: 100%;
   min-height: 0;
+  gap: 0; /* Ensure no gaps between terminal, options, and input */
 }
 
 /* Target TerminalDisplay specifically - scrollable within 500px container */

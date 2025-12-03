@@ -98,6 +98,10 @@
   overflow: hidden;
   position: relative;
   z-index: 1;
+  direction: ltr !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  writing-mode: horizontal-tb !important;
 }
 
 /* Title section */

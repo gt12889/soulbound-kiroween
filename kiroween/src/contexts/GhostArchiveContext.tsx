@@ -197,7 +197,8 @@ Quick Start:
 What would you like to explore?`,
       });
     }
-  }, [terminalOutput.length, commandHistory.length, setAvailableOptions, addOutput]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   // Random lore events - reduced frequency and only when agents are active
   useEffect(() => {
@@ -268,7 +269,7 @@ What would you like to explore?`,
         content: `Failed to connect to ${agentId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
-  }, [addOutput, playTerminalConnect, setAvailableOptions]);
+  }, [addOutput, playTerminalConnect, setAvailableOptions, guideState, setGuideState]);
 
   const disconnectAgent = useCallback(() => {
     if (connectedAgent) {
@@ -516,7 +517,51 @@ Kiroween Codebase Structure:
     const args = parts.slice(1);
 
     try {
-      // Detect input type for conversational routing
+      // CONVERSATIONAL MODE: If connected to an agent, route everything to them (unless explicit command)
+      if (connectedAgent && !isCommand(trimmed)) {
+        // Verify agent exists
+        const agent = ghostArchiveService.getPersonality(connectedAgent);
+        if (!agent) {
+          addOutput({ 
+            type: 'error', 
+            content: `Error: Connected agent '${connectedAgent}' not found. Disconnecting...` 
+          });
+          setConnectedAgent(undefined);
+          return;
+        }
+        
+        // Send input directly to connected agent
+        addOutput({ type: 'output', content: '💭 Thinking...' });
+        const response = await ghostArchiveService.ask(trimmed, [connectedAgent]);
+        
+        // Generate conversation suggestions for follow-up
+        const agentName = agent.name;
+        
+        const conversationSuggestions: TerminalOption[] = [
+          { number: 1, command: 'Tell me more about that', description: 'Ask for more details' },
+          { number: 2, command: 'What is your perspective on creativity?', description: 'Ask about creativity' },
+          { number: 3, command: 'How did you develop your ideas?', description: 'Ask about their process' },
+          { number: 4, command: `reason ${trimmed}`, description: 'Get step-by-step reasoning' },
+          { number: 5, command: 'disconnect', description: `Disconnect from ${agentName}` },
+        ];
+        
+        addOutput({ 
+          type: 'agent', 
+          content: response,
+          agentId: connectedAgent,
+          agentName: agentName,
+        });
+        
+        setAvailableOptions(conversationSuggestions);
+        addOutput({
+          type: 'output',
+          content: `\n💡 What would you like to ask ${agentName} next? (Type 1-5 or ask anything)`,
+        });
+        
+        return;
+      }
+
+      // NOT CONNECTED - Handle as before
       const inputType = detectInputType(trimmed);
 
       // Handle greetings
@@ -567,7 +612,7 @@ Kiroween Codebase Structure:
         return;
       }
 
-      // Natural language question detection - route questions automatically
+      // Natural language question detection - route questions automatically (when not connected)
       if (inputType === 'question' && !isCommand(trimmed)) {
         const intent = detectQuestionIntent(trimmed);
         
@@ -583,29 +628,56 @@ Kiroween Codebase Structure:
           if (intent === 'reasoning') {
             addOutput({ type: 'output', content: '🔍 Analyzing with multi-step reasoning...' });
             const reasonedAnswer = await ghostArchiveService.ask(trimmed, undefined, 'multi');
-            setAvailableOptions(questionOptions);
+            
+            const followUpSuggestions: TerminalOption[] = [
+              { number: 1, command: 'Tell me more about that', description: 'Get more details' },
+              { number: 2, command: 'collaborate ' + trimmed, description: 'Get multiple perspectives' },
+              { number: 3, command: 'connect shakespeare', description: 'Connect to a personality' },
+              { number: 4, command: 'help', description: 'See all commands' },
+            ];
+            
+            addOutput({ type: 'output', content: reasonedAnswer });
+            setAvailableOptions(followUpSuggestions);
             addOutput({ 
               type: 'output', 
-              content: `${reasonedAnswer}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+              content: '\n💡 What would you like to explore next? (Type 1-4 or ask anything)' 
             });
             return;
           } else if (intent === 'collaboration') {
             addOutput({ type: 'output', content: '👥 Engaging multiple agents...' });
             const collaboration = await ghostArchiveService.ask(trimmed, undefined, 'collaborative');
-            setAvailableOptions(questionOptions);
+            
+            const followUpSuggestions: TerminalOption[] = [
+              { number: 1, command: 'Tell me more', description: 'Explore this topic further' },
+              { number: 2, command: 'connect einstein', description: 'Connect to Einstein for science' },
+              { number: 3, command: 'workflows', description: 'See collaborative workflows' },
+              { number: 4, command: 'help', description: 'View all commands' },
+            ];
+            
+            addOutput({ type: 'output', content: collaboration });
+            setAvailableOptions(followUpSuggestions);
             addOutput({ 
               type: 'output', 
-              content: `${collaboration}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+              content: '\n💡 What would you like to do next? (Type 1-4 or continue chatting)' 
             });
             return;
           } else {
             // Regular question - ask directly but show options
             addOutput({ type: 'output', content: '💭 Thinking...' });
             const answer = await ghostArchiveService.ask(trimmed);
-            setAvailableOptions(questionOptions);
+            
+            const followUpSuggestions: TerminalOption[] = [
+              { number: 1, command: 'Can you explain that differently?', description: 'Get alternative explanation' },
+              { number: 2, command: 'connect shakespeare', description: 'Chat with Shakespeare' },
+              { number: 3, command: 'list', description: 'See all personalities' },
+              { number: 4, command: 'help', description: 'View commands' },
+            ];
+            
+            addOutput({ type: 'output', content: answer });
+            setAvailableOptions(followUpSuggestions);
             addOutput({ 
               type: 'output', 
-              content: `${answer}\n\n💡 Tip: You can also use numbers 1-3 to choose how to handle questions` 
+              content: '\n💡 What would you like to ask next? (Type 1-4 or ask anything)' 
             });
             return;
           }
@@ -622,8 +694,19 @@ Kiroween Codebase Structure:
           break;
 
         case 'disconnect':
-          setAvailableOptions([]);
           disconnectAgent();
+          
+          // Show suggestions for what to do after disconnecting
+          const afterDisconnectSuggestions: TerminalOption[] = [
+            { number: 1, command: 'list', description: 'Connect to another personality' },
+            { number: 2, command: 'workflows', description: 'Try collaborative workflows' },
+            { number: 3, command: 'help', description: 'See all commands' },
+          ];
+          setAvailableOptions(afterDisconnectSuggestions);
+          addOutput({
+            type: 'output',
+            content: '\n💡 What would you like to do next? (Type 1-3)',
+          });
           break;
 
         case 'list':
@@ -631,12 +714,12 @@ Kiroween Codebase Structure:
           const personalityOptions: TerminalOption[] = personalities.map((p, index) => ({
             number: index + 1,
             command: `connect ${p.id}`,
-            description: `${p.name} (${p.era})`,
+            description: `Chat with ${p.name} (${p.era})`,
           }));
           setAvailableOptions(personalityOptions);
           addOutput({
             type: 'output',
-            content: `Available personalities:\n${personalities.map((p, index) => `  ${index + 1}. ${p.id}: ${p.name} (${p.era})`).join('\n')}\n\n💡 Tip: Type a number to connect to that personality\n💡 Or ask: "Tell me about [personality name]"`,
+            content: `Available personalities:\n${personalities.map((p, index) => `  ${index + 1}. ${p.name} (${p.era}) - ${p.id}`).join('\n')}\n\n💡 Type a number (1-${personalities.length}) to connect, or ask: "Tell me about [name]"`,
           });
           break;
 
@@ -680,7 +763,16 @@ Kiroween Codebase Structure:
           const question = args.join(' ');
           addOutput({ type: 'output', content: 'Thinking...' });
           const answer = await ghostArchiveService.ask(question);
+          
+          const askFollowUp: TerminalOption[] = [
+            { number: 1, command: 'Tell me more', description: 'Get more details' },
+            { number: 2, command: 'reason ' + question, description: 'Get step-by-step reasoning' },
+            { number: 3, command: 'connect shakespeare', description: 'Connect to a personality' },
+          ];
+          
           addOutput({ type: 'output', content: answer });
+          setAvailableOptions(askFollowUp);
+          addOutput({ type: 'output', content: '\n💡 What next? (Type 1-3 or ask another question)' });
           break;
 
         case 'reason':
@@ -691,7 +783,21 @@ Kiroween Codebase Structure:
           const reasonQuestion = args.join(' ');
           addOutput({ type: 'output', content: 'Reasoning...' });
           const reasonedAnswer = await ghostArchiveService.ask(reasonQuestion, undefined, 'multi');
+          
+          const reasonFollowUp: TerminalOption[] = [
+            { number: 1, command: 'Explain that step-by-step', description: 'Get detailed breakdown' },
+            { number: 2, command: 'collaborate ' + reasonQuestion, description: 'Get multiple perspectives' },
+            { number: 3, command: 'connect einstein', description: 'Discuss with Einstein' },
+          ];
+          
           addOutput({ type: 'output', content: reasonedAnswer });
+          setAvailableOptions(reasonFollowUp);
+          addOutput({ type: 'output', content: '\n💡 Continue exploring? (Type 1-3 or ask anything)' });
+          
+          setGuideState(prev => ({
+            ...prev,
+            featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'reasoning'])],
+          }));
           break;
 
         case 'collaborate':
@@ -702,7 +808,21 @@ Kiroween Codebase Structure:
           const task = args.join(' ');
           addOutput({ type: 'output', content: 'Collaborating...' });
           const collaboration = await ghostArchiveService.ask(task, undefined, 'collaborative');
+          
+          const collaborateFollowUp: TerminalOption[] = [
+            { number: 1, command: 'Which perspective resonates most?', description: 'Explore perspectives' },
+            { number: 2, command: 'connect shakespeare', description: 'Deep dive with one personality' },
+            { number: 3, command: 'workflows', description: 'Try structured workflows' },
+          ];
+          
           addOutput({ type: 'output', content: collaboration });
+          setAvailableOptions(collaborateFollowUp);
+          addOutput({ type: 'output', content: '\n💡 What would you like to do? (Type 1-3 or continue chatting)' });
+          
+          setGuideState(prev => ({
+            ...prev,
+            featuresDiscovered: [...new Set([...prev.featuresDiscovered, 'collaboration'])],
+          }));
           break;
 
         case 'workflow':

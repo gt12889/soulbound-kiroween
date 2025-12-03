@@ -6,6 +6,11 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  direction: ltr !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  -moz-transform: scaleX(1) !important;
+  -ms-transform: scaleX(1) !important;
 }
 
 .blockWrapper.active {
@@ -34,10 +39,28 @@
   word-wrap: break-word;
   white-space: pre-wrap;
   direction: ltr !important;
-  unicode-bidi: normal !important;
+  unicode-bidi: bidi-override !important;
   transform: scaleX(1) !important;
   -webkit-transform: scaleX(1) !important;
+  -moz-transform: scaleX(1) !important;
+  -ms-transform: scaleX(1) !important;
   text-align: left !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: upright !important;
+}
+
+/* Aggressively force text direction for contentEditable */
+.blockContent[contenteditable="true"],
+.blockContent[contenteditable="true"] *,
+.blockContent[contenteditable=""] {
+  direction: ltr !important;
+  unicode-bidi: bidi-override !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: upright !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  -moz-transform: scaleX(1) !important;
+  -ms-transform: scaleX(1) !important;
 }
 
 .blockContent:focus {

@@ -97,11 +97,30 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
     }
   }, [isActive]);
 
+  // Force correct text direction on mount and updates
+  useEffect(() => {
+    if (blockRef.current) {
+      const element = blockRef.current;
+      element.style.direction = 'ltr';
+      element.style.unicodeBidi = 'bidi-override';
+      element.style.transform = 'scaleX(1)';
+      element.style.webkitTransform = 'scaleX(1)';
+      element.style.writingMode = 'horizontal-tb';
+      element.style.textOrientation = 'upright';
+      element.style.textAlign = 'left';
+    }
+  }, [block.content]);
+
   return (
     <div
       className={`${styles.blockWrapper} ${isActive ? styles.active : ''}`}
       data-block-id={block.id}
       data-block-type={block.type}
+      style={{
+        direction: 'ltr',
+        transform: 'scaleX(1)',
+        WebkitTransform: 'scaleX(1)',
+      }}
     >
       {/* Drag handle placeholder - will be implemented in Task 4.1 */}
       <div className={styles.dragHandlePlaceholder} />
@@ -110,20 +129,26 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
       <div
         ref={blockRef}
         className={styles.blockContent}
-        contentEditable
+        contentEditable="true"
         suppressContentEditableWarning
         onInput={handleInput}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
         onBlur={onBlur}
         dir="ltr"
+        lang="en"
         data-placeholder={block.content.length === 0 ? 'Type / for commands' : undefined}
         style={{
           direction: 'ltr',
-          unicodeBidi: 'normal',
+          unicodeBidi: 'bidi-override',
+          writingMode: 'horizontal-tb',
+          textOrientation: 'upright',
           transform: 'scaleX(1)',
           WebkitTransform: 'scaleX(1)',
+          MozTransform: 'scaleX(1)',
+          msTransform: 'scaleX(1)',
           textAlign: 'left',
+          fontFamily: 'inherit',
         }}
       >
         {block.content}

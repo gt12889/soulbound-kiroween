@@ -9,6 +9,8 @@
   unicode-bidi: normal !important;
   transform: scaleX(1) !important;
   -webkit-transform: scaleX(1) !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
 }
 
 /* Editor Toolbar - Cleaner, more minimal */
@@ -62,6 +64,19 @@
   scroll-behavior: smooth;
   direction: ltr !important;
   unicode-bidi: normal !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+}
+
+/* Force all contentEditable elements to display correctly */
+.blocksContainer [contenteditable="true"],
+.blocksContainer [contenteditable=""] {
+  direction: ltr !important;
+  unicode-bidi: embed !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
   transform: scaleX(1) !important;
   -webkit-transform: scaleX(1) !important;
 }

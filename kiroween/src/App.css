@@ -101,8 +101,21 @@ body {
 
 /* Prevent any transforms from flipping text */
 *:not(svg):not(path):not(circle):not(rect):not(line):not(polyline):not(polygon) {
-  transform: scaleX(1) !important;
-  -webkit-transform: scaleX(1) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+}
+
+/* Extra enforcement for contentEditable elements */
+[contenteditable="true"],
+[contenteditable=""] {
+  direction: ltr !important;
+  unicode-bidi: bidi-override !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: upright !important;
+  transform: none !important;
+  -webkit-transform: none !important;
 }
 
 /* ===================================

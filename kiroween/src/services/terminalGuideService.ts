@@ -38,38 +38,138 @@ class TerminalGuideService {
     
     // Just connected to an agent
     if (context.justConnected && context.connectedAgent) {
+      const agentName = context.connectedAgent;
+      
+      // Personality-specific conversation starters
+      const personalityQuestions: Record<string, string[]> = {
+        shakespeare: [
+          'What is love?',
+          'Tell me about writing great characters',
+          'How do you create memorable stories?',
+        ],
+        einstein: [
+          'Explain relativity in simple terms',
+          'What is the nature of time?',
+          'How do you approach problem solving?',
+        ],
+        tesla: [
+          'Tell me about your inventions',
+          'What is the future of energy?',
+          'How do you innovate?',
+        ],
+        cleopatra: [
+          'What makes a great leader?',
+          'Tell me about ancient Egypt',
+          'How did you navigate politics?',
+        ],
+        curie: [
+          'Tell me about radioactivity',
+          'What drives scientific discovery?',
+          'How did you overcome challenges?',
+        ],
+      };
+      
+      const questions = personalityQuestions[agentName] || [
+        'What can you help me with?',
+        'Tell me about yourself',
+        'What are your greatest achievements?',
+      ];
+      
       return [
-        { number: 1, command: `ask What can you help me with?`, description: 'Ask what they can help with' },
-        { number: 2, command: `ask Tell me about yourself`, description: 'Learn about this personality' },
-        { number: 3, command: 'disconnect', description: 'Disconnect and try another' },
+        { number: 1, command: questions[0], description: `Ask: "${questions[0]}"` },
+        { number: 2, command: questions[1], description: `Ask: "${questions[1]}"` },
+        { number: 3, command: questions[2], description: `Ask: "${questions[2]}"` },
+        { number: 4, command: 'What inspired you?', description: 'Ask about their inspiration' },
+        { number: 5, command: 'disconnect', description: 'Try a different personality' },
       ];
     }
     
     // Exploring - connected to an agent
     if (state.stage === 'exploring' && context.connectedAgent) {
+      const agentName = context.connectedAgent;
+      
+      // More conversation questions based on personality
+      const conversationTopics: Record<string, string[]> = {
+        shakespeare: [
+          'What is the essence of tragedy?',
+          'How do you view human nature?',
+          'Tell me about the power of language',
+        ],
+        einstein: [
+          'What is the relationship between energy and matter?',
+          'How does time work?',
+          'What is the nature of light?',
+        ],
+        tesla: [
+          'What is alternating current?',
+          'How will wireless energy work?',
+          'What inventions are you most proud of?',
+        ],
+        cleopatra: [
+          'How did you lead Egypt?',
+          'What is the role of diplomacy?',
+          'Tell me about your alliance with Rome',
+        ],
+        curie: [
+          'What is radioactivity?',
+          'How do you conduct research?',
+          'What advice do you have for scientists?',
+        ],
+      };
+      
+      const topics = conversationTopics[agentName] || [
+        'What are your main ideas?',
+        'Tell me about your work',
+        'What drives you?',
+      ];
+      
+      suggestions.push({
+        number: 1,
+        command: topics[0],
+        description: `Ask: "${topics[0]}"`,
+      });
+      
+      suggestions.push({
+        number: 2,
+        command: topics[1],
+        description: `Ask: "${topics[1]}"`,
+      });
+      
       if (!state.featuresDiscovered.includes('reasoning')) {
         suggestions.push({
-          number: suggestions.length + 1,
-          command: 'reason How did you develop your ideas?',
-          description: 'Try multi-step reasoning',
+          number: 3,
+          command: `reason ${topics[2]}`,
+          description: 'Try multi-step reasoning mode',
+        });
+      } else {
+        suggestions.push({
+          number: 3,
+          command: topics[2],
+          description: `Ask: "${topics[2]}"`,
         });
       }
       
       if (!state.featuresDiscovered.includes('workflows')) {
         suggestions.push({
-          number: suggestions.length + 1,
+          number: 4,
           command: 'workflows',
           description: 'Explore collaborative workflows',
+        });
+      } else {
+        suggestions.push({
+          number: 4,
+          command: 'What can we explore together?',
+          description: 'Ask for collaboration ideas',
         });
       }
       
       suggestions.push({
-        number: suggestions.length + 1,
+        number: 5,
         command: 'disconnect',
         description: 'Try a different personality',
       });
       
-      return suggestions.slice(0, 4);
+      return suggestions;
     }
     
     // Connected - show advanced features

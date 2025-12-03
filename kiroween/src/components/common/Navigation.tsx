@@ -30,10 +30,10 @@ const Navigation: React.FC = () => {
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
 
   const navItems = [
+    { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
     { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods', shortcutId: 'nav-necronomicon-notes' },
     { path: '/ghost-writer', label: 'Haunted Study', icon: '✍️', description: 'Spectral guidance', shortcutId: 'nav-ghost-writer' },
     { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest', shortcutId: 'nav-graveyard-dashboard' },
-    { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
     { path: '/cursed-calendar', label: 'Cursed Calendar', icon: '📅', description: 'Schedule your doom', shortcutId: 'nav-cursed-calendar' },
     { path: '/achievements', label: 'Deeds & Flames', icon: '🏆', description: 'Achievements & streaks', shortcutId: 'nav-achievements' },
   ];

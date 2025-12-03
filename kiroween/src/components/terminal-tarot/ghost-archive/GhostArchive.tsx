@@ -10,6 +10,7 @@ import { TerminalDisplay } from './TerminalDisplay';
 import { CommandInput } from './CommandInput';
 import { AgentStatusPanel } from './AgentStatusPanel';
 import { WorkflowVisualizer } from './WorkflowVisualizer';
+import { OptionsDisplay } from './OptionsDisplay';
 import styles from './GhostArchive.module.css';
 
 export const GhostArchive: React.FC = () => {
@@ -19,6 +20,7 @@ export const GhostArchive: React.FC = () => {
     connectedAgent,
     activeAgents,
     workflows,
+    availableOptions,
     executeCommand,
     getPersonality,
   } = useGhostArchive();
@@ -63,6 +65,7 @@ export const GhostArchive: React.FC = () => {
 
             <div className={styles.mainTerminal}>
               <TerminalDisplay outputs={terminalOutput} theme={theme} />
+              <OptionsDisplay options={availableOptions} theme={theme} />
               <CommandInput
                 onExecute={executeCommand}
                 history={commandHistory}
