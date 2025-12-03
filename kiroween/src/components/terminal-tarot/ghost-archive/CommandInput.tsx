@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useAudio } from '../../../hooks/useAudio';
+import { useGhostArchive } from '../../../contexts/GhostArchiveContext';
 import styles from './CommandInput.module.css';
 
 interface CommandInputProps {
@@ -29,6 +30,7 @@ export const CommandInput: React.FC<CommandInputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const { playTerminalType } = useAudio();
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { getOptionByNumber, setAvailableOptions } = useGhostArchive();
 
   // Focus input on mount
   useEffect(() => {
@@ -46,13 +48,39 @@ export const CommandInput: React.FC<CommandInputProps> = ({
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim()) {
+    const trimmedInput = input.trim();
+    if (!trimmedInput) return;
+
+    // Check if input is a number and map it to an option
+    const numberInput = parseInt(trimmedInput, 10);
+    if (!isNaN(numberInput) && numberInput > 0) {
+      const option = getOptionByNumber(numberInput);
+      if (option) {
+        playTerminalType(); // Play typing sound on command execution
+        // Clear options after selection
+        setAvailableOptions([]);
+        onExecute(option.command);
+        setInput('');
+        setHistoryIndex(-1);
+        return;
+      }
+      // If number doesn't match an option, still execute it
+      // The context will handle showing the "Invalid option number" error
+    }
+
+    // Regular command execution (including unmatched numbers)
+    if (trimmedInput) {
       playTerminalType(); // Play typing sound on command execution
-      onExecute(input);
+      // Don't clear options on invalid numbers so user can still see them
+      // Only clear for actual commands
+      if (isNaN(numberInput)) {
+        setAvailableOptions([]);
+      }
+      onExecute(trimmedInput);
       setInput('');
       setHistoryIndex(-1);
     }
-  }, [input, onExecute, playTerminalType]);
+  }, [input, onExecute, playTerminalType, getOptionByNumber, setAvailableOptions]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowUp') {

@@ -1,64 +1,114 @@
-.optionsDisplay {
-  margin: 0;
-  padding: 1rem;
-  background: rgba(0, 255, 0, 0.05);
+.optionsPanel {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
   border-top: 1px solid rgba(0, 255, 0, 0.2);
   border-bottom: 1px solid rgba(0, 255, 0, 0.2);
-  font-family: 'Courier New', 'Courier', 'Consolas', monospace;
-  flex-shrink: 0; /* Prevent options from shrinking */
+  max-height: 150px;
   overflow-y: auto;
-  max-height: 200px; /* Limit height if many options */
+  overflow-x: hidden;
 }
 
-.optionsTitle {
-  font-size: 14px;
+.optionsHeader {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
   font-weight: bold;
-  margin-bottom: 0.75rem;
-  color: #00ff88;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
 }
 
 .optionItem {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.4rem 0;
-  font-size: 14px;
-  line-height: 1.5;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .optionItem:hover {
   background: rgba(0, 255, 0, 0.1);
-  padding-left: 0.5rem;
-  margin-left: -0.5rem;
-  border-radius: 4px;
+  border-color: rgba(0, 255, 0, 0.5);
+  transform: translateX(2px);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
 }
 
 .optionNumber {
-  font-weight: bold;
-  color: #00ff00;
-  min-width: 2rem;
-  text-align: center;
-  background: rgba(0, 255, 0, 0.1);
-  padding: 0.2rem 0.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.4);
   border-radius: 3px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.8);
   flex-shrink: 0;
 }
 
 .optionDescription {
   flex: 1;
-  color: #88ff88;
-  word-wrap: break-word;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.optionsHint {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid rgba(0, 255, 0, 0.1);
-  font-size: 12px;
-  font-style: italic;
-  color: #66ff66;
+/* Scrollbar styling */
+.optionsPanel::-webkit-scrollbar {
+  width: 6px;
 }
 
+.optionsPanel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.optionsPanel::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.3);
+  border-radius: 3px;
+}
+
+.optionsPanel::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.5);
+}
+
+/* Animation for when options appear */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.optionsPanel {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .optionDescription {
+    white-space: normal;
+  }
+}

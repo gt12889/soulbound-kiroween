@@ -27,35 +27,24 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const blockRef = useRef<HTMLDivElement>(null);
-
-  // Get cursor position within the block
-  const getCursorPosition = useCallback((): number => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0 || !blockRef.current) return 0;
-
-    const range = selection.getRangeAt(0);
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(blockRef.current);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-
-    return preCaretRange.toString().length;
-  }, []);
+  const blockRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle keyboard events
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      // Enter: Split block at cursor position
+      // For textarea, handle Enter to split blocks
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        const cursorPos = getCursorPosition();
+        const textarea = e.currentTarget as HTMLTextAreaElement;
+        const cursorPos = textarea.selectionStart || 0;
         onSplit(cursorPos);
         return;
       }
 
       // Backspace at start: Merge with previous or delete empty block
       if (e.key === 'Backspace') {
-        const cursorPos = getCursorPosition();
+        const textarea = e.currentTarget as HTMLTextAreaElement;
+        const cursorPos = textarea.selectionStart || 0;
         if (cursorPos === 0) {
           e.preventDefault();
           if (block.content.length === 0) {
@@ -66,28 +55,8 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
           return;
         }
       }
-
-      // Delete at end: Could merge with next block (future enhancement)
-      if (e.key === 'Delete') {
-        const cursorPos = getCursorPosition();
-        if (cursorPos === block.content.length) {
-          // Future: merge with next block
-        }
-      }
     },
-    [block.content.length, getCursorPosition, onSplit, onDelete, onMerge]
-  );
-
-  // Handle content changes
-  const handleInput = useCallback(
-    (e: React.FormEvent<HTMLDivElement>) => {
-      const newContent = e.currentTarget.textContent || '';
-      onUpdate({
-        ...block,
-        content: newContent,
-      });
-    },
-    [block, onUpdate]
+    [block.content.length, onSplit, onDelete, onMerge]
   );
 
   // Focus management
@@ -97,62 +66,47 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
     }
   }, [isActive]);
 
-  // Force correct text direction on mount and updates
-  useEffect(() => {
-    if (blockRef.current) {
-      const element = blockRef.current;
-      element.style.direction = 'ltr';
-      element.style.unicodeBidi = 'bidi-override';
-      element.style.transform = 'scaleX(1)';
-      element.style.webkitTransform = 'scaleX(1)';
-      element.style.writingMode = 'horizontal-tb';
-      element.style.textOrientation = 'upright';
-      element.style.textAlign = 'left';
-    }
-  }, [block.content]);
 
   return (
     <div
       className={`${styles.blockWrapper} ${isActive ? styles.active : ''}`}
       data-block-id={block.id}
       data-block-type={block.type}
-      style={{
-        direction: 'ltr',
-        transform: 'scaleX(1)',
-        WebkitTransform: 'scaleX(1)',
-      }}
     >
       {/* Drag handle placeholder - will be implemented in Task 4.1 */}
       <div className={styles.dragHandlePlaceholder} />
 
-      {/* Editable content */}
-      <div
-        ref={blockRef}
+      {/* Use textarea instead of contentEditable to test */}
+      <textarea
+        ref={blockRef as any}
         className={styles.blockContent}
-        contentEditable="true"
-        suppressContentEditableWarning
-        onInput={handleInput}
-        onKeyDown={handleKeyDown}
+        value={block.content}
+        onChange={(e) => {
+          onUpdate({
+            ...block,
+            content: e.target.value,
+          });
+        }}
+        onKeyDown={handleKeyDown as any}
         onFocus={onFocus}
         onBlur={onBlur}
         dir="ltr"
         lang="en"
-        data-placeholder={block.content.length === 0 ? 'Type / for commands' : undefined}
+        placeholder={block.content.length === 0 ? 'Type / for commands' : ''}
         style={{
           direction: 'ltr',
-          unicodeBidi: 'bidi-override',
+          unicodeBidi: 'normal',
           writingMode: 'horizontal-tb',
-          textOrientation: 'upright',
-          transform: 'scaleX(1)',
-          WebkitTransform: 'scaleX(1)',
-          MozTransform: 'scaleX(1)',
-          msTransform: 'scaleX(1)',
           textAlign: 'left',
           fontFamily: 'inherit',
+          resize: 'none',
+          border: 'none',
+          background: 'transparent',
+          outline: 'none',
+          width: '100%',
+          minHeight: '1.5em',
         }}
-      >
-        {block.content}
-      </div>
+      />
     </div>
   );
 };

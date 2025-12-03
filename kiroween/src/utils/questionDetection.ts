@@ -95,10 +95,24 @@ export function detectQuestionIntent(input: string): 'question' | 'reasoning' | 
 }
 
 /**
+ * Check if input is a number (for option selection)
+ */
+export function isNumber(input: string): boolean {
+  const trimmed = input.trim();
+  return /^\d+$/.test(trimmed);
+}
+
+/**
  * Check if input looks like a command (starts with known command prefix)
  */
 export function isCommand(input: string): boolean {
   const trimmed = input.trim().toLowerCase();
+  
+  // Numbers are not commands - they're for option selection
+  if (isNumber(trimmed)) {
+    return false;
+  }
+  
   const firstWord = trimmed.split(/\s+/)[0];
   
   const knownCommands = [
@@ -114,10 +128,15 @@ export function isCommand(input: string): boolean {
  * Detect the overall type of user input for conversational routing
  */
 export function detectInputType(input: string): 
-  'greeting' | 'farewell' | 'exploration' | 'question' | 'command' | 'casual' {
+  'greeting' | 'farewell' | 'exploration' | 'question' | 'command' | 'casual' | 'number' {
   const trimmed = input.trim().toLowerCase();
   
-  // Check for commands first
+  // Check for numbers first - these are for option selection
+  if (isNumber(trimmed)) {
+    return 'number';
+  }
+  
+  // Check for commands
   if (isCommand(trimmed)) {
     return 'command';
   }

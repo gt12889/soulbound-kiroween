@@ -252,10 +252,6 @@ What would you like to explore?`,
       });
       
       setAvailableOptions(connectionOptions);
-      addOutput({
-        type: 'output',
-        content: `\n💡 You're now connected to ${agent?.name}! Try asking them questions naturally, or choose from the options above.`,
-      });
       
       // Update guide state
       setGuideState(prev => ({
@@ -564,6 +560,15 @@ Kiroween Codebase Structure:
       // NOT CONNECTED - Handle as before
       const inputType = detectInputType(trimmed);
 
+      // Handle numbers that didn't match an option
+      if (inputType === 'number') {
+        addOutput({
+          type: 'error',
+          content: `Invalid option number: ${trimmed}\n\n💡 Try one of the numbered options above, or type "help" to see available commands`,
+        });
+        return;
+      }
+
       // Handle greetings
       if (inputType === 'greeting') {
         const isFirstTime = commandHistory.length === 0;
@@ -617,13 +622,6 @@ Kiroween Codebase Structure:
         const intent = detectQuestionIntent(trimmed);
         
         if (intent === 'question' || intent === 'reasoning' || intent === 'collaboration') {
-          // Show contextual options for question handling
-          const questionOptions: TerminalOption[] = [
-            { number: 1, command: trimmed, description: 'Ask directly' },
-            { number: 2, command: `reason ${trimmed}`, description: 'Get detailed reasoning' },
-            { number: 3, command: `collaborate ${trimmed}`, description: 'Get multiple perspectives' },
-          ];
-          
           // Auto-execute based on detected intent, but show options for user awareness
           if (intent === 'reasoning') {
             addOutput({ type: 'output', content: '🔍 Analyzing with multi-step reasoning...' });

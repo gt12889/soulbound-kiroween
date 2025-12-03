@@ -39,28 +39,37 @@
   word-wrap: break-word;
   white-space: pre-wrap;
   direction: ltr !important;
-  unicode-bidi: bidi-override !important;
-  transform: scaleX(1) !important;
-  -webkit-transform: scaleX(1) !important;
-  -moz-transform: scaleX(1) !important;
-  -ms-transform: scaleX(1) !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
   text-align: left !important;
   writing-mode: horizontal-tb !important;
-  text-orientation: upright !important;
+  overflow: hidden;
 }
 
-/* Aggressively force text direction for contentEditable */
-.blockContent[contenteditable="true"],
-.blockContent[contenteditable="true"] *,
-.blockContent[contenteditable=""] {
+/* Style textarea to look like contentEditable */
+.blockContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.blockContent::placeholder {
+  color: rgba(224, 224, 224, 0.3);
+  font-style: italic;
+}
+
+/* Force text direction for all types */
+.blockContent,
+.blockContent * {
   direction: ltr !important;
-  unicode-bidi: bidi-override !important;
+  unicode-bidi: normal !important;
   writing-mode: horizontal-tb !important;
-  text-orientation: upright !important;
-  transform: scaleX(1) !important;
-  -webkit-transform: scaleX(1) !important;
-  -moz-transform: scaleX(1) !important;
-  -ms-transform: scaleX(1) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
 }
 
 .blockContent:focus {

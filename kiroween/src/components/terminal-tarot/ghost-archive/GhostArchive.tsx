@@ -3,7 +3,7 @@
  * Terminal interface for connecting to historical personalities
  */
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useGhostArchive } from '../../../contexts/GhostArchiveContext';
 import { CRTEffects } from './CRTEffects';
 import { TerminalDisplay } from './TerminalDisplay';
@@ -29,7 +29,14 @@ export const GhostArchive: React.FC = () => {
   const theme = useMemo(() => {
     if (connectedAgent) {
       const agent = getPersonality(connectedAgent);
-      return agent?.theme;
+      if (agent?.theme) {
+        return {
+          backgroundColor: agent.theme.backgroundColor,
+          textColor: agent.theme.textColor,
+          glowColor: agent.theme.glowColor,
+          cursorStyle: agent.theme.cursorStyle as 'block' | 'underline' | 'none' | undefined,
+        };
+      }
     }
     return {
       backgroundColor: '#0a2e0a',
