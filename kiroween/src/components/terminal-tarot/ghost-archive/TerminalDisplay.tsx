@@ -18,11 +18,35 @@ interface TerminalDisplayProps {
 
 export const TerminalDisplay: React.FC<TerminalDisplayProps> = memo(({ outputs, theme }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isInitialMount = useRef(true);
+  const lastOutputCount = useRef(outputs.length);
 
-  // Auto-scroll to bottom on new output
+  // On initial mount with existing history, scroll to bottom
+  // But don't auto-scroll if user manually scrolls up
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    if (containerRef.current && isInitialMount.current && outputs.length > 0) {
+      // Small delay to ensure DOM is rendered
+      setTimeout(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+        isInitialMount.current = false;
+      }, 100);
+    }
+  }, []); // Only run on mount
+
+  // Auto-scroll to bottom on new output, but only if user is near bottom
+  useEffect(() => {
+    if (containerRef.current && !isInitialMount.current) {
+      const container = containerRef.current;
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+      
+      // Only auto-scroll if user is near the bottom (within 100px) and new output was added
+      if (isNearBottom && outputs.length > lastOutputCount.current) {
+        container.scrollTop = container.scrollHeight;
+      }
+      
+      lastOutputCount.current = outputs.length;
     }
   }, [outputs]);
 

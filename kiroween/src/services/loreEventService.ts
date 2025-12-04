@@ -15,7 +15,7 @@ interface LoreEventTemplate {
 class LoreEventService {
   private eventHistory: LoreEvent[] = [];
   private lastEventTime: number = 0;
-  private cooldownMs: number = 30000; // 30 seconds between events
+  private cooldownMs: number = 120000; // 2 minutes between events (increased from 30 seconds)
 
   private globalEvents: LoreEventTemplate[] = [
     {

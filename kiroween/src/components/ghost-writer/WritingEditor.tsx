@@ -244,7 +244,7 @@ const WritingEditor = forwardRef<WritingEditorHandle, WritingEditorProps>(({ onT
 
   return (
     <PaperTexture className={styles.editorContainer}>
-      <GhostlyCursor isTyping={isTyping} enabled={true} />
+      <GhostlyCursor isTyping={isTyping} enabled={false} />
       <InkSplotch 
         splotches={inkSplotches} 
         onSplotchComplete={(id) => {
