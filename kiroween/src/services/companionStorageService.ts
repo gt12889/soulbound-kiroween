@@ -130,9 +130,9 @@ export async function saveCompanionType(type: CompanionType, userId?: string): P
   }
 
   try {
-    // Save to localStorage (FR-4.3)
-    storageService.set(COMPANION_TYPE_KEY, type);
-    storageService.set(COMPANION_SELECTION_TIMESTAMP_KEY, new Date());
+    // Save to localStorage (FR-4.3) - user-scoped for data isolation
+    storageService.set(COMPANION_TYPE_KEY, type, userId);
+    storageService.set(COMPANION_SELECTION_TIMESTAMP_KEY, new Date(), userId);
 
     // Save to Firebase for authenticated users (FR-4.2, FR-4.5)
     if (userId) {
@@ -199,8 +199,8 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
 
         // Validate cloud type (NFR-4)
         if (cloudType && validateCompanionType(cloudType)) {
-          // Update localStorage with cloud data for offline access
-          storageService.set(COMPANION_TYPE_KEY, cloudType);
+          // Update localStorage with cloud data for offline access - user-scoped
+          storageService.set(COMPANION_TYPE_KEY, cloudType, userId);
           
           return cloudType;
         } else if (cloudType) {
@@ -213,8 +213,8 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
       }
     }
 
-    // Load from localStorage (FR-4.3)
-    const localType = storageService.get<CompanionType>(COMPANION_TYPE_KEY);
+    // Load from localStorage (FR-4.3) - user-scoped
+    const localType = storageService.get<CompanionType>(COMPANION_TYPE_KEY, userId);
 
     // Validate local type (NFR-4)
     if (localType && validateCompanionType(localType)) {
@@ -222,7 +222,7 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
     } else if (localType) {
       console.warn('Invalid companion type from localStorage:', localType);
       // Data corruption - clear invalid data
-      storageService.remove(COMPANION_TYPE_KEY);
+      storageService.remove(COMPANION_TYPE_KEY, userId);
       return null;
     }
 
@@ -238,11 +238,12 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
  * Check if user has made a companion selection
  * Requirements: FR-1.4
  * 
+ * @param userId - Optional user ID for user-scoped storage
  * @returns true if companion type exists in storage, false otherwise
  */
-export function hasCompanionSelection(): boolean {
+export function hasCompanionSelection(userId?: string): boolean {
   try {
-    const type = storageService.get<CompanionType>(COMPANION_TYPE_KEY);
+    const type = storageService.get<CompanionType>(COMPANION_TYPE_KEY, userId);
     return type !== null && validateCompanionType(type);
   } catch (error) {
     console.error('Error checking companion selection:', error);
@@ -254,11 +255,12 @@ export function hasCompanionSelection(): boolean {
  * Get companion selection timestamp
  * Requirements: FR-4.1
  * 
+ * @param userId - Optional user ID for user-scoped storage
  * @returns The date when companion was selected, or null if not found
  */
-export function getCompanionSelectionTimestamp(): Date | null {
+export function getCompanionSelectionTimestamp(userId?: string): Date | null {
   try {
-    return storageService.get<Date>(COMPANION_SELECTION_TIMESTAMP_KEY);
+    return storageService.get<Date>(COMPANION_SELECTION_TIMESTAMP_KEY, userId);
   } catch (error) {
     console.error('Error getting companion selection timestamp:', error);
     return null;
@@ -269,11 +271,12 @@ export function getCompanionSelectionTimestamp(): Date | null {
  * Clear companion selection (for testing/debugging only)
  * This should NOT be exposed to users as selection is permanent (FR-4.4)
  * @internal
+ * @param userId - Optional user ID for user-scoped storage
  */
-export function clearCompanionSelection(): void {
+export function clearCompanionSelection(userId?: string): void {
   try {
-    storageService.remove(COMPANION_TYPE_KEY);
-    storageService.remove(COMPANION_SELECTION_TIMESTAMP_KEY);
+    storageService.remove(COMPANION_TYPE_KEY, userId);
+    storageService.remove(COMPANION_SELECTION_TIMESTAMP_KEY, userId);
   } catch (error) {
     console.error('Error clearing companion selection:', error);
   }
@@ -289,8 +292,8 @@ export function clearCompanionSelection(): void {
  */
 export async function syncCompanionType(userId: string): Promise<CompanionType | null> {
   try {
-    // Get local type
-    const localType = storageService.get<CompanionType>(COMPANION_TYPE_KEY);
+    // Get local type - user-scoped
+    const localType = storageService.get<CompanionType>(COMPANION_TYPE_KEY, userId);
     
     // Get cloud type with retry
     let cloudType: CompanionType | null = null;
@@ -315,12 +318,12 @@ export async function syncCompanionType(userId: string): Promise<CompanionType |
     if (isValidCloud && isValidLocal) {
       // Both exist - prefer cloud as source of truth
       if (cloudType !== localType) {
-        storageService.set(COMPANION_TYPE_KEY, cloudType);
+        storageService.set(COMPANION_TYPE_KEY, cloudType, userId);
       }
       return cloudType;
     } else if (isValidCloud && !isValidLocal) {
       // Cloud has data, local doesn't - sync from cloud to local
-      storageService.set(COMPANION_TYPE_KEY, cloudType);
+      storageService.set(COMPANION_TYPE_KEY, cloudType, userId);
       return cloudType;
     } else if (!isValidCloud && isValidLocal) {
       // Local has data, cloud doesn't - sync from local to cloud with retry
@@ -341,7 +344,7 @@ export async function syncCompanionType(userId: string): Promise<CompanionType |
     } else if (localType && !isValidLocal) {
       // Invalid local type - clear it
       console.warn('Invalid companion type from local storage:', localType);
-      storageService.remove(COMPANION_TYPE_KEY);
+      storageService.remove(COMPANION_TYPE_KEY, userId);
     }
 
     return null;
@@ -365,17 +368,17 @@ export async function syncCompanionType(userId: string): Promise<CompanionType |
  */
 export async function migrateExistingUser(userId?: string): Promise<boolean> {
   try {
-    // Check if user already has a companion selection
-    if (hasCompanionSelection()) {
+    // Check if user already has a companion selection - user-scoped
+    if (hasCompanionSelection(userId)) {
       return false;
     }
 
-    // Check if user has any existing data
+    // Check if user has any existing data - user-scoped
     const hasExistingData = 
-      storageService.get('tasks') !== null ||
-      storageService.get('notes') !== null ||
-      storageService.get('settings') !== null ||
-      storageService.get('tarot_readings') !== null;
+      storageService.get('tasks', userId) !== null ||
+      storageService.get('notes', userId) !== null ||
+      storageService.get('settings', userId) !== null ||
+      storageService.get('tarot_readings', userId) !== null;
 
     if (hasExistingData) {
       // Use retry logic for migration save

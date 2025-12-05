@@ -1,5 +1,5 @@
 /**
- * Core data models for Dark Productivity Suite
+ * Core data models for Soul Bound Codex
  */
 
 // Re-export companion types

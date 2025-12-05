@@ -567,7 +567,7 @@ class AIService {
     // Add provider-specific headers
     if (this.config.provider === 'openrouter' && this.config.refererUrl) {
       headers['HTTP-Referer'] = this.config.refererUrl;
-      headers['X-Title'] = 'Dark Productivity Suite - Ghost Writer';
+      headers['X-Title'] = 'Soul Bound Codex - Ghost Writer';
     }
 
     return headers;

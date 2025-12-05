@@ -49,10 +49,11 @@ interface KeyboardProviderProps {
 export function KeyboardProvider({ children }: KeyboardProviderProps) {
   const { user, isAuthenticated } = useAuth();
   
-  // Persist custom shortcuts to LocalStorage
+  // Persist custom shortcuts to LocalStorage - user-scoped for data isolation
   const [shortcuts, setShortcuts] = useLocalStorage<KeyboardShortcut[]>(
     'keyboard-shortcuts',
-    DEFAULT_SHORTCUTS
+    DEFAULT_SHORTCUTS,
+    user?.id
   );
   
   // Callbacks registry (not persisted)

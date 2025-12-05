@@ -38,8 +38,8 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { user, isAuthenticated } = useAuth();
   
-  // Persist theme selection to local storage (Requirement 10.3)
-  const [themeId, setThemeId] = useLocalStorage<ThemeId>('darkprod_theme', 'default-dark');
+  // Persist theme selection to local storage (Requirement 10.3) - user-scoped for data isolation
+  const [themeId, setThemeId] = useLocalStorage<ThemeId>('darkprod_theme', 'default-dark', user?.id);
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[themeId]);
   const [cloudSyncEnabled, setCloudSyncEnabled] = useState(false);
 

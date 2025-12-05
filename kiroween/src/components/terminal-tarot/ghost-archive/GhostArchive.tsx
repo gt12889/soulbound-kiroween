@@ -11,6 +11,8 @@ import { CommandInput } from './CommandInput';
 import { AgentStatusPanel } from './AgentStatusPanel';
 import { WorkflowVisualizer } from './WorkflowVisualizer';
 import { OptionsDisplay } from './OptionsDisplay';
+// import CommandHints from './CommandHints';
+// import StatusBar from './StatusBar';
 import styles from './GhostArchive.module.css';
 
 export const GhostArchive: React.FC = () => {
@@ -52,7 +54,7 @@ export const GhostArchive: React.FC = () => {
   // No need to call help command here
 
   return (
-    <div className={styles.ghostArchive}>
+    <div className={`${styles.ghostArchive} ghostArchive`}>
       <CRTEffects>
         <div className={styles.terminalContainer}>
           <div className={styles.terminalHeader}>

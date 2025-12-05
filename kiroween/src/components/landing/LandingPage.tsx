@@ -73,17 +73,17 @@ const LandingPage: React.FC = () => {
           style={{ transform: `translateY(${parallaxOffset * 0.3}px)` }}
         >
           <h1 className={styles.heroTitle}>
-            <span className={styles.titleLine}>The Dark Forest</span>
+            <span className={styles.titleLine}>Soul Bound Codex</span>
           </h1>
           <p className={styles.heroSubtitle}>
             A mystical realm where productivity dwells in shadow
           </p>
           <p className={styles.heroDescription}>
             Three paths lie before you, each leading to ancient powers. 
-            Choose wisely, traveler, for the forest remembers all who enter.
+            Choose wisely, traveler, for the codex remembers all who enter.
           </p>
           <button className={`${styles.ctaButton} button-primary`} onClick={handleGetStarted}>
-            <span>Enter the Forest</span>
+            <span>Enter the Codex</span>
           </button>
         </div>
       </section>
@@ -349,15 +349,23 @@ const LandingPage: React.FC = () => {
                 muted
                 playsInline
                 preload="auto"
+                poster="/trees.png"
+                onError={(e) => {
+                  console.error('Failed to load flower.mp4 video');
+                  // Fallback: hide video and show background
+                  const target = e.target as HTMLVideoElement;
+                  target.style.display = 'none';
+                }}
               >
                 <source src="/flower.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
               </video>
             </div>
           </div>
           <div className={styles.editorialText}>
             <div className={styles.editorialContentInner}>
             <AnimatedSlide delay={0}>
-              <h2 className={styles.editorialSubheading}>Dark Forest Ecosystem</h2>
+              <h2 className={styles.editorialSubheading}>Soul Bound Codex Ecosystem</h2>
             </AnimatedSlide>
             <AnimatedSlide delay={200}>
               <h3 className={styles.editorialHeading}>
@@ -422,7 +430,7 @@ const LandingPage: React.FC = () => {
           <div className={styles.footerGrid}>
             {/* Brand Column */}
             <div className={styles.footerBrand}>
-              <h3 className={styles.footerLogo}>🌲 The Dark Forest</h3>
+              <h3 className={styles.footerLogo}>📜 Soul Bound Codex</h3>
               <p className={styles.footerTagline}>
                 Where productivity meets mystery
               </p>
@@ -476,7 +484,7 @@ const LandingPage: React.FC = () => {
           {/* Footer Bottom */}
           <div className={styles.footerBottom}>
             <p className={styles.footerCopyright}>
-              © {new Date().getFullYear()} The Dark Forest. All rights reserved.
+              © {new Date().getFullYear()} Soul Bound Codex. All rights reserved.
             </p>
             <p className={styles.footerCredit}>
               Crafted with 🌙 in the shadows

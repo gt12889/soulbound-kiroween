@@ -3,7 +3,7 @@
  * Handles command input with history navigation
  */
 
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useAudio } from '../../../hooks/useAudio';
 import { useGhostArchive } from '../../../contexts/GhostArchiveContext';
 import styles from './CommandInput.module.css';
@@ -27,7 +27,8 @@ export const CommandInput: React.FC<CommandInputProps> = ({
 }) => {
   const [input, setInput] = useState('');
   const [historyIndex, setHistoryIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const { playTerminalType } = useAudio();
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { getOptionByNumber, setAvailableOptions } = useGhostArchive();
@@ -46,33 +47,30 @@ export const CommandInput: React.FC<CommandInputProps> = ({
     };
   }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const executeCommand = useCallback(() => {
     const trimmedInput = input.trim();
-    if (!trimmedInput) return;
+    if (!trimmedInput || isProcessing) return;
+
+    setIsProcessing(true);
 
     // Check if input is a number and map it to an option
     const numberInput = parseInt(trimmedInput, 10);
     if (!isNaN(numberInput) && numberInput > 0) {
       const option = getOptionByNumber(numberInput);
       if (option) {
-        playTerminalType(); // Play typing sound on command execution
-        // Clear options after selection
+        playTerminalType();
         setAvailableOptions([]);
         onExecute(option.command);
         setInput('');
         setHistoryIndex(-1);
+        setIsProcessing(false);
         return;
       }
-      // If number doesn't match an option, still execute it
-      // The context will handle showing the "Invalid option number" error
     }
 
-    // Regular command execution (including unmatched numbers)
+    // Regular command execution
     if (trimmedInput) {
-      playTerminalType(); // Play typing sound on command execution
-      // Don't clear options on invalid numbers so user can still see them
-      // Only clear for actual commands
+      playTerminalType();
       if (isNaN(numberInput)) {
         setAvailableOptions([]);
       }
@@ -80,17 +78,28 @@ export const CommandInput: React.FC<CommandInputProps> = ({
       setInput('');
       setHistoryIndex(-1);
     }
-  }, [input, onExecute, playTerminalType, getOptionByNumber, setAvailableOptions]);
+    
+    setIsProcessing(false);
+  }, [input, isProcessing, onExecute, playTerminalType, getOptionByNumber, setAvailableOptions]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'ArrowUp') {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    executeCommand();
+  }, [executeCommand]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter sends, Shift+Enter creates new line
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      executeCommand();
+    } else if (e.key === 'ArrowUp' && !e.shiftKey && input === '') {
       e.preventDefault();
       if (history.length > 0) {
         const newIndex = historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
         setHistoryIndex(newIndex);
         setInput(history[newIndex]);
       }
-    } else if (e.key === 'ArrowDown') {
+    } else if (e.key === 'ArrowDown' && !e.shiftKey && input === '') {
       e.preventDefault();
       if (historyIndex !== -1) {
         const newIndex = historyIndex + 1;
@@ -106,52 +115,67 @@ export const CommandInput: React.FC<CommandInputProps> = ({
       e.preventDefault();
       // TODO: Implement tab completion
     }
-  }, [history, historyIndex]);
+  }, [executeCommand, history, historyIndex, input]);
 
   return (
-    <form onSubmit={handleSubmit} className={styles.commandInputForm}>
-      <span className={styles.prompt} style={{ color: theme?.textColor || '#00ff88' }}>
-        {prompt}
-      </span>
-      <input
-        ref={inputRef}
-        type="text"
-        value={input}
-        onChange={(e) => {
-          setInput(e.target.value);
-          setHistoryIndex(-1);
-          
-          // Play typing sound with debounce
-          if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-          }
-          typingTimeoutRef.current = setTimeout(() => {
-            if (e.target.value.length > 0) {
-              playTerminalType();
-            }
-          }, 150); // Debounce typing sounds
-        }}
-        onKeyDown={handleKeyDown}
-        className={styles.input}
-        style={{
-          color: theme?.textColor || '#00ff00',
-          textShadow: theme?.glowColor ? `0 0 8px ${theme.glowColor}` : undefined,
-        }}
-        autoComplete="off"
-        spellCheck={false}
-        aria-label="Terminal command input"
-      />
-      {theme?.cursorStyle !== 'none' && (
-        <span
-          className={`${styles.cursor} ${
-            theme?.cursorStyle === 'underline' ? styles.cursorUnderline : styles.cursorBlock
-          }`}
-          style={{ backgroundColor: theme?.textColor || '#00ff00' }}
+    <div className={styles.commandInputWrapper}>
+      <form onSubmit={handleSubmit} className={styles.commandInputForm}>
+        <div className={styles.inputContainer}>
+          <span className={styles.prompt} style={{ color: theme?.textColor || '#00ff88' }}>
+            {prompt}
+          </span>
+          <textarea
+            ref={inputRef}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setHistoryIndex(-1);
+              
+              // Auto-resize textarea
+              if (inputRef.current) {
+                inputRef.current.style.height = 'auto';
+                inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 120)}px`;
+              }
+              
+              // Play typing sound with debounce
+              if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+              }
+              typingTimeoutRef.current = setTimeout(() => {
+                if (e.target.value.length > 0) {
+                  playTerminalType();
+                }
+              }, 150);
+            }}
+            onKeyDown={handleKeyDown}
+            className={styles.textarea}
+            style={{
+              color: theme?.textColor || '#00ff00',
+              textShadow: theme?.glowColor ? `0 0 8px ${theme.glowColor}` : undefined,
+            }}
+            placeholder="Type your incantation here..."
+            autoComplete="off"
+            spellCheck={false}
+            rows={1}
+            aria-label="Terminal command input"
+          />
+        </div>
+        <button
+          type="submit"
+          className={styles.sendButton}
+          disabled={!input.trim() || isProcessing}
+          style={{
+            borderColor: theme?.glowColor || '#00ff88',
+            color: theme?.textColor || '#00ff00',
+          }}
+          aria-label="Send command"
         >
-          {theme?.cursorStyle === 'underline' ? '▁' : '▋'}
-        </span>
-      )}
-    </form>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
   );
 };
 

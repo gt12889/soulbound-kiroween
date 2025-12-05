@@ -46,7 +46,7 @@ const GraveyardDashboard = lazy(() => import('./components/graveyard-dashboard/G
 const CursedCalendar = lazy(() => import('./components/cursed-calendar/CursedCalendar').then(module => ({ default: module.CursedCalendar })));
 const AchievementsPage = lazy(() => import('./components/achievements/AchievementsPage').then(module => ({ default: module.AchievementsPage })));
 const FocusedTimerPage = lazy(() => import('./components/focused-timer/FocusedTimerPage').then(module => ({ default: module.FocusedTimerPage })));
-const StreakDashboard = lazy(() => import('./components/streaks/StreakDashboard').then(module => ({ default: module.StreakDashboard })));
+// const StreakDashboard = lazy(() => import('./components/streaks/StreakDashboard').then(module => ({ default: module.StreakDashboard })));
 
 // Component to redirect authenticated users away from auth pages
 const AuthRedirect: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -193,6 +193,16 @@ const AppContent: React.FC = () => {
                         />
                         <Route 
                           path="/terminal-tarot" 
+                          element={
+                            <ErrorBoundary>
+                              <ProtectedRoute>
+                                <TerminalTarot />
+                              </ProtectedRoute>
+                            </ErrorBoundary>
+                          } 
+                        />
+                        <Route 
+                          path="/ghost-archive" 
                           element={
                             <ErrorBoundary>
                               <ProtectedRoute>

@@ -888,7 +888,9 @@
   position: relative;
   min-height: 350px;
   max-height: 400px;
-  background: rgba(45, 27, 78, 0.2);
+  background: 
+    radial-gradient(ellipse at center, rgba(139, 92, 246, 0.2) 0%, transparent 70%),
+    linear-gradient(135deg, rgba(45, 27, 78, 0.4) 0%, rgba(26, 26, 26, 0.6) 100%);
   border-radius: 16px;
   overflow: hidden;
   border: 2px solid var(--accent-purple);
@@ -896,6 +898,23 @@
     0 10px 40px rgba(0, 0, 0, 0.5),
     0 0 30px var(--glow-purple),
     inset 0 0 20px rgba(139, 92, 246, 0.2);
+  /* Fallback: animated gradient when video doesn't load */
+  animation: glowPulseBackground 4s ease-in-out infinite;
+}
+
+@keyframes glowPulseBackground {
+  0%, 100% {
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      0 0 30px var(--glow-purple),
+      inset 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      0 0 50px var(--glow-purple),
+      inset 0 0 40px rgba(139, 92, 246, 0.3);
+  }
 }
 
 .videoWrapper {

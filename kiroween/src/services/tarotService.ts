@@ -514,9 +514,10 @@ function calculateGrade(value: number, excellent: number, good: number): { score
  * @param stats - Commit statistics
  * @param cards - Selected tarot cards
  * @param projectAnalysis - Optional deep repository analysis
+ * @param projectSummary - Optional AI-generated project summary
  * @returns Interpretation text
  */
-export function generateInterpretation(stats: CommitStats, cards: TarotCard[], projectAnalysis?: ProjectStructure): string {
+export function generateInterpretation(stats: CommitStats, cards: TarotCard[], projectAnalysis?: ProjectStructure, projectSummary?: string): string {
   const lines: string[] = [];
 
   // Calculate comprehensive grades
@@ -557,6 +558,21 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[], p
   lines.push('═══════════════════════════════════════════════════════');
   lines.push('                    📊 SUMMARY                          ');
   lines.push('═══════════════════════════════════════════════════════\n');
+
+  // AI-Generated Project Summary (if available)
+  if (projectSummary) {
+    lines.push('📋 PROJECT OVERVIEW:');
+    lines.push(projectSummary);
+    lines.push('');
+  } else if (projectAnalysis) {
+    // Fallback to basic description if AI summary failed
+    lines.push('📋 PROJECT OVERVIEW:');
+    lines.push(`${projectAnalysis.name}: ${projectAnalysis.description}`);
+    if (projectAnalysis.framework) {
+      lines.push(`Built with ${projectAnalysis.language} and ${projectAnalysis.framework}.`);
+    }
+    lines.push('');
+  }
 
   // Three-card reading summary
   lines.push(`${cards[0].name} (Past) → ${cards[1].name} (Present) → ${cards[2].name} (Future)`);
@@ -677,42 +693,85 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[], p
     // Code Quality Assessment
     lines.push('\n📈 CODE QUALITY ASSESSMENT:');
     
-    const avgCommentRatio = projectAnalysis.files.reduce((sum, f) => {
-      const ratio = f.analysis.linesOfCode > 0 ? (f.analysis.comments / f.analysis.linesOfCode) * 100 : 0;
-      return sum + ratio;
-    }, 0) / projectAnalysis.files.length;
-    
-    lines.push(`   💬 Documentation: ${avgCommentRatio.toFixed(1)}% comment ratio${avgCommentRatio > 15 ? ' (Excellent!)' : avgCommentRatio > 8 ? ' (Good)' : ' (Needs improvement)'}`);
-    
-    if (projectAnalysis.structure.hasTests) {
-      lines.push('   ✅ Testing: Test suite detected - Quality safeguards in place');
+    if (projectAnalysis.files && projectAnalysis.files.length > 0) {
+      const avgCommentRatio = projectAnalysis.files.reduce((sum, f) => {
+        const analysis = f.analysis || {};
+        const ratio = (analysis.linesOfCode || 0) > 0 ? ((analysis.comments || 0) / analysis.linesOfCode) * 100 : 0;
+        return sum + ratio;
+      }, 0) / projectAnalysis.files.length;
+      
+      const praise = avgCommentRatio > 15 
+        ? ' (Excellent documentation! Your code is well-documented and maintainable)'
+        : avgCommentRatio > 8 
+        ? ' (Good documentation coverage - Consider adding JSDoc comments to complex functions)'
+        : ' (Consider adding more inline comments for complex logic - helps future you!)';
+      lines.push(`   💬 Documentation: ${avgCommentRatio.toFixed(1)}% comment ratio${praise}`);
     } else {
-      lines.push('   ⚠️ Testing: No test files detected - Consider adding tests');
+      lines.push('   💬 Documentation: Analysis pending...');
     }
     
-    if (projectAnalysis.structure.hasCI) {
-      lines.push('   🔄 Automation: CI/CD pipeline configured - Professional workflow');
+    if (projectAnalysis.structure?.hasTests) {
+      lines.push('   ✅ Testing: Test suite detected - Quality safeguards in place! Your codebase has automated testing which prevents regressions and ensures reliability. Excellent practice!');
+    } else {
+      lines.push('   ⚠️ Testing: No test files detected - Consider adding tests with Jest/Vitest for React components and unit tests for services. This will improve code quality and confidence in deployments.');
+    }
+    
+    if (projectAnalysis.structure?.hasCI) {
+      lines.push('   🔄 Automation: CI/CD pipeline configured - Professional workflow! Automated builds and tests on every commit ensure code quality and catch issues early.');
     }
     
     // Architecture Analysis
     lines.push('\n🏗️ ARCHITECTURE INSIGHTS:');
     
-    const totalFunctions = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.functions, 0);
-    const totalClasses = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.classes, 0);
-    const avgComplexity = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.complexity, 0) / projectAnalysis.files.length;
-    
-    lines.push(`   🔧 Functions: ${totalFunctions} total${totalFunctions > 100 ? ' (Large codebase)' : totalFunctions > 30 ? ' (Medium sized)' : ' (Compact)'}`);
-    lines.push(`   📦 Classes: ${totalClasses} total${totalClasses > 50 ? ' (Object-oriented approach)' : totalClasses > 10 ? ' (Moderate OOP)' : ' (Functional style)'}`);
-    lines.push(`   🔀 Complexity: ${avgComplexity.toFixed(1)} avg nesting${avgComplexity > 50 ? ' (High - consider refactoring)' : avgComplexity > 25 ? ' (Moderate)' : ' (Low - clean code!)'}`);
+    if (projectAnalysis.files && projectAnalysis.files.length > 0) {
+      const totalFunctions = projectAnalysis.files.reduce((sum, f) => sum + (f.analysis?.functions || 0), 0);
+      const totalClasses = projectAnalysis.files.reduce((sum, f) => sum + (f.analysis?.classes || 0), 0);
+      const avgComplexity = projectAnalysis.files.reduce((sum, f) => sum + (f.analysis?.complexity || 0), 0) / projectAnalysis.files.length;
+      
+      const funcPraise = totalFunctions > 100 
+        ? ' (Large, well-organized codebase - Consider breaking into microservices if it grows further)'
+        : totalFunctions > 30 
+        ? ' (Medium-sized codebase - Great balance of functionality and maintainability)'
+        : ' (Compact and focused - Easy to understand and maintain)';
+      
+      const classPraise = totalClasses > 50 
+        ? ' (Object-oriented approach - Good use of encapsulation and inheritance)'
+        : totalClasses > 10 
+        ? ' (Moderate OOP - Balanced approach with functional components)'
+        : ' (Functional style - Modern React patterns with hooks and functional components)';
+      
+      const complexityPraise = avgComplexity < 15
+        ? ' (Low complexity - Clean, readable code! Excellent maintainability)'
+        : avgComplexity < 25
+        ? ' (Moderate complexity - Well-structured with room for some optimization)'
+        : ' (High complexity - Consider extracting nested logic into separate functions or custom hooks)';
+      
+      lines.push(`   🔧 Functions: ${totalFunctions} total${funcPraise}`);
+      lines.push(`   📦 Classes: ${totalClasses} total${classPraise}`);
+      lines.push(`   🔀 Complexity: ${avgComplexity.toFixed(1)} avg nesting${complexityPraise}`);
+    } else {
+      lines.push('   🔧 Architecture analysis pending...');
+    }
     
     // File-by-File Highlights
     lines.push('\n📂 KEY FILES ANALYZED:');
     
-    projectAnalysis.files.slice(0, 5).forEach(file => {
-      const fileName = file.path.split('/').pop() || file.path;
-      lines.push(`   📄 ${fileName} (${file.language})`);
-      lines.push(`      ${file.analysis.linesOfCode} LOC | ${file.analysis.functions} functions | ${file.analysis.classes} classes`);
-    });
+    if (projectAnalysis.files && projectAnalysis.files.length > 0) {
+      projectAnalysis.files.slice(0, 5).forEach(file => {
+        const fileName = file.path.split('/').pop() || file.path;
+        const analysis = file.analysis || {};
+        const commentRatio = analysis.linesOfCode > 0 ? ((analysis.comments || 0) / analysis.linesOfCode * 100).toFixed(1) : '0';
+        const complexityNote = analysis.complexity < 15 
+          ? ' - Clean and maintainable'
+          : analysis.complexity < 25
+          ? ' - Well-structured'
+          : ' - Consider refactoring';
+        lines.push(`   📄 ${fileName} (${file.language || 'unknown'})`);
+        lines.push(`      ${analysis.linesOfCode || 0} LOC | ${analysis.functions || 0} functions | ${analysis.classes || 0} classes | ${commentRatio}% documented${complexityNote}`);
+      });
+    } else {
+      lines.push('   📄 File analysis pending...');
+    }
     
     // Technology Stack
     if (projectAnalysis.framework) {
@@ -732,6 +791,94 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[], p
 }
 
 /**
+ * Generate AI-powered project summary
+ */
+async function generateProjectSummary(
+  projectAnalysis: ProjectStructure,
+  commits: GitCommit[],
+  stats: CommitStats
+): Promise<string> {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    console.warn('[Tarot] No Gemini API key - skipping project summary');
+    return '';
+  }
+
+  try {
+    // Build context about the project
+    const recentCommits = commits.slice(0, 10).map(c => c.message).join('\n');
+    const fileInfo = (projectAnalysis.files && projectAnalysis.files.length > 0)
+      ? projectAnalysis.files.slice(0, 5).map(f => {
+          const analysis = f.analysis || {};
+          return `${f.path}: ${analysis.linesOfCode || 0} LOC, ${analysis.functions || 0} functions, ${f.language || 'unknown'}`;
+        }).join('\n')
+      : 'File analysis pending...';
+    
+    const topDeps = Object.keys(projectAnalysis.dependencies || {}).slice(0, 10).join(', ');
+
+    const prompt = `Analyze this GitHub repository and write a SHORT 2-3 sentence summary explaining what this project does and its purpose.
+
+Repository: ${projectAnalysis.name}
+Description: ${projectAnalysis.description}
+Language: ${projectAnalysis.language}${projectAnalysis.framework ? ` + ${projectAnalysis.framework}` : ''}
+Dependencies: ${topDeps}
+
+Recent Commits:
+${recentCommits}
+
+Key Files:
+${fileInfo}
+
+Code Stats: ${stats.totalCommits} commits, ${stats.averageCommitsPerDay.toFixed(1)} commits/day average
+Top Keywords: ${stats.topKeywords.join(', ')}
+
+Write a concise 2-3 sentence summary that:
+1. Explains what the project does/its purpose
+2. Mentions the tech stack if relevant
+3. Describes the type of application (web app, library, tool, etc.)
+
+Keep it professional but clear. Start directly with what the project is.`;
+
+    const model = import.meta.env.VITE_AI_MODEL || 'gemini-2.0-flash-exp';
+    
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'x-goog-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{ text: prompt }]
+          }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 150,
+            topP: 0.95,
+            topK: 40,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error('[Tarot] Failed to generate project summary:', response.status);
+      return '';
+    }
+
+    const data = await response.json();
+    const summary = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    return summary.trim();
+  } catch (error) {
+    console.error('[Tarot] Error generating project summary:', error);
+    return '';
+  }
+}
+
+/**
  * Generates a complete tarot reading with optional repository analysis
  * @param commits - Array of git commits
  * @param stats - Commit statistics
@@ -746,13 +893,21 @@ export async function generateTarotReading(
   console.log('[Tarot] Starting tarot reading generation...');
   const cards = generateThreeCardSpread(stats);
   
+  // Generate AI project summary if we have repository analysis
+  let projectSummary = '';
+  if (projectAnalysis) {
+    console.log('[Tarot] Generating AI project summary...');
+    projectSummary = await generateProjectSummary(projectAnalysis, commits, stats);
+    console.log('[Tarot] Project summary:', projectSummary ? 'SUCCESS' : 'EMPTY');
+  }
+  
   // Generate AI commentary
   console.log('[Tarot] Requesting AI commentary...');
   const aiCommentary = await generateAICommentary(commits, stats, cards);
   console.log('[Tarot] AI commentary result:', aiCommentary ? 'SUCCESS' : 'EMPTY');
   
   // Generate base interpretation
-  let interpretation = generateInterpretation(stats, cards, projectAnalysis);
+  let interpretation = generateInterpretation(stats, cards, projectAnalysis, projectSummary);
   
   // Prepend AI commentary if available
   if (aiCommentary) {

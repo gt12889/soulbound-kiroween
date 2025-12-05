@@ -5,7 +5,7 @@ import LoadingTransition from './LoadingTransition';
 import { logger } from '../../utils/logger';
 
 interface ProtectedRouteProps {
-  children: React.ReactElement;
+  children: React.ReactNode;
 }
 
 /**

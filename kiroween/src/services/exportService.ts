@@ -129,7 +129,7 @@ class ExportService {
    * Convert data to Markdown format
    */
   private toMarkdown(data: ExportData): string {
-    let markdown = `# Dark Productivity Suite Export\n\n`;
+    let markdown = `# Soul Bound Codex Export\n\n`;
     markdown += `**Export Date:** ${new Date(data.exportDate).toLocaleString()}\n`;
     markdown += `**Version:** ${data.version}\n\n`;
 
@@ -316,7 +316,7 @@ class ExportService {
       
       // Generate filename with timestamp
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-      link.download = `dark-productivity-suite-${timestamp}.${extension}`;
+      link.download = `soul-bound-codex-${timestamp}.${extension}`;
       link.href = url;
       
       // Trigger download

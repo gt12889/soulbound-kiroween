@@ -31,6 +31,7 @@ const Navigation: React.FC = () => {
 
   const navItems = [
     { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
+    { path: '/ghost-archive', label: 'Ghost Archive', icon: '👻', description: 'Historical minds', shortcutId: 'nav-ghost-archive' },
     { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods', shortcutId: 'nav-necronomicon-notes' },
     { path: '/ghost-writer', label: 'Haunted Study', icon: '✍️', description: 'Spectral guidance', shortcutId: 'nav-ghost-writer' },
     { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest', shortcutId: 'nav-graveyard-dashboard' },
@@ -160,11 +161,11 @@ const Navigation: React.FC = () => {
           className={styles.navHeader}
           onClick={handleNavClick}
           onMouseEnter={handleNavHover}
-          title="Return to the forest entrance"
-          aria-label="Return to the forest entrance"
+          title="Return to Soul Bound Codex"
+          aria-label="Return to Soul Bound Codex"
         >
-          <div className={styles.forestIcon} aria-hidden="true">🌲</div>
-          <h1 className={styles.title}>The Dark Forest</h1>
+          <div className={styles.forestIcon} aria-hidden="true">📜</div>
+          <h1 className={styles.title}>Soul Bound Codex</h1>
           <p className={styles.subtitle}>Choose Your Path</p>
         </Link>
         

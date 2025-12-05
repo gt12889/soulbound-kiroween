@@ -1,5 +1,5 @@
 /**
- * Context exports for Dark Productivity Suite
+ * Context exports for Soul Bound Codex
  */
 
 export { AppProvider, useApp } from './AppContext';
