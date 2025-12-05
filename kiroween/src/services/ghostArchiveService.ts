@@ -7,6 +7,7 @@
 import type { Agent } from '../types/agent';
 import { agentOrchestrator } from './agentOrchestrator';
 import { sagemakerService } from './sagemakerService';
+import { huggingFaceEinsteinService } from './huggingFaceEinsteinService';
 import { hasSageMakerEndpoint } from '../config/sagemakerPersonalities';
 import { createScopedLogger } from '../utils/logger';
 
@@ -30,6 +31,9 @@ class GhostArchiveService {
     try {
       // Initialize SageMaker service
       await sagemakerService.initialize();
+      
+      // Initialize Hugging Face Einstein service
+      await huggingFaceEinsteinService.initialize();
       
       // Load and register personalities
       const module = await import('../data/personalities.json');
@@ -72,13 +76,53 @@ class GhostArchiveService {
   }
 
   /**
-   * Ask a question - uses hybrid SageMaker + fallback approach
+   * Ask a question - uses hybrid SageMaker + Hugging Face + fallback approach
    */
   async ask(question: string, preferredAgents?: string[], reasoningMode?: 'single' | 'multi' | 'collaborative'): Promise<string> {
-    // If connected to a single personality with SageMaker endpoint, use it
+    // If connected to a single personality, check for specialized services
     if (preferredAgents && preferredAgents.length === 1) {
       const agentId = preferredAgents[0];
       
+      // Check for Einstein using Hugging Face API
+      if (agentId === 'einstein' || agentId.toLowerCase().includes('einstein')) {
+        try {
+          const available = await huggingFaceEinsteinService.isAvailable();
+          if (available) {
+            logger.info(`Routing to Hugging Face Einstein API for ${agentId}`);
+            
+            // Get conversation history for this agent
+            const history = this.conversationHistory[agentId] || [];
+            
+            // Convert history format (filter out system messages)
+            const formattedHistory = history
+              .filter(msg => msg.role !== 'system')
+              .map(msg => ({
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content
+              }));
+            
+            // Invoke Hugging Face Einstein API
+            const response = await huggingFaceEinsteinService.generateResponse(
+              question,
+              formattedHistory
+            );
+            
+            // Update conversation history
+            this.conversationHistory[agentId] = [
+              ...history,
+              { role: 'user' as const, content: question },
+              { role: 'assistant' as const, content: response },
+            ].slice(-10); // Keep last 10 exchanges
+            
+            return response;
+          }
+        } catch (error) {
+          logger.warn(`Hugging Face Einstein API failed for ${agentId}, using fallback:`, error);
+          // Fall through to orchestrator fallback
+        }
+      }
+      
+      // Check for SageMaker endpoint
       if (hasSageMakerEndpoint(agentId) && sagemakerService.isAvailable(agentId)) {
         try {
           logger.info(`Routing to SageMaker for ${agentId}`);
@@ -96,8 +140,8 @@ class GhostArchiveService {
           // Update conversation history
           this.conversationHistory[agentId] = [
             ...history,
-            { role: 'user', content: question },
-            { role: 'assistant', content: response },
+            { role: 'user' as const, content: question },
+            { role: 'assistant' as const, content: response },
           ].slice(-10); // Keep last 10 exchanges
           
           return response;

@@ -1,7 +1,9 @@
-import React, { useState, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useCallback, lazy, Suspense, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { TarotReading } from '../../types';
 import { analyzeCommits, generateDemoCommits } from '../../services/gitService';
 import { generateTarotReading } from '../../services/tarotService';
+import { analyzeRepository, type ProjectStructure } from '../../services/repositoryAnalysisService';
 import { useAudio } from '../../hooks/useAudio';
 import TarotCard from './TarotCard';
 import LoadingFallback from '../common/LoadingFallback';
@@ -11,7 +13,24 @@ import styles from './TarotReader.module.css';
 const GhostArchive = lazy(() => import('./ghost-archive/GhostArchive').then(module => ({ default: module.GhostArchive })));
 
 const TarotReader: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'tarot' | 'ghost-archive'>('tarot');
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Determine initial tab from URL path
+  const getInitialTab = (): 'tarot' | 'ghost-archive' => {
+    if (location.pathname === '/ghost-archive') {
+      return 'ghost-archive';
+    }
+    return 'tarot';
+  };
+  
+  const [activeTab, setActiveTab] = useState<'tarot' | 'ghost-archive'>(getInitialTab());
+  
+  // Update tab when URL changes
+  useEffect(() => {
+    const newTab = getInitialTab();
+    setActiveTab(newTab);
+  }, [location.pathname]);
   const [reading, setReading] = useState<TarotReading | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +55,97 @@ const TarotReader: React.FC = () => {
       // Use demo data
       const commits = generateDemoCommits();
       const stats = analyzeCommits(commits);
-      const newReading = await generateTarotReading(commits, stats);
+      
+      // Create demo project analysis for PROJECT OVERVIEW section with detailed static data
+      const demoProjectAnalysis: ProjectStructure = {
+        name: 'Dark Productivity Suite',
+        description: 'A mystical productivity application with tarot readings, task management, and spirit companions',
+        language: 'TypeScript',
+        framework: 'React',
+        dependencies: {
+          'react': '^18.2.0',
+          'react-router-dom': '^6.20.0',
+          'three': '^0.160.0',
+          'firebase': '^10.7.0',
+          '@types/react': '^18.2.0',
+          'typescript': '^5.3.0'
+        },
+        files: [
+          {
+            path: 'src/components/terminal-tarot/TarotReader.tsx',
+            language: 'TypeScript',
+            size: 15234,
+            analysis: {
+              imports: ['react', 'three', 'firebase'],
+              functions: 28,
+              classes: 3,
+              complexity: 12.5,
+              comments: 145,
+              linesOfCode: 615
+            }
+          },
+          {
+            path: 'src/services/tarotService.ts',
+            language: 'TypeScript',
+            size: 28456,
+            analysis: {
+              imports: ['types', 'firebase'],
+              functions: 42,
+              classes: 5,
+              complexity: 18.3,
+              comments: 312,
+              linesOfCode: 882
+            }
+          },
+          {
+            path: 'src/contexts/CompanionContext.tsx',
+            language: 'TypeScript',
+            size: 18923,
+            analysis: {
+              imports: ['react', 'hooks'],
+              functions: 35,
+              classes: 2,
+              complexity: 15.7,
+              comments: 198,
+              linesOfCode: 672
+            }
+          },
+          {
+            path: 'src/components/graveyard-dashboard/GraveyardView.tsx',
+            language: 'TypeScript',
+            size: 22341,
+            analysis: {
+              imports: ['react', 'contexts'],
+              functions: 31,
+              classes: 4,
+              complexity: 14.2,
+              comments: 167,
+              linesOfCode: 573
+            }
+          },
+          {
+            path: 'src/services/storageService.ts',
+            language: 'TypeScript',
+            size: 15678,
+            analysis: {
+              imports: ['types'],
+              functions: 24,
+              classes: 1,
+              complexity: 9.8,
+              comments: 203,
+              linesOfCode: 875
+            }
+          }
+        ],
+        structure: {
+          hasTests: true,
+          hasDocumentation: true,
+          hasCI: true,
+          folders: ['src', 'public', 'tests', 'docs', 'kiroween']
+        }
+      };
+      
+      const newReading = await generateTarotReading(commits, stats, demoProjectAnalysis);
       
       // Set reading immediately
       setReading(newReading);
@@ -85,24 +194,22 @@ const TarotReader: React.FC = () => {
       // Analyze commits
       const stats = analyzeCommits(commits);
 
-      // Perform deep repository analysis if enabled
+      // Perform deep repository analysis by default
       let projectAnalysis;
-      if (deepAnalysis) {
-        try {
-          console.log('🔬 Performing deep repository analysis...');
-          const urlMatch = trimmedUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
-          if (urlMatch) {
-            const [, owner, repo] = urlMatch;
-            projectAnalysis = await analyzeRepository(owner, repo.replace(/\.git$/, ''));
-            console.log('✅ Repository analysis complete');
-          }
-        } catch (analyzeError) {
-          console.warn('⚠️ Deep analysis failed, continuing with commit analysis only:', analyzeError);
-          // Continue without deep analysis
+      try {
+        console.log('🔬 Performing deep repository analysis...');
+        const urlMatch = trimmedUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+        if (urlMatch) {
+          const [, owner, repo] = urlMatch;
+          projectAnalysis = await analyzeRepository(owner, repo.replace(/\.git$/, ''));
+          console.log('✅ Repository analysis complete:', projectAnalysis);
         }
+      } catch (analyzeError) {
+        console.warn('⚠️ Deep analysis failed, continuing with commit analysis only:', analyzeError);
+        // Continue without deep analysis - don't fail the whole reading
       }
 
-      // Generate tarot reading (now async with AI + optional deep analysis)
+      // Generate tarot reading (now async with AI + deep analysis)
       const newReading = await generateTarotReading(commits, stats, projectAnalysis);
       
       // Simulate a brief delay for dramatic effect
@@ -133,7 +240,13 @@ const TarotReader: React.FC = () => {
   const handleTabChange = useCallback((tab: 'tarot' | 'ghost-archive') => {
     playUIClick();
     setActiveTab(tab);
-  }, [playUIClick]);
+    // Navigate to the correct URL when tab changes
+    if (tab === 'ghost-archive') {
+      navigate('/ghost-archive', { replace: true });
+    } else {
+      navigate('/terminal-tarot', { replace: true });
+    }
+  }, [playUIClick, navigate]);
 
   return (
     <div className={styles.tarotReader}>
@@ -235,22 +348,6 @@ const TarotReader: React.FC = () => {
               <span className={styles.buttonIcon} aria-hidden="true">🔮</span>
               Generate Reading
             </button>
-          </div>
-          
-          <div className={styles.deepAnalysisToggle}>
-            <label>
-              <input
-                type="checkbox"
-                checked={deepAnalysis}
-                onChange={(e) => setDeepAnalysis(e.target.checked)}
-              />
-              <span className={styles.toggleLabel}>
-                🔬 Deep Repository Analysis
-                <span className={styles.toggleHint}>
-                  Analyze files, code structure, and tech stack (slower but comprehensive)
-                </span>
-              </span>
-            </label>
           </div>
           
           <div className={styles.controls}>
@@ -390,6 +487,22 @@ const TarotReader: React.FC = () => {
                   
                   // Summary Section
                   if (sectionTitle.includes('SUMMARY')) {
+                    // Split content into paragraphs, handling PROJECT OVERVIEW section
+                    const contentLines = sectionContent.split('\n').filter(line => line.trim());
+                    const overviewIndex = contentLines.findIndex(line => line.includes('PROJECT OVERVIEW'));
+                    
+                    // Find where PROJECT OVERVIEW ends (look for next section marker or tarot card reference)
+                    let overviewEndIndex = contentLines.length;
+                    if (overviewIndex >= 0) {
+                      // Look for the next section that starts with a pattern like "(X/100)" or contains "→"
+                      const nextSectionIndex = contentLines.findIndex((line, i) => 
+                        i > overviewIndex && (line.match(/\(\d+\/100\)/) || line.includes('→'))
+                      );
+                      if (nextSectionIndex > overviewIndex) {
+                        overviewEndIndex = nextSectionIndex;
+                      }
+                    }
+                    
                     return (
                       <div key={idx} className={styles.readingSection}>
                         <div className={styles.sectionHeader}>
@@ -397,9 +510,39 @@ const TarotReader: React.FC = () => {
                           <span className={styles.sectionBadge}>Overview</span>
                         </div>
                         <div className={styles.sectionBody}>
-                          {sectionContent.split('\n').filter(line => line.trim()).map((line, i) => (
-                            <p key={i} className={styles.summaryLine}>{line}</p>
-                          ))}
+                          {overviewIndex >= 0 ? (
+                            <>
+                              {/* Project Overview Section - render as paragraphs */}
+                              <div className={styles.projectOverview}>
+                                {contentLines.slice(overviewIndex + 1, overviewEndIndex).map((line, i) => {
+                                  // Skip empty lines and section headers
+                                  if (!line.trim() || line.includes('PROJECT OVERVIEW')) return null;
+                                  return (
+                                    <p key={i} className={styles.projectSummaryLine}>{line}</p>
+                                  );
+                                }).filter(Boolean)}
+                              </div>
+                              {/* Rest of summary */}
+                              {overviewEndIndex < contentLines.length && (
+                                <div className={styles.summaryRest}>
+                                  {contentLines.slice(overviewEndIndex).map((line, i) => {
+                                    if (!line.trim()) return null;
+                                    return (
+                                      <p key={`rest-${i}`} className={styles.summaryLine}>{line}</p>
+                                    );
+                                  }).filter(Boolean)}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            // No PROJECT OVERVIEW found, render all as paragraphs
+                            contentLines.map((line, i) => {
+                              if (!line.trim()) return null;
+                              return (
+                                <p key={i} className={styles.summaryLine}>{line}</p>
+                              );
+                            }).filter(Boolean)
+                          )}
                         </div>
                       </div>
                     );
@@ -461,39 +604,39 @@ const TarotReader: React.FC = () => {
                     );
                   }
                   
+                  // Repository Deep Dive Section
+                  if (sectionTitle.includes('REPOSITORY DEEP DIVE')) {
+                    return (
+                      <div key={idx} className={styles.readingSection}>
+                        <div className={styles.sectionHeader}>
+                          <h3 className={styles.sectionTitle}>🔬 Repository Deep Dive</h3>
+                          <span className={styles.sectionBadge}>Code Analysis</span>
+                        </div>
+                        <div className={styles.sectionBody}>
+                          <div className={styles.deepDiveContent}>
+                            {sectionContent.split('\n').filter(line => line.trim()).map((line, i) => {
+                              // Section headers (all caps followed by colon)
+                              if (line.match(/^[A-Z\s]+:$/)) {
+                                return <h4 key={i} className={styles.deepDiveHeader}>{line}</h4>;
+                              }
+                              // Indented items (start with spaces/tab or bullet)
+                              if (line.match(/^\s+[•▸📄📦🔧✅⚠️🔄]/)) {
+                                return <p key={i} className={styles.deepDiveItem}>{line.trim()}</p>;
+                              }
+                              // Regular lines
+                              return <p key={i} className={styles.deepDiveLine}>{line}</p>;
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
                   return null;
                 }).filter(Boolean);
               })()}
             </div>
           </div>
-
-          {reading.commitStats && (
-            <div className={styles.statsPanel}>
-              <h3 className={styles.statsTitle}>Commit Analysis</h3>
-              <div className={styles.statsGrid}>
-                <div className={styles.statItem}>
-                  <div className={styles.statLabel}>Total Commits</div>
-                  <div className={styles.statValue}>{reading.commitStats.totalCommits}</div>
-                </div>
-                <div className={styles.statItem}>
-                  <div className={styles.statLabel}>Daily Average</div>
-                  <div className={styles.statValue}>{reading.commitStats.averageCommitsPerDay.toFixed(1)}</div>
-                </div>
-                <div className={styles.statItem}>
-                  <div className={styles.statLabel}>Sentiment Score</div>
-                  <div className={styles.statValue}>{reading.commitStats.sentimentScore.toFixed(2)}</div>
-                </div>
-                <div className={styles.statItem}>
-                  <div className={styles.statLabel}>Top Keywords</div>
-                  <div className={styles.statKeywords}>
-                    {reading.commitStats.topKeywords.map((keyword, idx) => (
-                      <span key={idx} className={styles.keyword}>{keyword}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className={styles.actions}>
             <button 

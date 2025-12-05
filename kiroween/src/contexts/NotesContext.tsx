@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Note } from '../types';
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
 // import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
 import { useCompanion } from './CompanionContext';
@@ -60,8 +61,11 @@ interface NotesProviderProps {
  * Requirements: 3.1, 3.2, 3.6, 7.2, 8.1
  */
 export function NotesProvider({ children }: NotesProviderProps) {
-  // Persist notes to LocalStorage
-  const [notes, setNotes] = useLocalStorage<Note[]>('notes', []);
+  // Get user context for data isolation
+  const { user } = useAuth();
+  
+  // Persist notes to LocalStorage - user-scoped for data isolation
+  const [notes, setNotes] = useLocalStorage<Note[]>('notes', [], user?.id);
   
   // Undo/Redo functionality
   // Requirement: 8.1, 8.5 - Implement undo/redo with max 10 actions

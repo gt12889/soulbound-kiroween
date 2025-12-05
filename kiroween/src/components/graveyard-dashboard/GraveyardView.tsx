@@ -12,6 +12,7 @@ import { MoonLighting } from './MoonLighting';
 import { DiggingModal } from './DiggingModal';
 import SkeletonLoader from '../common/SkeletonLoader';
 import EmptyState from '../common/EmptyState';
+import PageHeader from '../common/PageHeader';
 import type { Task } from '../../types';
 import styles from './GraveyardView.module.css';
 
@@ -271,10 +272,12 @@ export function GraveyardView() {
       {/* Archive Suggestions Modal */}
       <ArchiveSuggestions />
 
-      <header className={styles.header}>
-        <h1 className={styles.title}>Graveyard Dashboard</h1>
-        <p className={styles.subtitle}>Where tasks come to rest</p>
-        
+      <PageHeader 
+        title="Graveyard Dashboard" 
+        subtitle="Where tasks come to rest"
+        cursorColor="#B19EEF"
+        className={styles.header}
+      >
         <div className={styles.headerActions}>
           <button
             className={`${styles.createButton} button-primary`}
@@ -295,7 +298,7 @@ export function GraveyardView() {
             {bulkSelectionMode ? '✓ Bulk Mode' : '☐ Bulk Select'}
           </button>
         </div>
-      </header>
+      </PageHeader>
 
       {/* Bulk action toolbar - Requirement 9.1, 9.2, 9.3 */}
       {bulkSelectionMode && (

@@ -7,14 +7,17 @@ const logger = createScopedLogger('[LocalStorage]');
 /**
  * Custom hook for syncing state with LocalStorage
  * Automatically saves changes within 1 second
+ * Supports user-scoped storage for data isolation
  * 
  * @param key Storage key (without prefix)
  * @param initialValue Default value if no stored value exists
+ * @param userId Optional user ID for user-scoped storage
  * @returns [storedValue, setValue, error]
  */
 export function useLocalStorage<T>(
   key: string,
-  initialValue: T
+  initialValue: T,
+  userId?: string
 ): [T, (value: T | ((prev: T) => T)) => void, StorageError | null] {
   const [error, setError] = useState<StorageError | null>(null);
   const saveTimeoutRef = useRef<number | null>(null);
@@ -22,7 +25,7 @@ export function useLocalStorage<T>(
   // Initialize state from storage or use initial value
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      const item = storageService.get<T>(key);
+      const item = storageService.get<T>(key, userId);
       return item !== null ? item : initialValue;
     } catch (err) {
       logger.error(`Error loading from storage (${key}):`, err);
@@ -41,7 +44,7 @@ export function useLocalStorage<T>(
     // Set new timeout to save after 1 second
     saveTimeoutRef.current = setTimeout(() => {
       try {
-        storageService.set(key, value);
+        storageService.set(key, value, userId);
         setError(null);
       } catch (err) {
         logger.error(`Error saving to storage (${key}):`, err);
@@ -54,7 +57,7 @@ export function useLocalStorage<T>(
         }
       }
     }, 1000);
-  }, [key]);
+  }, [key, userId]);
 
   // Update stored value and trigger save
   const setValue = useCallback((value: T | ((prev: T) => T)) => {
@@ -77,7 +80,8 @@ export function useLocalStorage<T>(
   // Listen for storage events from other tabs/windows
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      const fullKey = 'darkprod_' + key;
+      // Build the full key based on userId
+      const fullKey = userId ? `darkprod_user_${userId}_${key}` : `darkprod_${key}`;
       if (e.key === fullKey && e.newValue !== null) {
         try {
           const newValue = JSON.parse(e.newValue);
@@ -90,7 +94,7 @@ export function useLocalStorage<T>(
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [key]);
+  }, [key, userId]);
 
   return [storedValue, setValue, error];
 }

@@ -22,6 +22,7 @@ export interface Agent {
   greeting: string;
   theme: TerminalTheme;
   fragmentTypes: FragmentType[];
+  elevenLabsVoiceId?: string; // Optional ElevenLabs voice ID for this personality
 }
 
 export interface AgentResponse {

@@ -246,20 +246,32 @@ export function generateProjectInsights(analysis: ProjectStructure): string[] {
   insights.push(`📦 Project: ${analysis.name} - ${analysis.description}`);
   insights.push(`💻 Primary Language: ${analysis.language}${analysis.framework ? ` with ${analysis.framework}` : ''}`);
   
-  // Code metrics
-  const totalLines = analysis.files.reduce((sum, f) => sum + f.analysis.linesOfCode, 0);
-  const totalFunctions = analysis.files.reduce((sum, f) => sum + f.analysis.functions, 0);
-  const totalClasses = analysis.files.reduce((sum, f) => sum + f.analysis.classes, 0);
-  const avgComplexity = analysis.files.reduce((sum, f) => sum + f.analysis.complexity, 0) / analysis.files.length;
+  // Code metrics - handle empty or undefined files array
+  if (analysis.files && analysis.files.length > 0) {
+    const totalLines = analysis.files.reduce((sum, f) => sum + (f.analysis?.linesOfCode || 0), 0);
+    const totalFunctions = analysis.files.reduce((sum, f) => sum + (f.analysis?.functions || 0), 0);
+    const totalClasses = analysis.files.reduce((sum, f) => sum + (f.analysis?.classes || 0), 0);
+    const avgComplexity = analysis.files.reduce((sum, f) => sum + (f.analysis?.complexity || 0), 0) / analysis.files.length;
+    const depCount = Object.keys(analysis.dependencies || {}).length;
+    
+    insights.push(`📊 Codebase: ${totalLines.toLocaleString()} lines across ${analysis.files.length} analyzed files - Well-structured codebase with clear separation of concerns`);
+    insights.push(`🔧 Structure: ${totalFunctions} functions, ${totalClasses} classes - Excellent modular design with reusable components`);
+    insights.push(`🔀 Complexity: ${avgComplexity.toFixed(1)} average nesting depth - ${avgComplexity < 15 ? 'Clean, maintainable code! 🎉' : avgComplexity < 25 ? 'Good complexity management' : 'Consider extracting some nested logic'}`);
+    insights.push(`📦 ${depCount} dependencies installed - Modern tech stack with carefully selected libraries`);
+  } else {
+    insights.push(`📊 Codebase: Analysis in progress...`);
+  }
   
-  insights.push(`📊 Codebase: ${totalLines} lines across ${analysis.files.length} analyzed files`);
-  insights.push(`🔧 Structure: ${totalFunctions} functions, ${totalClasses} classes`);
-  insights.push(`🔀 Complexity: ${avgComplexity.toFixed(1)} average nesting depth`);
-  
-  // Quality indicators
-  if (analysis.structure.hasTests) insights.push('✅ Has test coverage');
-  if (analysis.structure.hasDocumentation) insights.push('📚 Has documentation');
-  if (analysis.structure.hasCI) insights.push('🔄 Has CI/CD pipeline');
+  // Quality indicators with praise
+  if (analysis.structure?.hasTests) {
+    insights.push('✅ Has test coverage - Excellent! Testing ensures reliability and maintainability');
+  }
+  if (analysis.structure?.hasDocumentation) {
+    insights.push('📚 Has documentation - Great documentation practices help with onboarding and maintenance');
+  }
+  if (analysis.structure?.hasCI) {
+    insights.push('🔄 Has CI/CD pipeline - Professional development workflow with automated quality checks');
+  }
   
   // Dependencies
   const depCount = Object.keys(analysis.dependencies).length;

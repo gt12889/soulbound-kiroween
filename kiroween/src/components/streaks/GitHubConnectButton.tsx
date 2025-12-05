@@ -83,6 +83,9 @@ export const GitHubConnectButton: React.FC<GitHubConnectButtonProps> = ({
       provider.addScope('read:user');
       provider.addScope('public_repo');
       provider.addScope('repo'); // For private repos if user grants access
+      if (!auth) {
+        throw new Error('Firebase Auth is not initialized');
+      }
       const userCredential = await signInWithPopup(auth, provider);
       const firebaseUser = userCredential.user;
       

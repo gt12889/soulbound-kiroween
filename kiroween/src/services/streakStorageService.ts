@@ -62,8 +62,8 @@ class StreakStorageService {
           const streakData = cloudData?.streakData;
 
           if (streakData && this.validateStreakData(streakData)) {
-            // Update localStorage with cloud data for offline access
-            storageService.set(STREAK_DATA_KEY, streakData);
+            // Update localStorage with cloud data for offline access - user-scoped
+            storageService.set(STREAK_DATA_KEY, streakData, userId);
             return streakData;
           }
         } catch (error) {
@@ -72,8 +72,8 @@ class StreakStorageService {
         }
       }
 
-      // Load from localStorage
-      const localData = storageService.get<StreakData>(STREAK_DATA_KEY);
+      // Load from localStorage - user-scoped
+      const localData = storageService.get<StreakData>(STREAK_DATA_KEY, userId);
 
       if (localData && this.validateStreakData(localData)) {
         return localData;
@@ -102,8 +102,8 @@ class StreakStorageService {
         );
       }
 
-      // Save to localStorage immediately
-      storageService.set(STREAK_DATA_KEY, data);
+      // Save to localStorage immediately - user-scoped
+      storageService.set(STREAK_DATA_KEY, data, userId);
 
       // Debounce Firebase sync
       if (userId) {

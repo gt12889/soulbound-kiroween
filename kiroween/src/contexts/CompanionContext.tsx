@@ -170,41 +170,45 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
   const { themeId } = useTheme();
   const { currentModule, companionType } = useApp();
   
-  // Core companion state - will be synced with AppContext companionType via useEffect
-  const [activeCompanion, setActiveCompanion] = useLocalStorage<CompanionType>('activeCompanion', 'shadow');
-  const [unlockedCompanions, setUnlockedCompanions] = useLocalStorage<CompanionType[]>('unlockedCompanions', ['shadow']);
+  // Core companion state - user-scoped for data isolation
+  const [activeCompanion, setActiveCompanion] = useLocalStorage<CompanionType>('activeCompanion', 'shadow', user?.id);
+  const [unlockedCompanions, setUnlockedCompanions] = useLocalStorage<CompanionType[]>('unlockedCompanions', ['shadow'], user?.id);
   const [customNames, setCustomNames] = useLocalStorage<Record<CompanionType, string | undefined>>(
     'companionCustomNames',
-    { shadow: undefined, zombie: undefined, ember: undefined }
+    { shadow: undefined, zombie: undefined, ember: undefined },
+    user?.id
   );
   
-  // Mood and interaction state
+  // Mood and interaction state - user-scoped for data isolation
   const [mood, setMood] = useLocalStorage<CompanionMood>(
     'companionMood',
-    initializeCompanionMood()
+    initializeCompanionMood(),
+    user?.id
   );
-  const [lastInteraction, setLastInteraction] = useLocalStorage<number>('companionLastInteraction', Date.now());
-  const [interactionCount, setInteractionCount] = useLocalStorage<number>('companionInteractionCount', 0);
+  const [lastInteraction, setLastInteraction] = useLocalStorage<number>('companionLastInteraction', Date.now(), user?.id);
+  const [interactionCount, setInteractionCount] = useLocalStorage<number>('companionInteractionCount', 0, user?.id);
   const [dailyInteractions, setDailyInteractions] = useLocalStorage<{ date: string; count: number }>(
     'companionDailyInteractions',
-    { date: new Date().toDateString(), count: 0 }
+    { date: new Date().toDateString(), count: 0 },
+    user?.id
   );
   
-  // Skill tree state (one per companion type)
+  // Skill tree state (one per companion type) - user-scoped for data isolation
   const [skillTrees, setSkillTrees] = useLocalStorage<Record<CompanionType, SkillTree>>(
     'companionSkillTrees',
     {
       shadow: initializeSkillTree('shadow'),
       zombie: initializeSkillTree('zombie'),
       ember: initializeSkillTree('ember'),
-    }
+    },
+    user?.id
   );
   
-  // Ritual state
-  const [ritualProgress, setRitualProgress] = useLocalStorage<RitualProgress[]>('companionRitualProgress', []);
-  const [completedRituals, setCompletedRituals] = useLocalStorage<string[]>('companionCompletedRituals', []);
+  // Ritual state - user-scoped for data isolation
+  const [ritualProgress, setRitualProgress] = useLocalStorage<RitualProgress[]>('companionRitualProgress', [], user?.id);
+  const [completedRituals, setCompletedRituals] = useLocalStorage<string[]>('companionCompletedRituals', [], user?.id);
   
-  // Statistics
+  // Statistics - user-scoped for data isolation
   const [stats, setStats] = useLocalStorage<CompanionStats>('companionStats', {
     totalTasks: 0,
     currentStreak: 0,
@@ -212,7 +216,7 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     totalInteractions: 0,
     ritualsCompleted: 0,
     bondedSince: Date.now(),
-  });
+  }, user?.id);
   
   // Context awareness state
   const [userContext, setUserContext] = useState<UserContext>({
@@ -225,16 +229,18 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     writingSessionDuration: 0,
   });
   
-  // Settings
-  const [audioEnabled, setAudioEnabled] = useLocalStorage<boolean>('companionAudioEnabled', true);
-  const [audioVolume, setAudioVolume] = useLocalStorage<number>('companionAudioVolume', 70);
+  // Settings - user-scoped for data isolation
+  const [audioEnabled, setAudioEnabled] = useLocalStorage<boolean>('companionAudioEnabled', true, user?.id);
+  const [audioVolume, setAudioVolume] = useLocalStorage<number>('companionAudioVolume', 70, user?.id);
   const [animationIntensity, setAnimationIntensity] = useLocalStorage<'full' | 'reduced' | 'minimal'>(
     'companionAnimationIntensity',
-    'full'
+    'full',
+    user?.id
   );
   const [multiSpiritInteractions, setMultiSpiritInteractions] = useLocalStorage<boolean>(
     'companionMultiSpiritInteractions',
-    true
+    true,
+    user?.id
   );
   
   // Get current skill tree for active companion

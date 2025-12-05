@@ -20,6 +20,7 @@ export interface ComprehensiveSettings extends AppSettings {
   enableAutoSave?: boolean;
   autoSaveInterval?: number;
   hapticsEnabled?: boolean;
+  elevenLabsApiKey?: string;
 }
 
 const DEFAULT_COMPREHENSIVE_SETTINGS: ComprehensiveSettings = {

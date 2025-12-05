@@ -290,7 +290,7 @@ Provide your unique perspective on this codebase review, considering your histor
         const response = await agentOrchestrator.routeAndExecute({
           task: agentPrompt,
           preferredAgents: [agent.id],
-          reasoningMode: agent.reasoningType === 'collaborative' ? 'single' : agent.reasoningType,
+          reasoningMode: agent.reasoningType === 'collaborative' ? 'collaborative' : agent.reasoningType === 'tree-of-thought' || agent.reasoningType === 'self-consistency' ? 'multi' : 'single',
         });
 
         // Extract score from response (look for patterns like "Score: 85" or "85/100")

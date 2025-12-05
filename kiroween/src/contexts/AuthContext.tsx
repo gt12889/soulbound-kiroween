@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useMemo } from '
 import type { ReactNode } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '../services/firebaseService';
+import { storageService } from '../services/storageService';
 import type { User } from '../types';
 import * as authService from '../services/authService';
 
@@ -54,6 +55,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
+
+  // Migrate existing data to user-scoped storage when user logs in
+  useEffect(() => {
+    if (user && !storageService.hasUserScopedMigration(user.id)) {
+      try {
+        console.log('[AuthContext] Migrating data to user-scoped storage for user:', user.id);
+        const result = storageService.migrateToUserScopedStorage(user.id);
+        console.log('[AuthContext] Migration complete:', result);
+      } catch (error) {
+        console.error('[AuthContext] Failed to migrate user data:', error);
+      }
+    }
+  }, [user]);
 
   const login = async (email: string, password: string): Promise<User> => {
     const user = await authService.login(email, password);

@@ -27,13 +27,27 @@ class StorageService {
   private encryptionKey: CryptoKey | null = null;
 
   /**
+   * Build storage key with optional user ID for data isolation
+   * @param key Storage key (without prefix)
+   * @param userId Optional user ID for user-specific storage
+   * @returns Full storage key with prefix and optional user scope
+   */
+  private buildKey(key: string, userId?: string): string {
+    if (userId) {
+      return `${this.prefix}user_${userId}_${key}`;
+    }
+    return `${this.prefix}${key}`;
+  }
+
+  /**
    * Get data from LocalStorage
    * @param key Storage key (without prefix)
+   * @param userId Optional user ID for user-scoped storage
    * @returns Parsed data or null if not found
    */
-  get<T>(key: string): T | null {
+  get<T>(key: string, userId?: string): T | null {
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       const item = localStorage.getItem(fullKey);
       
       if (item === null) {
@@ -54,10 +68,11 @@ class StorageService {
    * Set data in LocalStorage
    * @param key Storage key (without prefix)
    * @param value Data to store
+   * @param userId Optional user ID for user-scoped storage
    */
-  set<T>(key: string, value: T): void {
+  set<T>(key: string, value: T, userId?: string): void {
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       const serialized = this.serialize(value);
       localStorage.setItem(fullKey, serialized);
     } catch (error) {
@@ -80,10 +95,11 @@ class StorageService {
   /**
    * Remove data from LocalStorage
    * @param key Storage key (without prefix)
+   * @param userId Optional user ID for user-scoped storage
    */
-  remove(key: string): void {
+  remove(key: string, userId?: string): void {
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       localStorage.removeItem(fullKey);
     } catch (error) {
       console.error(`Error removing from storage (${key}):`, error);
@@ -96,13 +112,22 @@ class StorageService {
 
   /**
    * Clear all application data from LocalStorage
+   * @param userId Optional user ID to clear only that user's data
    */
-  clear(): void {
+  clear(userId?: string): void {
     try {
       const keys = Object.keys(localStorage);
       keys.forEach(key => {
-        if (key.startsWith(this.prefix)) {
-          localStorage.removeItem(key);
+        if (userId) {
+          // Clear only user-specific keys
+          if (key.startsWith(`${this.prefix}user_${userId}_`)) {
+            localStorage.removeItem(key);
+          }
+        } else {
+          // Clear all app keys
+          if (key.startsWith(this.prefix)) {
+            localStorage.removeItem(key);
+          }
         }
       });
     } catch (error) {
@@ -216,6 +241,81 @@ class StorageService {
         'Failed to initialize encryption',
         'UNKNOWN'
       );
+    }
+  }
+
+  /**
+   * Migrate data from global storage to user-scoped storage
+   * This should be called once when a user first logs in
+   * @param userId User ID for scoping the data
+   * @returns Statistics about migrated data
+   */
+  migrateToUserScopedStorage(userId: string): {
+    migratedKeys: string[];
+    skippedKeys: string[];
+  } {
+    try {
+      const keys = Object.keys(localStorage);
+      const migratedKeys: string[] = [];
+      const skippedKeys: string[] = [];
+
+      keys.forEach(key => {
+        // Only migrate keys with our prefix that aren't already user-scoped
+        if (key.startsWith(this.prefix) && !key.includes(`${this.prefix}user_`)) {
+          const dataKey = key.substring(this.prefix.length);
+          
+          // Skip migration metadata keys
+          if (dataKey.startsWith('migration_') || dataKey === 'last_sync' || dataKey === 'sync_queue') {
+            skippedKeys.push(dataKey);
+            return;
+          }
+
+          // Check if user-scoped version already exists
+          const userScopedKey = this.buildKey(dataKey, userId);
+          if (localStorage.getItem(userScopedKey) === null) {
+            // Copy data to user-scoped key
+            const value = localStorage.getItem(key);
+            if (value !== null) {
+              localStorage.setItem(userScopedKey, value);
+              migratedKeys.push(dataKey);
+            }
+          } else {
+            // User-scoped data already exists, don't overwrite
+            skippedKeys.push(dataKey);
+          }
+        }
+      });
+
+      // Store migration completion flag
+      this.set(`migration_to_user_scoped_${userId}`, {
+        completed: true,
+        timestamp: new Date(),
+        migratedKeys,
+        skippedKeys
+      });
+
+      console.log(`Migrated ${migratedKeys.length} keys to user-scoped storage for user ${userId}`);
+      return { migratedKeys, skippedKeys };
+    } catch (error) {
+      console.error('Error during user-scoped migration:', error);
+      throw new StorageError(
+        `Failed to migrate to user-scoped storage: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'UNKNOWN'
+      );
+    }
+  }
+
+  /**
+   * Check if user-scoped migration has been completed for a user
+   * @param userId User ID to check
+   * @returns true if migration was completed, false otherwise
+   */
+  hasUserScopedMigration(userId: string): boolean {
+    try {
+      const migrationData = this.get<{ completed: boolean }>(`migration_to_user_scoped_${userId}`);
+      return migrationData?.completed === true;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -351,8 +451,9 @@ class StorageService {
   /**
    * Get all data for export or cloud sync
    * Returns all notes, tasks, tarot readings, and pomodoro sessions
+   * @param userId Optional user ID for user-scoped data
    */
-  getAllData(): {
+  getAllData(userId?: string): {
     notes: any[];
     tasks: any[];
     tarotReadings: any[];
@@ -360,17 +461,18 @@ class StorageService {
     settings: any;
   } {
     return {
-      notes: this.get<any[]>('notes') || [],
-      tasks: this.get<any[]>('tasks') || [],
-      tarotReadings: this.get<any[]>('tarot_readings') || [],
-      pomodoroSessions: this.get<any[]>('pomodoro_sessions') || [],
-      settings: this.get<any>('settings') || {},
+      notes: this.get<any[]>('notes', userId) || [],
+      tasks: this.get<any[]>('tasks', userId) || [],
+      tarotReadings: this.get<any[]>('tarot_readings', userId) || [],
+      pomodoroSessions: this.get<any[]>('pomodoro_sessions', userId) || [],
+      settings: this.get<any>('settings', userId) || {},
     };
   }
 
   /**
    * Set all data (used for import or cloud sync restore)
    * Supports merging with existing data
+   * @param userId Optional user ID for user-scoped data
    */
   setAllData(
     data: {
@@ -380,54 +482,55 @@ class StorageService {
       pomodoroSessions?: any[];
       settings?: any;
     },
-    merge: boolean = false
+    merge: boolean = false,
+    userId?: string
   ): void {
     if (data.notes) {
       if (merge) {
-        const existing = this.get<any[]>('notes') || [];
+        const existing = this.get<any[]>('notes', userId) || [];
         const merged = this.mergeArrays(existing, data.notes, 'id');
-        this.set('notes', merged);
+        this.set('notes', merged, userId);
       } else {
-        this.set('notes', data.notes);
+        this.set('notes', data.notes, userId);
       }
     }
     
     if (data.tasks) {
       if (merge) {
-        const existing = this.get<any[]>('tasks') || [];
+        const existing = this.get<any[]>('tasks', userId) || [];
         const merged = this.mergeArrays(existing, data.tasks, 'id');
-        this.set('tasks', merged);
+        this.set('tasks', merged, userId);
       } else {
-        this.set('tasks', data.tasks);
+        this.set('tasks', data.tasks, userId);
       }
     }
     
     if (data.tarotReadings) {
       if (merge) {
-        const existing = this.get<any[]>('tarot_readings') || [];
+        const existing = this.get<any[]>('tarot_readings', userId) || [];
         const merged = this.mergeArrays(existing, data.tarotReadings, 'id');
-        this.set('tarot_readings', merged);
+        this.set('tarot_readings', merged, userId);
       } else {
-        this.set('tarot_readings', data.tarotReadings);
+        this.set('tarot_readings', data.tarotReadings, userId);
       }
     }
     
     if (data.pomodoroSessions) {
       if (merge) {
-        const existing = this.get<any[]>('pomodoro_sessions') || [];
+        const existing = this.get<any[]>('pomodoro_sessions', userId) || [];
         const merged = this.mergeArrays(existing, data.pomodoroSessions, 'id');
-        this.set('pomodoro_sessions', merged);
+        this.set('pomodoro_sessions', merged, userId);
       } else {
-        this.set('pomodoro_sessions', data.pomodoroSessions);
+        this.set('pomodoro_sessions', data.pomodoroSessions, userId);
       }
     }
     
     if (data.settings) {
       if (merge) {
-        const existing = this.get<any>('settings') || {};
-        this.set('settings', { ...existing, ...data.settings });
+        const existing = this.get<any>('settings', userId) || {};
+        this.set('settings', { ...existing, ...data.settings }, userId);
       } else {
-        this.set('settings', data.settings);
+        this.set('settings', data.settings, userId);
       }
     }
   }
@@ -595,38 +698,40 @@ class StorageService {
   /**
    * Encrypt and store data for cloud sync
    * Requirements: 17.4
+   * @param userId Optional user ID for user-scoped storage
    */
-  async setEncryptedForCloud<T>(key: string, value: T): Promise<void> {
+  async setEncryptedForCloud<T>(key: string, value: T, userId?: string): Promise<void> {
     if (!this.encryptionEnabled || !this.encryptionKey) {
       // Fall back to regular storage if encryption not available
-      this.set(key, value);
+      this.set(key, value, userId);
       return;
     }
 
     try {
       const serialized = this.serialize(value);
       const encrypted = await this.encryptData(serialized, this.encryptionKey);
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       localStorage.setItem(fullKey, encrypted);
     } catch (error) {
       console.error(`Error encrypting data for cloud (${key}):`, error);
       // Fall back to unencrypted storage
-      this.set(key, value);
+      this.set(key, value, userId);
     }
   }
 
   /**
    * Decrypt and retrieve data from cloud sync
    * Requirements: 17.4
+   * @param userId Optional user ID for user-scoped storage
    */
-  async getEncryptedFromCloud<T>(key: string): Promise<T | null> {
+  async getEncryptedFromCloud<T>(key: string, userId?: string): Promise<T | null> {
     if (!this.encryptionEnabled || !this.encryptionKey) {
       // Fall back to regular storage if encryption not available
-      return this.get<T>(key);
+      return this.get<T>(key, userId);
     }
 
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       const item = localStorage.getItem(fullKey);
       
       if (item === null) {
@@ -638,7 +743,7 @@ class StorageService {
     } catch (error) {
       console.error(`Error decrypting data from cloud (${key}):`, error);
       // Fall back to regular get
-      return this.get<T>(key);
+      return this.get<T>(key, userId);
     }
   }
 
@@ -672,10 +777,11 @@ class StorageService {
 
   /**
    * Get encrypted data from storage
+   * @param userId Optional user ID for user-scoped storage
    */
-  getEncrypted<T>(key: string): T | null {
+  getEncrypted<T>(key: string, userId?: string): T | null {
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       const item = localStorage.getItem(fullKey);
       
       if (item === null) {
@@ -695,10 +801,11 @@ class StorageService {
 
   /**
    * Set encrypted data in storage
+   * @param userId Optional user ID for user-scoped storage
    */
-  setEncrypted<T>(key: string, value: T): void {
+  setEncrypted<T>(key: string, value: T, userId?: string): void {
     try {
-      const fullKey = this.prefix + key;
+      const fullKey = this.buildKey(key, userId);
       const serialized = this.serialize(value);
       const encrypted = this.encrypt(serialized);
       localStorage.setItem(fullKey, encrypted);
@@ -722,15 +829,16 @@ class StorageService {
   /**
    * Sync local data to cloud
    * Returns data ready for cloud upload
+   * @param userId Optional user ID for user-scoped data
    */
-  prepareDataForCloudSync(): {
+  prepareDataForCloudSync(userId?: string): {
     notes: any[];
     tasks: any[];
     tarotReadings: any[];
     pomodoroSessions: any[];
     settings: any;
   } {
-    const data = this.getAllData();
+    const data = this.getAllData(userId);
     
     // Ensure all dates are properly serialized
     return {
@@ -761,6 +869,7 @@ class StorageService {
   /**
    * Restore data from cloud sync
    * Merges cloud data with local data
+   * @param userId Optional user ID for user-scoped data
    */
   async restoreFromCloudSync(cloudData: {
     notes?: any[];
@@ -768,12 +877,12 @@ class StorageService {
     tarotReadings?: any[];
     pomodoroSessions?: any[];
     settings?: any;
-  }): Promise<void> {
+  }, userId?: string): Promise<void> {
     try {
       console.log('Restoring data from cloud sync...');
       
       // Use merge mode to combine cloud and local data
-      this.setAllData(cloudData, true);
+      this.setAllData(cloudData, true, userId);
       
       console.log('Data restored from cloud successfully');
     } catch (error) {
@@ -787,8 +896,9 @@ class StorageService {
 
   /**
    * Get storage statistics
+   * @param userId Optional user ID to get stats for specific user
    */
-  getStorageStats(): {
+  getStorageStats(userId?: string): {
     used: number;
     available: number;
     percentage: number;
@@ -799,8 +909,10 @@ class StorageService {
     
     // Calculate size of all items with our prefix
     const keys = Object.keys(localStorage);
+    const targetPrefix = userId ? `${this.prefix}user_${userId}_` : this.prefix;
+    
     keys.forEach(key => {
-      if (key.startsWith(this.prefix)) {
+      if (key.startsWith(targetPrefix)) {
         const item = localStorage.getItem(key);
         if (item) {
           totalSize += item.length * 2; // UTF-16 encoding (2 bytes per char)
@@ -823,41 +935,43 @@ class StorageService {
 
   /**
    * Check if storage is approaching quota
+   * @param userId Optional user ID to check specific user's quota
    */
-  isStorageNearQuota(threshold: number = 80): boolean {
-    const stats = this.getStorageStats();
+  isStorageNearQuota(threshold: number = 80, userId?: string): boolean {
+    const stats = this.getStorageStats(userId);
     return stats.percentage >= threshold;
   }
 
   /**
    * Clear old data to free up space
    * Removes items older than specified days
+   * @param userId Optional user ID for user-scoped data
    */
-  clearOldData(daysOld: number = 90): number {
+  clearOldData(daysOld: number = 90, userId?: string): number {
     let clearedCount = 0;
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
     try {
       // Clear old tarot readings
-      const readings = this.get<any[]>('tarot_readings') || [];
+      const readings = this.get<any[]>('tarot_readings', userId) || [];
       const filteredReadings = readings.filter(reading => {
         const date = reading.date instanceof Date ? reading.date : new Date(reading.date);
         return date > cutoffDate;
       });
       if (filteredReadings.length < readings.length) {
-        this.set('tarot_readings', filteredReadings);
+        this.set('tarot_readings', filteredReadings, userId);
         clearedCount += readings.length - filteredReadings.length;
       }
 
       // Clear old completed pomodoro sessions
-      const sessions = this.get<any[]>('pomodoro_sessions') || [];
+      const sessions = this.get<any[]>('pomodoro_sessions', userId) || [];
       const filteredSessions = sessions.filter(session => {
         const date = session.startTime instanceof Date ? session.startTime : new Date(session.startTime);
         return date > cutoffDate;
       });
       if (filteredSessions.length < sessions.length) {
-        this.set('pomodoro_sessions', filteredSessions);
+        this.set('pomodoro_sessions', filteredSessions, userId);
         clearedCount += sessions.length - filteredSessions.length;
       }
 

@@ -658,6 +658,39 @@
   text-shadow: 0 0 10px var(--glow-purple);
 }
 
+/* Project Overview Section */
+.projectOverview {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(45, 27, 78, 0.1) 100%);
+  border: 2px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+}
+
+.projectSummaryLine {
+  font-family: 'Segoe UI', 'Lora', 'Arial', sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  color: #f0f0f0;
+  margin: 0.75rem 0;
+  letter-spacing: 0.3px;
+  font-weight: 400;
+}
+
+.projectSummaryLine:first-child {
+  margin-top: 0;
+}
+
+.projectSummaryLine:last-child {
+  margin-bottom: 0;
+}
+
+/* Summary Rest Section */
+.summaryRest {
+  margin-top: 1.5rem;
+}
+
 /* Summary Lines */
 .summaryLine {
   font-family: 'Segoe UI', 'Lora', 'Arial', sans-serif;
@@ -814,6 +847,58 @@
 .insightItem::first-letter {
   font-size: 1.5rem;
   margin-right: 0.5rem;
+}
+
+/* Repository Deep Dive Styles */
+.deepDiveContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.deepDiveHeader {
+  font-family: 'Cinzel', 'Georgia', serif;
+  font-size: 1.25rem;
+  color: var(--accent-purple-light);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+  text-shadow: 0 0 15px var(--glow-purple);
+}
+
+.deepDiveHeader:first-child {
+  margin-top: 0;
+}
+
+.deepDiveLine {
+  font-family: 'Segoe UI', 'Lora', 'Arial', sans-serif;
+  font-size: 1.05rem;
+  line-height: 2;
+  color: #e0e0e0;
+  margin: 0.5rem 0;
+  letter-spacing: 0.3px;
+  font-weight: 400;
+}
+
+.deepDiveItem {
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  font-size: 1rem;
+  line-height: 1.9;
+  color: #d0d0d0;
+  margin: 0.4rem 0;
+  padding-left: 2rem;
+  position: relative;
+  letter-spacing: 0.2px;
+}
+
+.deepDiveItem::before {
+  content: '▸';
+  position: absolute;
+  left: 0.5rem;
+  color: var(--accent-purple-light);
+  font-size: 1.1rem;
 }
 
 /* Legacy Stats Panel (Not currently used - can be removed) */

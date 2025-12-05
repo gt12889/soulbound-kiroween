@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Task } from '../types';
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
 import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
 import { useCompanion } from './CompanionContext';
@@ -69,8 +70,11 @@ interface TasksProviderProps {
  * Requirements: 4.1, 4.2, 4.3, 4.6, 7.3, 8.1
  */
 export function TasksProvider({ children }: TasksProviderProps) {
-  // Persist tasks to LocalStorage
-  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
+  // Get user context for data isolation
+  const { user } = useAuth();
+  
+  // Persist tasks to LocalStorage - user-scoped for data isolation
+  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', [], user?.id);
   
   // Undo/Redo functionality
   // Requirement: 8.1, 8.5 - Implement undo/redo with max 10 actions

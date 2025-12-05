@@ -64,8 +64,8 @@ interface AppProviderProps {
 export function AppProvider({ children }: AppProviderProps) {
   const { user, isAuthenticated } = useAuth();
   
-  // Persist settings to LocalStorage
-  const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings);
+  // Persist settings to LocalStorage - user-scoped for data isolation
+  const [settings, setSettings] = useLocalStorage<AppSettings>('settings', defaultSettings, user?.id);
   
   // Current module state (initialized from settings)
   const [currentModule, setCurrentModuleState] = useState<ModuleName>(
@@ -79,13 +79,14 @@ export function AppProvider({ children }: AppProviderProps) {
   // Session state for bootup animation
   const [hasBootupAnimationPlayed, setHasBootupAnimationPlayed] = useState(false);
 
-  // Sidebar state, persisted to local storage
-  const [sidebarMode, setSidebarMode] = useLocalStorage<SidebarMode>('sidebarMode', 'expanded');
+  // Sidebar state, persisted to local storage - user-scoped for data isolation
+  const [sidebarMode, setSidebarMode] = useLocalStorage<SidebarMode>('sidebarMode', 'expanded', user?.id);
 
-  // Companion type state, persisted to local storage (FR-1.3, FR-4.3)
+  // Companion type state, persisted to local storage (FR-1.3, FR-4.3) - user-scoped for data isolation
   const [companionType, setCompanionTypeState] = useLocalStorage<CompanionType | null>(
     'dark-productivity-companion-type',
-    null
+    null,
+    user?.id
   );
   
   // Backward compatibility: isSidebarOpen is true when not hidden

@@ -1,0 +1,10 @@
+flask==3.0.0
+flask-cors==4.0.0
+requests==2.31.0
+# For app_simple.py (Inference API) - lighter weight, no model download
+# For app.py (Local models) - uncomment below and comment requests
+# transformers==4.35.0
+# torch==2.1.0
+# accelerate==0.24.1
+# sentencepiece==0.1.99
+
