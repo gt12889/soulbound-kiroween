@@ -168,7 +168,7 @@ interface CompanionProviderProps {
 export function CompanionProvider({ children }: CompanionProviderProps) {
   const { user, isAuthenticated } = useAuth();
   const { themeId } = useTheme();
-  const { currentModule } = useApp();
+  const { currentModule, companionType } = useApp();
   
   // Core companion state - user-scoped for data isolation
   const [activeCompanion, setActiveCompanion] = useLocalStorage<CompanionType>('activeCompanion', 'shadow', user?.id);
@@ -263,6 +263,23 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
     }
   }, [dailyInteractions, setDailyInteractions]);
   
+  // Sync activeCompanion with AppContext companionType
+  // Map 'forest' from AppContext to 'zombie' for CompanionContext (skillTree types)
+  // This ensures the selected companion from the modal is displayed correctly
+  useEffect(() => {
+    if (companionType) {
+      const mappedCompanion: CompanionType = companionType === 'forest' ? 'zombie' : companionType;
+      if (activeCompanion !== mappedCompanion) {
+        logger.log(`Syncing activeCompanion from AppContext: ${companionType} -> ${mappedCompanion}`);
+        setActiveCompanion(mappedCompanion);
+        // Also unlock the companion if not already unlocked
+        if (!unlockedCompanions.includes(mappedCompanion)) {
+          setUnlockedCompanions([...unlockedCompanions, mappedCompanion]);
+        }
+      }
+    }
+  }, [companionType, activeCompanion, setActiveCompanion, unlockedCompanions, setUnlockedCompanions]);
+
   // Update context when module changes
   useEffect(() => {
     setUserContext(prev => ({

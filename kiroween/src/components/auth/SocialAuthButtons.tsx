@@ -29,9 +29,19 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({ onError, disabled
     
     try {
       await signInWithGoogle();
-      // Navigate to the page user was trying to access, or default to graveyard-dashboard
-      const from = (location.state as any)?.from?.pathname || '/graveyard-dashboard';
-      navigate(from, { replace: true });
+      // Check if user has selected a companion - check both context and localStorage
+      // This handles timing issues where context might not be updated yet
+      const companionType = localStorage.getItem('companionType');
+      const hasCompanion = companionType !== null && companionType !== '';
+      
+      // If no companion selected, redirect to achievements page to select one
+      // Otherwise, navigate to the page user was trying to access, or default to graveyard-dashboard
+      const from = (location.state as any)?.from?.pathname;
+      if (!hasCompanion) {
+        navigate('/achievements', { replace: true });
+      } else {
+        navigate(from || '/graveyard-dashboard', { replace: true });
+      }
     } catch (err: any) {
       const errorMessage = err.message || 'Google sign-in failed. Please try again.';
       if (onError) {
