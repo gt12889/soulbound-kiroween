@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { GhostArchiveProvider } from '../../contexts/GhostArchiveContext';
 import LoadingFallback from '../common/LoadingFallback';
 import ErrorBoundary from '../common/ErrorBoundary';
 
@@ -8,11 +9,13 @@ const TarotReader = lazy(() => import('./TarotReader'));
 
 const TerminalTarot: React.FC = () => {
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<LoadingFallback message="Consulting the cards..." />}>
-        <TarotReader />
-      </Suspense>
-    </ErrorBoundary>
+    <GhostArchiveProvider>
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback message="Consulting the cards..." />}>
+          <TarotReader />
+        </Suspense>
+      </ErrorBoundary>
+    </GhostArchiveProvider>
   );
 };
 
