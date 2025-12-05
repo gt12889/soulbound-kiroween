@@ -76,7 +76,7 @@ class ElevenLabsService {
 
       const data = await response.json();
       this.cachedVoices = data.voices || [];
-      return this.cachedVoices;
+      return this.cachedVoices || [];
     } catch (error) {
       console.error('Error fetching ElevenLabs voices:', error);
       throw error;
