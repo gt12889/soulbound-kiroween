@@ -1,0 +1,114 @@
+.optionsPanel {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(0, 255, 0, 0.2);
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.optionsHeader {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+}
+
+.optionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 255, 0, 0.05);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.optionItem:hover {
+  background: rgba(0, 255, 0, 0.1);
+  border-color: rgba(0, 255, 0, 0.5);
+  transform: translateX(2px);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.optionNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.8);
+  flex-shrink: 0;
+}
+
+.optionDescription {
+  flex: 1;
+  opacity: 0.9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Scrollbar styling */
+.optionsPanel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.optionsPanel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.optionsPanel::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 0, 0.3);
+  border-radius: 3px;
+}
+
+.optionsPanel::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 0, 0.5);
+}
+
+/* Animation for when options appear */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.optionsPanel {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .optionsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .optionDescription {
+    white-space: normal;
+  }
+}

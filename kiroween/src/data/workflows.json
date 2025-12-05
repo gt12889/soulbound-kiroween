@@ -1,0 +1,200 @@
+[
+  {
+    "id": "fragment-restoration",
+    "name": "Fragment Restoration",
+    "description": "Multi-agent collaborative restoration of corrupted historical documents",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "analyze-fragment",
+        "type": "agent",
+        "agentId": null,
+        "action": "Analyze the corrupted fragment and identify its type, era, and key missing elements",
+        "input": {
+          "fragment": "{{fragment}}"
+        },
+        "timeout": 30000,
+        "retries": 2
+      },
+      {
+        "id": "route-to-agents",
+        "type": "condition",
+        "action": "Determine which agents are best suited for this fragment type",
+        "input": {},
+        "condition": "{{stepResults.analyze-fragment.result.type}}",
+        "timeout": 1000,
+        "retries": 0
+      },
+      {
+        "id": "parallel-restoration",
+        "type": "agent",
+        "agentId": null,
+        "action": "Generate restoration suggestions in parallel from multiple agents",
+        "input": {
+          "fragment": "{{fragment}}",
+          "analysis": "{{stepResults.analyze-fragment.result}}"
+        },
+        "timeout": 60000,
+        "retries": 1
+      },
+      {
+        "id": "aggregate-suggestions",
+        "type": "aggregate",
+        "action": "Combine and rank restoration suggestions",
+        "input": {
+          "fromStep": "parallel-restoration"
+        },
+        "timeout": 5000,
+        "retries": 0
+      }
+    ]
+  },
+  {
+    "id": "deep-analysis",
+    "name": "Deep Analysis",
+    "description": "Chain-of-thought analysis with multiple agents providing perspectives",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "initial-analysis",
+        "type": "agent",
+        "agentId": null,
+        "action": "Provide initial analysis with chain-of-thought reasoning",
+        "input": {
+          "question": "{{question}}"
+        },
+        "timeout": 45000,
+        "retries": 2
+      },
+      {
+        "id": "secondary-perspective",
+        "type": "agent",
+        "agentId": null,
+        "action": "Provide alternative perspective on the same question",
+        "input": {
+          "question": "{{question}}",
+          "initialAnalysis": "{{stepResults.initial-analysis.result}}"
+        },
+        "timeout": 45000,
+        "retries": 2
+      },
+      {
+        "id": "synthesize",
+        "type": "aggregate",
+        "action": "Synthesize both perspectives into unified answer",
+        "input": {
+          "fromStep": "secondary-perspective"
+        },
+        "timeout": 10000,
+        "retries": 0
+      }
+    ]
+  },
+  {
+    "id": "creative-collaboration",
+    "name": "Creative Collaboration",
+    "description": "Parallel creative generation, then synthesis",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "parallel-creation",
+        "type": "agent",
+        "agentId": null,
+        "action": "Generate creative content in parallel from multiple agents",
+        "input": {
+          "prompt": "{{prompt}}"
+        },
+        "timeout": 60000,
+        "retries": 1
+      },
+      {
+        "id": "synthesize-creative",
+        "type": "aggregate",
+        "action": "Combine creative outputs into unified work",
+        "input": {
+          "fromStep": "parallel-creation"
+        },
+        "timeout": 15000,
+        "retries": 0
+      }
+    ]
+  },
+  {
+    "id": "fact-checking",
+    "name": "Fact Checking",
+    "description": "Multiple agents verify information, orchestrator resolves conflicts",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "verify-parallel",
+        "type": "agent",
+        "agentId": null,
+        "action": "Verify the statement from multiple agent perspectives",
+        "input": {
+          "statement": "{{statement}}"
+        },
+        "timeout": 30000,
+        "retries": 2
+      },
+      {
+        "id": "resolve-conflicts",
+        "type": "aggregate",
+        "action": "Resolve any conflicts between agent verifications",
+        "input": {
+          "fromStep": "verify-parallel"
+        },
+        "timeout": 10000,
+        "retries": 0
+      }
+    ]
+  },
+  {
+    "id": "codebase-review",
+    "name": "Codebase Review",
+    "description": "Multi-agent comprehensive codebase review with different perspectives.",
+    "trigger": "command",
+    "steps": [
+      {
+        "id": "architecture-analysis",
+        "type": "agent",
+        "agentId": "einstein",
+        "action": "Analyze the codebase architecture, design patterns, and structural quality.",
+        "input": {
+          "codebase": "{{input.codebase}}"
+        },
+        "onSuccess": "security-review"
+      },
+      {
+        "id": "security-review",
+        "type": "agent",
+        "agentId": "marie-curie",
+        "action": "Review the codebase for security vulnerabilities, authentication issues, and data protection concerns.",
+        "input": {
+          "codebase": "{{input.codebase}}",
+          "architecture_analysis": "{{stepResults.architecture-analysis}}"
+        },
+        "onSuccess": "code-quality-review"
+      },
+      {
+        "id": "code-quality-review",
+        "type": "agent",
+        "agentId": "shakespeare",
+        "action": "Review code quality, readability, maintainability, and adherence to best practices from a literary perspective.",
+        "input": {
+          "codebase": "{{input.codebase}}",
+          "previous_reviews": "{{stepResults.security-review}}"
+        },
+        "onSuccess": "synthesize-review"
+      },
+      {
+        "id": "synthesize-review",
+        "type": "aggregate",
+        "action": "Combine all review perspectives into a comprehensive report.",
+        "input": {
+          "fromSteps": ["architecture-analysis", "security-review", "code-quality-review"]
+        }
+      }
+    ]
+  }
+]
+

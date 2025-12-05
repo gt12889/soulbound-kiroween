@@ -12,6 +12,10 @@
   justify-content: center;
   z-index: 1001; /* Higher than suggestions to ensure it appears on top */
   animation: fadeIn 0.3s ease-in-out;
+  /* Prevent flashing during mount/unmount */
+  will-change: opacity;
+  backface-visibility: hidden;
+  contain: layout style paint;
 }
 
 @keyframes fadeIn {

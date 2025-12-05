@@ -1,0 +1,274 @@
+.coverageVisualizer {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(0, 255, 0, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+}
+
+.header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #00ff00;
+  margin: 0;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.coverageComparison {
+  margin: 1.5rem 0;
+}
+
+.coverageBar {
+  margin-bottom: 1rem;
+}
+
+.barLabel {
+  font-size: 0.9rem;
+  color: #88ff88;
+  margin-bottom: 0.5rem;
+}
+
+.barContainer {
+  position: relative;
+  width: 100%;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.barValue {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #000;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+.improvement {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.improvementLabel {
+  color: #88ff88;
+  font-size: 0.9rem;
+}
+
+.improvementValue {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.improvementValue.positive {
+  color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.improvementValue.negative {
+  color: #ff4444;
+  text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+}
+
+.riskAssessment {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  border-radius: 4px;
+}
+
+.riskHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.riskLabel {
+  color: #88ff88;
+  font-size: 0.9rem;
+}
+
+.riskBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.riskBadge.low {
+  background: rgba(0, 255, 0, 0.2);
+  color: #00ff00;
+  border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.riskBadge.medium {
+  background: rgba(255, 170, 0, 0.2);
+  color: #ffaa00;
+  border: 1px solid rgba(255, 170, 0, 0.5);
+}
+
+.riskBadge.high {
+  background: rgba(255, 68, 68, 0.2);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.5);
+}
+
+.sectionTitle {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00ff00;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.highRiskAreas {
+  margin-bottom: 1rem;
+}
+
+.riskList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.riskList li {
+  color: #ff8888;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.riskList li::before {
+  content: '⚠';
+  position: absolute;
+  left: 0;
+}
+
+.recommendations {
+  margin-top: 1rem;
+}
+
+.recommendationList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recommendationList li {
+  color: #88ff88;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.recommendationList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #00ff00;
+}
+
+.gaps {
+  margin-top: 1.5rem;
+}
+
+.gapList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gapItem {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  border-radius: 4px;
+}
+
+.gapItem.low {
+  border-color: rgba(0, 255, 0, 0.3);
+}
+
+.gapItem.medium {
+  border-color: rgba(255, 170, 0, 0.3);
+}
+
+.gapItem.high {
+  border-color: rgba(255, 68, 68, 0.3);
+}
+
+.gapHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.gapType {
+  font-size: 0.85rem;
+  color: #88ff88;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.gapRisk {
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.gapRisk.low {
+  background: rgba(0, 255, 0, 0.2);
+  color: #00ff00;
+}
+
+.gapRisk.medium {
+  background: rgba(255, 170, 0, 0.2);
+  color: #ffaa00;
+}
+
+.gapRisk.high {
+  background: rgba(255, 68, 68, 0.2);
+  color: #ff4444;
+}
+
+.gapScenario {
+  color: #00ff00;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.gapRecommendation {
+  color: #88ff88;
+  font-size: 0.9rem;
+}
+

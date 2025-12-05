@@ -32,21 +32,25 @@ export interface TimerStats {
   todaySessions: number;
 }
 
-export enum TimerErrorCode {
-  PERSISTENCE_FAILED = 'PERSISTENCE_FAILED',
-  INVALID_DURATION = 'INVALID_DURATION',
-  NOTIFICATION_DENIED = 'NOTIFICATION_DENIED',
-  SYNC_FAILED = 'SYNC_FAILED',
-}
+export type TimerErrorCode = 
+  | 'PERSISTENCE_FAILED'
+  | 'INVALID_DURATION'
+  | 'NOTIFICATION_DENIED'
+  | 'SYNC_FAILED';
 
 export class TimerError extends Error {
+  public code: TimerErrorCode;
+  public recoverable: boolean;
+
   constructor(
     message: string,
-    public code: TimerErrorCode,
-    public recoverable: boolean = true
+    code: TimerErrorCode,
+    recoverable: boolean = true
   ) {
     super(message);
     this.name = 'TimerError';
+    this.code = code;
+    this.recoverable = recoverable;
   }
 }
 

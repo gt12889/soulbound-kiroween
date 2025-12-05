@@ -1,0 +1,106 @@
+.agentStatusPanel {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 255, 0, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.panelTitle {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #00ff88;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+}
+
+.agentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.agentItem {
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 0, 0.1);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.agentItem.connected {
+  border-color: rgba(0, 255, 0, 0.5);
+  background: rgba(0, 255, 0, 0.05);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+.agentName {
+  font-weight: bold;
+  color: #00ff00;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.agentEra {
+  font-size: 0.75rem;
+  color: #88ff88;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+}
+
+.agentStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.agentStatus.idle .statusDot {
+  background: #00ff00;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.agentStatus.busy .statusDot {
+  background: #ffaa00;
+  box-shadow: 0 0 8px rgba(255, 170, 0, 0.5);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.agentStatus.error .statusDot {
+  background: #ff4444;
+  box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+}
+
+.agentStatus.idle {
+  color: #88ff88;
+}
+
+.agentStatus.busy {
+  color: #ffaa88;
+}
+
+.agentStatus.error {
+  color: #ff8888;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+

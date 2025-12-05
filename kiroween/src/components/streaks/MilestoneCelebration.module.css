@@ -1,0 +1,445 @@
+/* Celebration Overlay */
+.celebrationOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Main Celebration Burst */
+.celebrationBurst {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    var(--burst-color, #4cc9f0) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: burstExpand 1.5s ease-out;
+  opacity: 0;
+}
+
+@keyframes burstExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+/* Celebration Content */
+.celebrationContent {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  animation: contentZoomIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes contentZoomIn {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.milestoneEmoji {
+  font-size: 6rem;
+  margin-bottom: 1rem;
+  animation: emojiPulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+@keyframes emojiPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.milestoneTitle {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 
+    0 0 10px rgba(76, 201, 240, 0.8),
+    0 0 20px rgba(76, 201, 240, 0.6),
+    0 0 30px rgba(76, 201, 240, 0.4);
+  margin-bottom: 0.5rem;
+  animation: titleGlow 2s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 10px rgba(76, 201, 240, 0.8),
+      0 0 20px rgba(76, 201, 240, 0.6),
+      0 0 30px rgba(76, 201, 240, 0.4);
+  }
+  50% {
+    text-shadow: 
+      0 0 20px rgba(76, 201, 240, 1),
+      0 0 30px rgba(76, 201, 240, 0.8),
+      0 0 40px rgba(76, 201, 240, 0.6);
+  }
+}
+
+.milestoneSubtitle {
+  font-size: 1.5rem;
+  color: #b8b8b8;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Confetti Particles */
+.confettiContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--confetti-color, #4cc9f0);
+  animation: confettiFall 2s ease-out forwards;
+  animation-delay: var(--confetti-delay, 0s);
+  opacity: 0;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--confetti-x, 0), var(--confetti-y, 200px)) 
+               rotate(var(--confetti-rotation, 360deg));
+    opacity: 0;
+  }
+}
+
+/* Star Burst */
+.starBurst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  font-size: 2rem;
+  animation: starBurst 1.5s ease-out forwards;
+  animation-delay: var(--star-delay, 0s);
+  opacity: 0;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes starBurst {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--star-distance, 100px) * cos(var(--star-angle, 0deg))),
+      calc(-50% + var(--star-distance, 100px) * sin(var(--star-angle, 0deg)))
+    ) scale(1.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Glow Waves */
+.glowWaves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.glowWave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin: -100px 0 0 -100px;
+  border: 3px solid var(--wave-color, #4cc9f0);
+  border-radius: 50%;
+  animation: waveExpand 2s ease-out forwards;
+  animation-delay: var(--wave-delay, 0s);
+  opacity: 0;
+}
+
+@keyframes waveExpand {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Sparkle Particles */
+.sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.sparkle {
+  position: absolute;
+  left: var(--sparkle-x, 50%);
+  top: var(--sparkle-y, 50%);
+  font-size: 1.5rem;
+  animation: sparkleFloat 2s ease-out forwards;
+  animation-delay: var(--sparkle-delay, 0s);
+  opacity: 0;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes sparkleFloat {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% - 100px)) scale(1.5) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .celebrationOverlay,
+  .celebrationBurst,
+  .celebrationContent,
+  .milestoneEmoji,
+  .milestoneTitle,
+  .confetti,
+  .star,
+  .glowWave,
+  .sparkle {
+    animation: none !important;
+  }
+  
+  .celebrationContent {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .milestoneEmoji,
+  .milestoneTitle,
+  .milestoneSubtitle {
+    opacity: 1;
+  }
+}
+
+/* Companion Celebration - Integrates with companion particle system */
+.companionCelebration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Companion Burst Particles - mirrors companion's celebration particles */
+.companionBurst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+}
+
+.companionBurstParticle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--burst-color, #4cc9f0);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--burst-color, #4cc9f0);
+  animation: companionBurstExpand 1.5s ease-out forwards;
+  animation-delay: var(--burst-delay, 0s);
+  opacity: 0;
+}
+
+@keyframes companionBurstExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--burst-distance, 100px) * cos(var(--burst-angle, 0deg))),
+      calc(-50% + var(--burst-distance, 100px) * sin(var(--burst-angle, 0deg)))
+    ) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* Companion Hearts - mirrors companion's encouragement hearts */
+.companionHearts {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+}
+
+.companionHeart {
+  position: absolute;
+  font-size: 2rem;
+  animation: companionHeartFloat 2s ease-out forwards;
+  animation-delay: var(--heart-delay, 0s);
+  opacity: 0;
+  filter: drop-shadow(0 0 10px rgba(157, 78, 221, 0.8));
+}
+
+@keyframes companionHeartFloat {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--heart-distance, 80px) * cos(var(--heart-angle, 0deg))),
+      calc(-50% + var(--heart-distance, 80px) * sin(var(--heart-angle, 0deg)))
+    ) scale(1.2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Companion Message - appears after main celebration */
+.companionMessage {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  color: #ffffff;
+  text-align: center;
+  padding: 1rem 2rem;
+  background: rgba(157, 78, 221, 0.2);
+  border: 2px solid rgba(157, 78, 221, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 0 20px rgba(157, 78, 221, 0.3),
+    inset 0 0 20px rgba(157, 78, 221, 0.1);
+  animation: companionMessageAppear 0.8s ease-out 1s forwards;
+  opacity: 0;
+}
+
+@keyframes companionMessageAppear {
+  0% {
+    transform: translateX(-50%) translateY(20px) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .milestoneEmoji {
+    font-size: 4rem;
+  }
+  
+  .milestoneTitle {
+    font-size: 2rem;
+  }
+  
+  .milestoneSubtitle {
+    font-size: 1.2rem;
+  }
+  
+  .celebrationBurst {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .star {
+    font-size: 1.5rem;
+  }
+  
+  .sparkle {
+    font-size: 1rem;
+  }
+  
+  .companionHeart {
+    font-size: 1.5rem;
+  }
+  
+  .companionMessage {
+    font-size: 1.2rem;
+    padding: 0.75rem 1.5rem;
+    bottom: 10%;
+  }
+}

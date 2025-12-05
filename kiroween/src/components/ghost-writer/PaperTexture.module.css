@@ -1,0 +1,110 @@
+/* Paper Texture Background */
+.paperTexture {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  background: 
+    /* Aged paper base */
+    #f4e8d0,
+    /* Paper grain */
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.03) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 3px
+    ),
+    /* Horizontal lines */
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.02) 3px
+    ),
+    /* Aged yellowing */
+    radial-gradient(
+      ellipse at top left,
+      rgba(255, 240, 200, 0.3) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at bottom right,
+      rgba(200, 180, 150, 0.2) 0%,
+      transparent 50%
+    );
+  background-size: 
+    100% 100%,
+    4px 4px,
+    4px 4px,
+    100% 100%,
+    100% 100%;
+  
+  /* Inner shadow for depth */
+  box-shadow: 
+    inset 0 0 30px rgba(0, 0, 0, 0.1),
+    inset 0 0 60px rgba(0, 0, 0, 0.05);
+  
+  /* Torn edges effect */
+  border: 2px solid transparent;
+  position: relative;
+}
+
+/* Torn edge decoration - removed diagonal lines */
+.paperTexture::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: transparent;
+  z-index: -1;
+  border-radius: 2px;
+}
+
+/* Paper texture overlay (noise) */
+.paperTexture::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" /></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.1"/></svg>');
+  opacity: 0.3;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Force all child elements to display correctly */
+.paperTexture * {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+}
+
+/* Specifically for contentEditable */
+.paperTexture [contenteditable] {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  text-align: left !important;
+}
+
+
+

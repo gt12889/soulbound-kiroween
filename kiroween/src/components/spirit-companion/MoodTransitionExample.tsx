@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { MoodState } from '../../types/companionMood';
+import type { MoodState } from '../../types/companionMood';
 import { useMoodTransition, getCombinedMoodClasses } from '../../hooks/useMoodTransition';
 import './moodTransitions.css';
 

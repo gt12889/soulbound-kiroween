@@ -6,6 +6,11 @@
   display: flex;
   align-items: flex-start;
   gap: 8px;
+  direction: ltr !important;
+  transform: scaleX(1) !important;
+  -webkit-transform: scaleX(1) !important;
+  -moz-transform: scaleX(1) !important;
+  -ms-transform: scaleX(1) !important;
 }
 
 .blockWrapper.active {
@@ -33,6 +38,38 @@
   transition: background 0.15s ease;
   word-wrap: break-word;
   white-space: pre-wrap;
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  text-align: left !important;
+  writing-mode: horizontal-tb !important;
+  overflow: hidden;
+}
+
+/* Style textarea to look like contentEditable */
+.blockContent::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.blockContent::placeholder {
+  color: rgba(224, 224, 224, 0.3);
+  font-style: italic;
+}
+
+/* Force text direction for all types */
+.blockContent,
+.blockContent * {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
 }
 
 .blockContent:focus {

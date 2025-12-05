@@ -8,6 +8,8 @@ import { TagManager } from '../common/TagManager';
 import { TagCloud } from '../common/TagCloud';
 import { ArchiveSuggestions } from './ArchiveSuggestions';
 import { ConfirmDialog } from '../common/ConfirmDialog';
+import { MoonLighting } from './MoonLighting';
+import { DiggingModal } from './DiggingModal';
 import SkeletonLoader from '../common/SkeletonLoader';
 import EmptyState from '../common/EmptyState';
 import type { Task } from '../../types';
@@ -63,6 +65,9 @@ export function GraveyardView() {
   const [showTagDialog, setShowTagDialog] = useState(false);
   const [bulkTagInput, setBulkTagInput] = useState<string[]>([]);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
+  const [dugUpTask, setDugUpTask] = useState<Task | null>(null);
+  const [hoveredTombstoneId, setHoveredTombstoneId] = useState<string | null>(null);
+  const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null);
   const dragCounter = useRef(0);
 
   // Simulate initial data loading
@@ -238,7 +243,31 @@ export function GraveyardView() {
   }, [selectedIds, bulkTagInput, bulkTag, clearSelection]);
 
   return (
-    <article className={styles.graveyard}>
+    <MoonLighting>
+      <article className={styles.graveyard}>
+      {/* Fog Overlay */}
+      <div 
+        className={styles.fogOverlay}
+        style={
+          hoverPosition
+            ? ({
+                '--fog-x': `${hoverPosition.x}%`,
+                '--fog-y': `${hoverPosition.y}%`,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
+        <div 
+          className={`${styles.fogLayer} ${styles.fogLayer1} ${hoveredTombstoneId ? styles.fogParting : ''}`}
+        ></div>
+        <div 
+          className={`${styles.fogLayer} ${styles.fogLayer2} ${hoveredTombstoneId ? styles.fogParting : ''}`}
+        ></div>
+        <div 
+          className={`${styles.fogLayer} ${styles.fogLayer3} ${hoveredTombstoneId ? styles.fogParting : ''}`}
+        ></div>
+      </div>
+      
       {/* Archive Suggestions Modal */}
       <ArchiveSuggestions />
 
@@ -453,12 +482,27 @@ export function GraveyardView() {
               onDragEnter={(e) => handleDragEnter(e, index)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, index)}
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const containerRect = e.currentTarget.closest(`.${styles.graveyard}`)?.getBoundingClientRect();
+                if (containerRect) {
+                  const x = ((rect.left + rect.width / 2 - containerRect.left) / containerRect.width) * 100;
+                  const y = ((rect.top + rect.height / 2 - containerRect.top) / containerRect.height) * 100;
+                  setHoveredTombstoneId(task.id);
+                  setHoverPosition({ x, y });
+                }
+              }}
+              onMouseLeave={() => {
+                setHoveredTombstoneId(null);
+                setHoverPosition(null);
+              }}
             >
               <Tombstone
                 task={task}
                 onToggleComplete={toggleTaskCompletion}
                 onDelete={handleDelete}
                 onArchive={archiveTask}
+                onDigUp={setDugUpTask}
                 isDragging={draggedIndex === index}
                 showCheckbox={bulkSelectionMode}
                 isSelected={isSelected(task.id)}
@@ -515,6 +559,14 @@ export function GraveyardView() {
           </div>
         </ConfirmDialog>
       )}
-    </article>
+
+      {/* Digging Modal */}
+      <DiggingModal
+        task={dugUpTask}
+        isOpen={dugUpTask !== null}
+        onClose={() => setDugUpTask(null)}
+      />
+      </article>
+    </MoonLighting>
   );
 }

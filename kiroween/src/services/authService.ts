@@ -12,6 +12,25 @@ import type { User as FirebaseUser, UserCredential } from 'firebase/auth';
 import { auth } from './firebaseService';
 import type { User } from '../types';
 
+/**
+ * Type guard to check if an error is a Firebase Auth error
+ * Firebase Auth errors have a 'code' property that starts with 'auth/'
+ */
+interface FirebaseAuthError {
+  code: string;
+  message?: string;
+}
+
+function isFirebaseAuthError(error: unknown): error is FirebaseAuthError {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: unknown }).code === 'string' &&
+    (error as { code: string }).code.startsWith('auth/')
+  );
+}
+
 
 
 /**
@@ -74,13 +93,15 @@ export const register = async (email: string, password: string): Promise<User> =
   try {
     const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
     return convertFirebaseUser(userCredential.user);
-  } catch (error: any) {
-    if (error.code === 'auth/email-already-in-use') {
-      throw new Error('An account with this email already exists');
-    } else if (error.code === 'auth/invalid-email') {
-      throw new Error('Invalid email address');
-    } else if (error.code === 'auth/weak-password') {
-      throw new Error('Password is too weak');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('An account with this email already exists');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('Password is too weak');
+      }
     }
     throw new Error('Registration failed. Please try again.');
   }
@@ -94,13 +115,15 @@ export const login = async (email: string, password: string): Promise<User> => {
   try {
     const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
     return convertFirebaseUser(userCredential.user);
-  } catch (error: any) {
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      throw new Error('Invalid email or password');
-    } else if (error.code === 'auth/invalid-email') {
-      throw new Error('Invalid email address');
-    } else if (error.code === 'auth/too-many-requests') {
-      throw new Error('Too many failed attempts. Please try again later.');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        throw new Error('Invalid email or password');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many failed attempts. Please try again later.');
+      }
     }
     throw new Error('Login failed. Please try again.');
   }
@@ -125,11 +148,13 @@ export const sendPasswordReset = async (email: string): Promise<void> => {
   if (!auth) throw new Error('Firebase is not initialized.');
   try {
     await sendPasswordResetEmail(auth, email);
-  } catch (error: any) {
-    if (error.code === 'auth/user-not-found') {
-      throw new Error('No account found with this email');
-    } else if (error.code === 'auth/invalid-email') {
-      throw new Error('Invalid email address');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/user-not-found') {
+        throw new Error('No account found with this email');
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Invalid email address');
+      }
     }
     throw new Error('Failed to send password reset email. Please try again.');
   }
@@ -147,11 +172,13 @@ export const resetPassword = async (code: string, newPassword: string): Promise<
 
   try {
     await confirmPasswordReset(auth, code, newPassword);
-  } catch (error: any) {
-    if (error.code === 'auth/invalid-action-code') {
-      throw new Error('Invalid or expired reset code');
-    } else if (error.code === 'auth/weak-password') {
-      throw new Error('Password is too weak');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/invalid-action-code') {
+        throw new Error('Invalid or expired reset code');
+      } else if (error.code === 'auth/weak-password') {
+        throw new Error('Password is too weak');
+      }
     }
     throw new Error('Failed to reset password. Please try again.');
   }
@@ -166,11 +193,13 @@ export const signInWithGoogle = async (): Promise<User> => {
   try {
     const userCredential: UserCredential = await signInWithPopup(auth, provider);
     return convertFirebaseUser(userCredential.user);
-  } catch (error: any) {
-    if (error.code === 'auth/popup-closed-by-user') {
-      throw new Error('Sign-in cancelled');
-    } else if (error.code === 'auth/popup-blocked') {
-      throw new Error('Popup blocked. Please allow popups for this site.');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign-in cancelled');
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      }
     }
     throw new Error('Google sign-in failed. Please try again.');
   }
@@ -185,13 +214,15 @@ export const signInWithGithub = async (): Promise<User> => {
   try {
     const userCredential: UserCredential = await signInWithPopup(auth, provider);
     return convertFirebaseUser(userCredential.user);
-  } catch (error: any) {
-    if (error.code === 'auth/popup-closed-by-user') {
-      throw new Error('Sign-in cancelled');
-    } else if (error.code === 'auth/popup-blocked') {
-      throw new Error('Popup blocked. Please allow popups for this site.');
-    } else if (error.code === 'auth/account-exists-with-different-credential') {
-      throw new Error('An account already exists with this email using a different sign-in method');
+  } catch (error: unknown) {
+    if (isFirebaseAuthError(error)) {
+      if (error.code === 'auth/popup-closed-by-user') {
+        throw new Error('Sign-in cancelled');
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
+        throw new Error('An account already exists with this email using a different sign-in method');
+      }
     }
     throw new Error('GitHub sign-in failed. Please try again.');
   }

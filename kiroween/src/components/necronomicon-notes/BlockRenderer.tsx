@@ -27,35 +27,24 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const blockRef = useRef<HTMLDivElement>(null);
-
-  // Get cursor position within the block
-  const getCursorPosition = useCallback((): number => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0 || !blockRef.current) return 0;
-
-    const range = selection.getRangeAt(0);
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(blockRef.current);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-
-    return preCaretRange.toString().length;
-  }, []);
+  const blockRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle keyboard events
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      // Enter: Split block at cursor position
+      // For textarea, handle Enter to split blocks
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        const cursorPos = getCursorPosition();
+        const textarea = e.currentTarget as HTMLTextAreaElement;
+        const cursorPos = textarea.selectionStart || 0;
         onSplit(cursorPos);
         return;
       }
 
       // Backspace at start: Merge with previous or delete empty block
       if (e.key === 'Backspace') {
-        const cursorPos = getCursorPosition();
+        const textarea = e.currentTarget as HTMLTextAreaElement;
+        const cursorPos = textarea.selectionStart || 0;
         if (cursorPos === 0) {
           e.preventDefault();
           if (block.content.length === 0) {
@@ -66,28 +55,8 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
           return;
         }
       }
-
-      // Delete at end: Could merge with next block (future enhancement)
-      if (e.key === 'Delete') {
-        const cursorPos = getCursorPosition();
-        if (cursorPos === block.content.length) {
-          // Future: merge with next block
-        }
-      }
     },
-    [block.content.length, getCursorPosition, onSplit, onDelete, onMerge]
-  );
-
-  // Handle content changes
-  const handleInput = useCallback(
-    (e: React.FormEvent<HTMLDivElement>) => {
-      const newContent = e.currentTarget.textContent || '';
-      onUpdate({
-        ...block,
-        content: newContent,
-      });
-    },
-    [block, onUpdate]
+    [block.content.length, onSplit, onDelete, onMerge]
   );
 
   // Focus management
@@ -96,6 +65,7 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
       blockRef.current.focus();
     }
   }, [isActive]);
+
 
   return (
     <div
@@ -106,20 +76,37 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({
       {/* Drag handle placeholder - will be implemented in Task 4.1 */}
       <div className={styles.dragHandlePlaceholder} />
 
-      {/* Editable content */}
-      <div
-        ref={blockRef}
+      {/* Use textarea instead of contentEditable to test */}
+      <textarea
+        ref={blockRef as any}
         className={styles.blockContent}
-        contentEditable
-        suppressContentEditableWarning
-        onInput={handleInput}
-        onKeyDown={handleKeyDown}
+        value={block.content}
+        onChange={(e) => {
+          onUpdate({
+            ...block,
+            content: e.target.value,
+          });
+        }}
+        onKeyDown={handleKeyDown as any}
         onFocus={onFocus}
         onBlur={onBlur}
-        data-placeholder={block.content.length === 0 ? 'Type / for commands' : undefined}
-      >
-        {block.content}
-      </div>
+        dir="ltr"
+        lang="en"
+        placeholder={block.content.length === 0 ? 'Type / for commands' : ''}
+        style={{
+          direction: 'ltr',
+          unicodeBidi: 'normal',
+          writingMode: 'horizontal-tb',
+          textAlign: 'left',
+          fontFamily: 'inherit',
+          resize: 'none',
+          border: 'none',
+          background: 'transparent',
+          outline: 'none',
+          width: '100%',
+          minHeight: '1.5em',
+        }}
+      />
     </div>
   );
 };

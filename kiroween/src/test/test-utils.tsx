@@ -8,6 +8,8 @@ import { TasksProvider } from '../contexts/TasksContext';
 import { ToastProvider } from '../contexts/ToastContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { CompanionProvider } from '../contexts/CompanionContext';
+import { StreakProvider } from '../contexts/StreakContext';
+import { TimerProvider } from '../contexts/TimerContext';
 
 /**
  * Test utilities for integration tests
@@ -16,19 +18,24 @@ import { CompanionProvider } from '../contexts/CompanionContext';
 
 // Wrapper with all providers
 // Note: CompanionProvider must be before TasksProvider since TasksProvider depends on CompanionContext
+// Note: StreakProvider must be before TasksProvider, NotesProvider, and TimerProvider since they depend on StreakContext
 export const AllProviders = ({ children }: { children: React.ReactNode }) => (
   <BrowserRouter>
     <AuthProvider>
       <ToastProvider>
         <ThemeProvider>
           <AppProvider>
-            <NotesProvider>
-              <CompanionProvider>
-                <TasksProvider>
-                  {children}
-                </TasksProvider>
-              </CompanionProvider>
-            </NotesProvider>
+            <CompanionProvider>
+              <StreakProvider>
+                <TimerProvider>
+                  <NotesProvider>
+                    <TasksProvider>
+                      {children}
+                    </TasksProvider>
+                  </NotesProvider>
+                </TimerProvider>
+              </StreakProvider>
+            </CompanionProvider>
           </AppProvider>
         </ThemeProvider>
       </ToastProvider>

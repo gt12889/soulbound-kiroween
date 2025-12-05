@@ -18,7 +18,7 @@ export const useDoubleTab = ({
 }: UseDoubleTabOptions) => {
   const lastTabPressRef = useRef<number>(0);
   const tabCountRef = useRef<number>(0);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {

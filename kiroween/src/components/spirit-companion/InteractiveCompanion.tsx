@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useCompanion } from '../../contexts/CompanionContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { CompanionDialogue } from './CompanionDialogue';
-import { COMPANION_TYPES } from '../../types/companion';
+import { COMPANION_TYPES, type CompanionType } from '../../types/companion';
 import styles from './InteractiveCompanion.module.css';
 
-export type EvolutionStage = 'egg' | 'hatchling' | 'juvenile' | 'adult' | 'elder' | 'ascended';
+export type EvolutionStage = 'egg' | 'hatchling' | 'juvenile' | 'adult' | 'ascended';
 
 interface InteractiveCompanionProps {
   achievementCount: number;
@@ -13,7 +13,7 @@ interface InteractiveCompanionProps {
   onInteract?: () => void;
 }
 
-export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
+export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = React.memo(({
   achievementCount,
   taskCompletionCount,
   onInteract,
@@ -37,10 +37,8 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
     const totalProgress = achievementCount * 10 + taskCompletionCount;
     let newStage: EvolutionStage = 'egg';
 
-    if (totalProgress >= 200) {
+    if (totalProgress >= 100) {
       newStage = 'ascended';
-    } else if (totalProgress >= 100) {
-      newStage = 'elder';
     } else if (totalProgress >= 50) {
       newStage = 'adult';
     } else if (totalProgress >= 20) {
@@ -161,7 +159,9 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
 
   const getStageInfo = () => {
     // Get the companion definition based on active companion
-    const companionDef = COMPANION_TYPES[activeCompanion];
+    // Migrate 'zombie' to 'forest' for backwards compatibility
+    const migratedCompanion = activeCompanion === 'zombie' ? 'forest' : activeCompanion;
+    const companionDef = COMPANION_TYPES[migratedCompanion as CompanionType];
     
     // Use theme colors for companion stages
     // Progression: lighter -> darker as companion evolves
@@ -170,12 +170,11 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
       hatchling: currentTheme.colors.highlightBlueLight,
       juvenile: currentTheme.colors.accentPurple,
       adult: currentTheme.colors.highlightBlue,
-      elder: currentTheme.colors.accentPurpleDark,
       ascended: currentTheme.colors.borderPrimary,
     };
 
     // Map stage index to stage name
-    const stageIndex = ['egg', 'hatchling', 'juvenile', 'adult', 'elder', 'ascended'].indexOf(stage);
+    const stageIndex = ['egg', 'hatchling', 'juvenile', 'adult', 'ascended'].indexOf(stage);
     const stageData = companionDef.stages[stageIndex];
 
     return {
@@ -187,7 +186,7 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
   };
 
   const stageInfo = getStageInfo();
-  const progress = Math.min(100, ((achievementCount * 10 + taskCompletionCount) / 200) * 100);
+  const progress = Math.min(100, ((achievementCount * 10 + taskCompletionCount) / 100) * 100);
 
   // Apply ghost video positioning with !important to override CSS modules
   useEffect(() => {
@@ -354,7 +353,7 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
             <video
               ref={ghostVideoRef}
               className={styles.zombieVideo}
-              src="/zombie_idle.mp4"
+              src={stage === 'adult' ? '/zombie_adult.mp4' : '/zombie_idle.mp4'}
               autoPlay
               loop
               muted
@@ -425,22 +424,20 @@ export const InteractiveCompanion: React.FC<InteractiveCompanionProps> = ({
             <span className={styles.milestoneIcon}>👻</span>
             <span className={styles.milestoneText}>Juvenile (20 pts)</span>
           </div>
-          <div className={`${styles.milestone} ${['adult', 'elder', 'ascended'].includes(stage) ? styles.unlocked : ''}`}>
+          <div className={`${styles.milestone} ${['adult', 'ascended'].includes(stage) ? styles.unlocked : ''}`}>
             <span className={styles.milestoneIcon}>🦇</span>
             <span className={styles.milestoneText}>Adult (50 pts)</span>
           </div>
-          <div className={`${styles.milestone} ${['elder', 'ascended'].includes(stage) ? styles.unlocked : ''}`}>
-            <span className={styles.milestoneIcon}>🌙</span>
-            <span className={styles.milestoneText}>Elder (100 pts)</span>
-          </div>
           <div className={`${styles.milestone} ${stage === 'ascended' ? styles.unlocked : ''}`}>
             <span className={styles.milestoneIcon}>⭐</span>
-            <span className={styles.milestoneText}>Ascended (200 pts)</span>
+            <span className={styles.milestoneText}>Ascended (100 pts)</span>
           </div>
         </div>
       </div>
     </div>
   );
-};
+});
+
+InteractiveCompanion.displayName = 'InteractiveCompanion';
 
 export default InteractiveCompanion;

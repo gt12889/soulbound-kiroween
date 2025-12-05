@@ -18,6 +18,88 @@
   display: none;
 }
 
+/* Fog overlay that parts on tombstone hover */
+.fogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+}
+
+.fogLayer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at var(--fog-x, 50%) var(--fog-y, 50%),
+    rgba(77, 45, 110, 0.3) 0%,
+    rgba(45, 27, 78, 0.2) 30%,
+    transparent 60%
+  );
+  transition: background 0.5s ease;
+}
+
+.fogLayer1 {
+  animation: fogDrift1 20s ease-in-out infinite;
+  opacity: 0.4;
+}
+
+.fogLayer2 {
+  animation: fogDrift2 25s ease-in-out infinite;
+  opacity: 0.3;
+  animation-delay: -10s;
+}
+
+.fogLayer3 {
+  animation: fogDrift3 30s ease-in-out infinite;
+  opacity: 0.25;
+  animation-delay: -20s;
+}
+
+@keyframes fogDrift1 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -30px);
+  }
+}
+
+@keyframes fogDrift2 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-25px, 20px);
+  }
+}
+
+@keyframes fogDrift3 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(15px, 25px);
+  }
+}
+
+/* Fog parts when hovering over tombstone */
+.fogParting {
+  background: radial-gradient(
+    ellipse at var(--fog-x, 50%) var(--fog-y, 50%),
+    rgba(77, 45, 110, 0.05) 0%,
+    rgba(45, 27, 78, 0.02) 15%,
+    transparent 35%
+  ) !important;
+  opacity: 0.15 !important;
+  transition: background 0.6s ease, opacity 0.6s ease;
+}
+
 .header {
   text-align: center;
   margin-bottom: 2rem;
@@ -42,9 +124,7 @@
   font-style: italic;
 }
 
-.createButton {
-  /* Inherits global button styles and will use .button-primary */
-}
+/* .createButton inherits global button styles and uses .button-primary */
 
 /* Create form */
 .createForm {
@@ -71,11 +151,7 @@
   font-size: 0.9rem;
 }
 
-.formGroup input,
-.formGroup textarea,
-.formGroup select {
-  /* Styling is now handled by global input/textarea/select styles in App.css */
-}
+/* .formGroup input/textarea/select styling handled by global styles in App.css */
 
 .formGroup input:focus,
 .formGroup textarea:focus,
@@ -86,13 +162,9 @@
 }
 
 .submitButton {
-  /* Inherits global button styles and will use .button-primary */
-  width: 100%; /* Keep layout specific property */
+  width: 100%; /* Layout specific property */
 }
-
-.submitButton:hover {
-  /* Handled by global button:hover and .button-primary:hover */
-}
+/* .submitButton inherits global button styles and uses .button-primary */
 
 /* Grid layout for tombstones - Requirement 4.1 */
 .tombstoneGrid {
@@ -229,9 +301,7 @@
   color: var(--text-primary); /* Keep specific color */
 }
 
-.bulkModeButton:hover {
-  /* Handled by global button:hover and .button-primary:hover */
-}
+/* .bulkModeButton:hover handled by global button:hover and .button-primary:hover */
 
 .bulkModeButton.active {
   background: var(--highlight-green-light);
@@ -276,13 +346,8 @@
   font-size: 0.9rem;
 }
 
-.bulkButton:hover:not(:disabled) {
-  /* Handled by global button:hover and .button-secondary:hover */
-}
-
-.bulkButton:disabled {
-  /* Handled by global button:disabled */
-}
+/* .bulkButton:hover:not(:disabled) handled by global button:hover and .button-secondary:hover */
+/* .bulkButton:disabled handled by global button:disabled */
 
 .selectionCount {
   color: var(--text-secondary);
@@ -327,17 +392,9 @@
   gap: 0.5rem;
 }
 
-.bulkActionButton:hover {
-  /* Handled by global button:hover and .button-primary:hover */
-}
-
-.bulkActionButton.destructive {
-  /* Will be handled by global .button-danger and local overrides */
-}
-
-.bulkActionButton.destructive:hover {
-  /* Will be handled by global .button-danger:hover */
-}
+/* .bulkActionButton:hover handled by global button:hover and .button-primary:hover */
+/* .bulkActionButton.destructive handled by global .button-danger and local overrides */
+/* .bulkActionButton.destructive:hover handled by global .button-danger:hover */
 
 
 /* Moon Phase Calendar Widget - integrated into graveyard corner */

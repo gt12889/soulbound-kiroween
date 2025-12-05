@@ -42,7 +42,7 @@ export const CompanionSelectionModal: React.FC<CompanionSelectionModalProps> = (
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   // Companion types in order
-  const companionTypes: CompanionType[] = ['shadow', 'zombie', 'ember'];
+  const companionTypes: CompanionType[] = ['shadow', 'forest', 'ember'];
 
   /**
    * Focus trap: Keep focus within modal using useFocusTrap hook

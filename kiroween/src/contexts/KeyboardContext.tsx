@@ -10,6 +10,9 @@ import {
   detectConflicts,
   type KeyboardShortcut,
 } from '../utils/keyboardShortcuts';
+import { createScopedLogger } from '../utils/logger';
+
+const logger = createScopedLogger('[Keyboard]');
 
 interface KeyboardContextType {
   // Shortcuts state
@@ -70,10 +73,9 @@ export function KeyboardProvider({ children }: KeyboardProviderProps) {
         const cloudSettings = await cloudSyncService.fetchSettings(user.id);
         if (cloudSettings?.keyboardShortcuts && Array.isArray(cloudSettings.keyboardShortcuts)) {
           setShortcuts(cloudSettings.keyboardShortcuts);
-          console.log('Keyboard shortcuts loaded from cloud successfully');
         }
       } catch (error) {
-        console.error('Failed to load keyboard shortcuts from cloud:', error);
+        logger.error('Failed to load keyboard shortcuts from cloud:', error);
       }
     };
 
@@ -87,9 +89,8 @@ export function KeyboardProvider({ children }: KeyboardProviderProps) {
 
       try {
         await cloudSyncService.syncSettings(user.id, { keyboardShortcuts: shortcuts });
-        console.log('Keyboard shortcuts synced to cloud successfully');
       } catch (error) {
-        console.error('Failed to sync keyboard shortcuts to cloud:', error);
+        logger.error('Failed to sync keyboard shortcuts to cloud:', error);
       }
     };
 

@@ -30,12 +30,12 @@ const Navigation: React.FC = () => {
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
 
   const navItems = [
+    { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
     { path: '/necronomicon-notes', label: 'Ancient Library', icon: '📖', description: 'Deep in the woods', shortcutId: 'nav-necronomicon-notes' },
     { path: '/ghost-writer', label: 'Haunted Study', icon: '✍️', description: 'Spectral guidance', shortcutId: 'nav-ghost-writer' },
     { path: '/graveyard-dashboard', label: 'Forgotten Graveyard', icon: '⚰️', description: 'Where tasks rest', shortcutId: 'nav-graveyard-dashboard' },
-    { path: '/terminal-tarot', label: 'Mystic Clearing', icon: '🔮', description: 'Seek guidance', shortcutId: 'nav-terminal-tarot' },
     { path: '/cursed-calendar', label: 'Cursed Calendar', icon: '📅', description: 'Schedule your doom', shortcutId: 'nav-cursed-calendar' },
-    { path: '/achievements', label: 'Deeds & Decrees', icon: '🏆', description: 'Your legend in the woods', shortcutId: 'nav-achievements' },
+    { path: '/achievements', label: 'Deeds & Flames', icon: '🏆', description: 'Achievements & streaks', shortcutId: 'nav-achievements' },
   ];
 
   // Memoized event handlers to prevent unnecessary re-renders
@@ -106,14 +106,14 @@ const Navigation: React.FC = () => {
       );
     });
 
-    // Register quick capture shortcut (Ctrl+K)
+    // Register quick note shortcut (Ctrl+K)
     // Requirement: 13.1
     registerShortcut(
       {
         id: 'quick-capture',
         action: 'open-quick-capture',
         keys: [], // Keys are defined in DEFAULT_SHORTCUTS
-        description: 'Open quick capture',
+        description: 'Open quick note',
         category: 'actions',
         customizable: true,
       },
@@ -136,114 +136,117 @@ const Navigation: React.FC = () => {
   }
 
   return (
-    <nav className={`${styles.navigation} ${sidebarMode === 'collapsed' ? styles.collapsed : ''}`}>
-      <button 
-        className={styles.toggleButton}
-        onClick={toggleSidebar}
-        onMouseEnter={handleNavHover}
-        title={
-          sidebarMode === 'expanded' ? 'Collapse to icons' : 
-          sidebarMode === 'collapsed' ? 'Hide sidebar' : 
-          'Expand sidebar'
-        }
-        aria-label={
-          sidebarMode === 'expanded' ? 'Collapse to icons' : 
-          sidebarMode === 'collapsed' ? 'Hide sidebar' : 
-          'Expand sidebar'
-        }
-      >
-        {sidebarMode === 'expanded' ? '«' : sidebarMode === 'collapsed' ? '«' : '»'}
-      </button>
-      <Link 
-        to="/" 
-        className={styles.navHeader}
-        onClick={handleNavClick}
-        onMouseEnter={handleNavHover}
-        title="Return to the forest entrance"
-        aria-label="Return to the forest entrance"
-      >
-        <div className={styles.forestIcon} aria-hidden="true">🌲</div>
-        <h1 className={styles.title}>The Dark Forest</h1>
-        <p className={styles.subtitle}>Choose Your Path</p>
-      </Link>
-      
-      <ul className={styles.navList}>
-        {navItems.map((item) => (
-          <li 
-            key={item.path} 
-            className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
-          >
-            <Link 
-              to={item.path} 
-              className={styles.navLink}
-              onClick={handleNavClick}
-              onMouseEnter={handleNavHover}
-              aria-label={`${item.label} - ${item.description}`}
+    <>
+      <nav className={`${styles.navigation} ${sidebarMode === 'collapsed' ? styles.collapsed : ''}`}>
+        <button 
+          className={styles.toggleButton}
+          onClick={toggleSidebar}
+          onMouseEnter={handleNavHover}
+          title={
+            sidebarMode === 'expanded' ? 'Collapse to icons' : 
+            sidebarMode === 'collapsed' ? 'Hide sidebar' : 
+            'Expand sidebar'
+          }
+          aria-label={
+            sidebarMode === 'expanded' ? 'Collapse to icons' : 
+            sidebarMode === 'collapsed' ? 'Hide sidebar' : 
+            'Expand sidebar'
+          }
+        >
+          {sidebarMode === 'expanded' ? '«' : sidebarMode === 'collapsed' ? '«' : '»'}
+        </button>
+        <Link 
+          to="/" 
+          className={styles.navHeader}
+          onClick={handleNavClick}
+          onMouseEnter={handleNavHover}
+          title="Return to the forest entrance"
+          aria-label="Return to the forest entrance"
+        >
+          <div className={styles.forestIcon} aria-hidden="true">🌲</div>
+          <h1 className={styles.title}>The Dark Forest</h1>
+          <p className={styles.subtitle}>Choose Your Path</p>
+        </Link>
+        
+        <ul className={styles.navList}>
+          {navItems.map((item) => (
+            <li 
+              key={item.path} 
+              className={`${styles.navItem} ${(location.pathname === item.path || (item.path === '/achievements' && location.pathname === '/streaks')) ? styles.active : ''}`}
             >
-              <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
-              <div className={styles.navContent}>
-                <span className={styles.navLabel}>{item.label}</span>
-                <span className={styles.navDescription}>{item.description}</span>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      
-      <div className={styles.navFooter}>
-        {/* Sync Status Indicator - Requirements: 17.7 */}
-        <SyncStatusIndicator />
+              <Link 
+                to={item.path} 
+                className={styles.navLink}
+                onClick={handleNavClick}
+                onMouseEnter={handleNavHover}
+                aria-label={`${item.label} - ${item.description}`}
+              >
+                <span className={styles.navIcon} aria-hidden="true">{item.icon}</span>
+                <div className={styles.navContent}>
+                  <span className={styles.navLabel}>{item.label}</span>
+                  <span className={styles.navDescription}>{item.description}</span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
         
-        {/* Quick Capture Button - Requirements: 13.1, 6.1 */}
-        <button 
-          className={styles.quickCaptureButton}
-          onClick={handleQuickCaptureClick}
-          onMouseEnter={handleNavHover}
-          title="Quick capture (Ctrl+K)"
-          aria-label="Quick capture (Ctrl+K)"
-        >
-          <span className={styles.quickCaptureIcon} aria-hidden="true">⚡</span>
-          <span className={styles.quickCaptureLabel}>Quick Capture</span>
-        </button>
-        
-        <button 
-          className={styles.settingsButton}
-          onClick={handleSettingsClick}
-          onMouseEnter={handleNavHover}
-          title="Realm settings"
-          aria-label="Open settings"
-        >
-          <span className={styles.settingsIcon} aria-hidden="true">⚙️</span>
-          <span className={styles.settingsLabel}>Settings</span>
-        </button>
-        
-        <button 
-          className={styles.exportButton}
-          onClick={handleExport}
-          onMouseEnter={handleNavHover}
-          title="Preserve your journey"
-          aria-label="Export data"
-        >
-          <span className={styles.exportIcon} aria-hidden="true">📜</span>
-          <span className={styles.exportLabel}>Save Journey</span>
-        </button>
-        
-        {user && (
+        <div className={styles.navFooter}>
+          {/* Sync Status Indicator - Requirements: 17.7 */}
+          <SyncStatusIndicator />
+          
+          {/* Quick Note Button - Compact icon-only design */}
           <button 
-            className={styles.logoutButton}
-            onClick={handleLogout}
+            className={styles.quickNoteButton}
+            onClick={handleQuickCaptureClick}
             onMouseEnter={handleNavHover}
-            title="Leave the realm"
-            aria-label="Logout"
+            title="Quick Note (Ctrl+K)"
+            aria-label="Quick Note (Ctrl+K)"
           >
-            <span className={styles.logoutIcon} aria-hidden="true">🚪</span>
-            <span className={styles.logoutLabel}>Depart</span>
+            <span className={styles.quickNoteIcon} aria-hidden="true">📝</span>
+            {sidebarMode === 'expanded' && <span className={styles.quickNoteLabel}>Quick Note</span>}
           </button>
-        )}
-        
-        <div className={styles.ornament} aria-hidden="true">🍂</div>
-      </div>
+          
+          <button 
+            className={styles.settingsButton}
+            onClick={handleSettingsClick}
+            onMouseEnter={handleNavHover}
+            title="Realm settings"
+            aria-label="Open settings"
+          >
+            <span className={styles.settingsIcon} aria-hidden="true">⚙️</span>
+            <span className={styles.settingsLabel}>Settings</span>
+          </button>
+          
+          <button 
+            className={styles.exportButton}
+            onClick={handleExport}
+            onMouseEnter={handleNavHover}
+            title="Preserve your journey"
+            aria-label="Export data"
+          >
+            <span className={styles.exportIcon} aria-hidden="true">📜</span>
+            <span className={styles.exportLabel}>Save Journey</span>
+          </button>
+          
+          {user && (
+            <button 
+              className={styles.logoutButton}
+              onClick={handleLogout}
+              onMouseEnter={handleNavHover}
+              title="Leave the realm"
+              aria-label="Logout"
+            >
+              <span className={styles.logoutIcon} aria-hidden="true">🚪</span>
+              <span className={styles.logoutLabel}>Depart</span>
+            </button>
+          )}
+          
+          <div className={styles.ornament} aria-hidden="true">🍂</div>
+        </div>
+      </nav>
       
+      {/* Modals rendered outside nav to avoid z-index/positioning constraints */}
       <SettingsModal isOpen={isSettingsOpen} onClose={handleSettingsClose} />
       <ExportDialog 
         isOpen={isExportDialogOpen} 
@@ -253,7 +256,7 @@ const Navigation: React.FC = () => {
         settings={settings}
       />
       <QuickCapture isOpen={isQuickCaptureOpen} onClose={handleQuickCaptureClose} />
-    </nav>
+    </>
   );
 };
 

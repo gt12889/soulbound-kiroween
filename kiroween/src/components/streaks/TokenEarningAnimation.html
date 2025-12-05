@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Earning Animation Demo</title>
+  <style>
+    :root {
+      --accent-rgb: 139, 92, 246;
+      --accent-color: rgb(139, 92, 246);
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --text-muted: #808080;
+      --border-color: #333333;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .token-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .token-display {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .token-label {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .token-icons {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .token-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+      transition: all 0.3s ease;
+    }
+
+    .token-available {
+      color: var(--accent-color);
+      filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.5));
+      animation: tokenPulse 2s ease-in-out infinite;
+    }
+
+    .token-empty {
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+
+    .token-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Token Pulse Animation */
+    @keyframes tokenPulse {
+      0%, 100% {
+        filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.5));
+      }
+      50% {
+        filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.8));
+      }
+    }
+
+    /* Token Earning Celebration Animation */
+    @keyframes tokenEarnBounce {
+      0% {
+        transform: scale(1);
+      }
+      25% {
+        transform: scale(1.2) rotate(5deg);
+      }
+      50% {
+        transform: scale(1.1) rotate(-5deg);
+      }
+      75% {
+        transform: scale(1.15) rotate(3deg);
+      }
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes tokenEarnGlow {
+      0%, 100% {
+        box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2);
+      }
+      50% {
+        box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.6), 0 0 36px rgba(var(--accent-rgb), 0.4);
+      }
+    }
+
+    @keyframes tokenEarnShine {
+      0% {
+        transform: translateX(-100%) rotate(45deg);
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(200%) rotate(45deg);
+        opacity: 0;
+      }
+    }
+
+    /* Celebrating State */
+    .celebrating {
+      animation: tokenEarnGlow 2s ease-in-out;
+    }
+
+    .celebrating .token-icon.token-available {
+      animation: tokenEarnBounce 0.6s ease-in-out, tokenPulse 2s ease-in-out infinite;
+    }
+
+    .celebrating::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(var(--accent-rgb), 0.3) 50%,
+        transparent 100%
+      );
+      animation: tokenEarnShine 1s ease-in-out;
+      pointer-events: none;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .info-box {
+      padding: 1rem;
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .info-box h3 {
+      margin-top: 0;
+      color: var(--accent-color);
+    }
+
+    .info-box ul {
+      margin: 0;
+      padding-left: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .animation-stages {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stage {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stage-title {
+      font-weight: bold;
+      color: var(--accent-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .stage-duration {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <h1>🎟️ Token Earning Animation Demo</h1>
+  
+  <div class="demo-container">
+    <div style="text-align: center;">
+      <div class="token-container" id="tokenDisplay">
+        <div class="token-display">
+          <span class="token-label" aria-hidden="true">🎟️</span>
+          <div class="token-icons">
+            <span class="token-icon token-available">●</span>
+            <span class="token-icon token-available">●</span>
+            <span class="token-icon token-empty">○</span>
+          </div>
+          <span class="token-count">(2/3)</span>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="triggerAnimation()">
+      🎉 Trigger Token Earning Animation
+    </button>
+
+    <div class="info-box">
+      <h3>Animation Stages</h3>
+      <div class="animation-stages">
+        <div class="stage">
+          <div class="stage-title">Bounce</div>
+          <div class="stage-duration">0.6 seconds</div>
+          <div style="margin-top: 0.5rem;">Tokens scale and rotate</div>
+        </div>
+        <div class="stage">
+          <div class="stage-title">Glow</div>
+          <div class="stage-duration">2.0 seconds</div>
+          <div style="margin-top: 0.5rem;">Container pulses with light</div>
+        </div>
+        <div class="stage">
+          <div class="stage-title">Shine</div>
+          <div class="stage-duration">1.0 second</div>
+          <div style="margin-top: 0.5rem;">Light sweeps across</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h3>Animation Features</h3>
+      <ul>
+        <li><strong>Bounce Effect:</strong> Tokens scale to 1.2x and rotate ±5°</li>
+        <li><strong>Glow Pulse:</strong> Box shadow expands from 12px to 36px</li>
+        <li><strong>Shine Effect:</strong> Gradient sweeps from left to right</li>
+        <li><strong>Duration:</strong> 2 seconds total (overlapping animations)</li>
+        <li><strong>Trigger:</strong> Auto-detects token count increase</li>
+        <li><strong>Manual:</strong> Can be triggered via onTokenEarned prop</li>
+        <li><strong>Accessibility:</strong> Respects prefers-reduced-motion</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h3>When Animation Triggers</h3>
+      <ul>
+        <li>✅ Token count increases (e.g., 1 → 2)</li>
+        <li>✅ onTokenEarned prop set to true</li>
+        <li>❌ Token count decreases (using a token)</li>
+        <li>❌ Token count stays the same</li>
+        <li>❌ Component first mounts</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <h3>CSS Keyframes</h3>
+      <pre style="background: var(--bg-primary); padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.875rem;">
+@keyframes tokenEarnBounce {
+  0%   { transform: scale(1); }
+  25%  { transform: scale(1.2) rotate(5deg); }
+  50%  { transform: scale(1.1) rotate(-5deg); }
+  75%  { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes tokenEarnGlow {
+  0%, 100% { box-shadow: 0 0 12px rgba(139, 92, 246, 0.2); }
+  50%      { box-shadow: 0 0 24px rgba(139, 92, 246, 0.6),
+                         0 0 36px rgba(139, 92, 246, 0.4); }
+}
+
+@keyframes tokenEarnShine {
+  0%   { transform: translateX(-100%) rotate(45deg); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translateX(200%) rotate(45deg); opacity: 0; }
+}</pre>
+    </div>
+  </div>
+
+  <script>
+    function triggerAnimation() {
+      const container = document.getElementById('tokenDisplay');
+      container.classList.remove('celebrating');
+      
+      // Force reflow to restart animation
+      void container.offsetWidth;
+      
+      container.classList.add('celebrating');
+      
+      // Remove class after animation completes
+      setTimeout(() => {
+        container.classList.remove('celebrating');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

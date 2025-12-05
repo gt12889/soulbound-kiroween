@@ -1,31 +1,42 @@
 import React from 'react';
-// import { Navigate, useLocation } from 'react-router-dom';
-// import { useAuth } from '../../contexts/AuthContext';
-// import LoadingTransition from './LoadingTransition';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import LoadingTransition from './LoadingTransition';
+import { logger } from '../../utils/logger';
 
 interface ProtectedRouteProps {
   children: React.ReactElement;
 }
 
 /**
+ * Feature flag for bypassing authentication in development
+ * Set VITE_BYPASS_AUTH=true in .env to bypass auth checks (development only)
+ * WARNING: This should NEVER be enabled in production
+ */
+const BYPASS_AUTH = import.meta.env.DEV && import.meta.env.VITE_BYPASS_AUTH === 'true';
+
+/**
  * ProtectedRoute component that guards authenticated-only pages
  * Redirects unauthenticated users to login page
  * Handles session expiration by redirecting to login
  * 
- * TEMPORARY: Auth bypass for development
+ * Authentication can be bypassed in development by setting VITE_BYPASS_AUTH=true
+ * This is useful for local development when Firebase is not configured
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // const { isAuthenticated, loading } = useAuth();
-  // const location = useLocation();
-
-  // TEMPORARY: Skip auth check for development
-  // TODO: Re-enable authentication once Firebase is properly configured
-  
-  // For now, just render the children without auth check
-  return children;
-
-  /* Original auth logic - commented out for development
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
   const [showContent, setShowContent] = React.useState(false);
+
+  // Development bypass: Skip auth check if flag is enabled
+  // This should only be used when Firebase is not configured locally
+  if (BYPASS_AUTH) {
+    logger.warn(
+      '[ProtectedRoute] Authentication bypass is enabled. ' +
+      'This should only be used for local development without Firebase.'
+    );
+    return children;
+  }
 
   // Add timeout to prevent infinite loading
   React.useEffect(() => {
@@ -48,7 +59,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // User is authenticated, render the protected content
   return children;
-  */
 };
 
 export default ProtectedRoute;

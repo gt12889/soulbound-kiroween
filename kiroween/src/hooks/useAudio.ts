@@ -103,6 +103,46 @@ export const useAudio = () => {
     audioService.playSound('ui-hover');
   }, []);
 
+  /**
+   * Play terminal typing sound effect
+   * Quick typing click
+   */
+  const playTerminalType = useCallback(() => {
+    audioService.playSound('terminal-type');
+  }, []);
+
+  /**
+   * Play terminal connection sound effect
+   * Connection established
+   */
+  const playTerminalConnect = useCallback(() => {
+    audioService.playSound('terminal-connect');
+  }, []);
+
+  /**
+   * Play terminal disconnection sound effect
+   * Disconnection
+   */
+  const playTerminalDisconnect = useCallback(() => {
+    audioService.playSound('terminal-disconnect');
+  }, []);
+
+  /**
+   * Play workflow completion sound effect
+   * Success chime
+   */
+  const playWorkflowComplete = useCallback(() => {
+    audioService.playSound('workflow-complete');
+  }, []);
+
+  /**
+   * Play lore event sound effect
+   * Mysterious ethereal tone
+   */
+  const playLoreEvent = useCallback(() => {
+    audioService.playSound('lore-event');
+  }, []);
+
   return {
     playSound,
     playGhostAppear,
@@ -113,6 +153,11 @@ export const useAudio = () => {
     playTombstoneSink,
     playUIClick,
     playUIHover,
+    playTerminalType,
+    playTerminalConnect,
+    playTerminalDisconnect,
+    playWorkflowComplete,
+    playLoreEvent,
   };
 };
 

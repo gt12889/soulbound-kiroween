@@ -21,6 +21,9 @@ import {
   calculateMood,
 } from '../types/companionMood';
 import { calculateMoonPhase } from '../services/moonPhaseService';
+import { createScopedLogger } from '../utils/logger';
+
+const logger = createScopedLogger('[Companion]');
 
 /**
  * User context for context-aware companion reactions
@@ -339,10 +342,11 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
   }, [tasksCompletedToday, stats.currentStreak, interactionsToday, lastTaskDate, mood, setMood]);
   
   // Load companion data from Firebase on mount for authenticated users
+  // Optimized: Only depend on auth state, setters are stable from useLocalStorage
   useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    
     const loadFromFirebase = async () => {
-      if (!isAuthenticated || !user) return;
-      
       try {
         const cloudData = await cloudSyncService.fetchCompanionData(user.id);
         
@@ -356,18 +360,18 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
           if (cloudData.mood) setMood(cloudData.mood);
           if (cloudData.completedRituals) setCompletedRituals(cloudData.completedRituals);
           if (cloudData.ritualProgress) setRitualProgress(cloudData.ritualProgress);
-          
-          console.log('Companion data loaded from Firebase');
         }
       } catch (error) {
-        console.error('Failed to load companion data from Firebase:', error);
+        logger.error('Failed to load companion data from Firebase:', error);
       }
     };
     
     loadFromFirebase();
-  }, [isAuthenticated, user, setActiveCompanion, setUnlockedCompanions, setCustomNames, setSkillTrees, setStats, setMood, setCompletedRituals, setRitualProgress]); // Only run when auth state changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id]); // Only run when auth state changes - setters are stable
   
   // Subscribe to real-time companion data updates
+  // Optimized: Only depend on auth state, setters are stable from useLocalStorage
   useEffect(() => {
     if (!isAuthenticated || !user) return;
     
@@ -385,12 +389,13 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
         if (cloudData.ritualProgress) setRitualProgress(cloudData.ritualProgress);
       },
       (error) => {
-        console.error('Error in companion data subscription:', error);
+        logger.error('Error in companion data subscription:', error);
       }
     );
     
     return () => unsubscribe();
-  }, [isAuthenticated, user, setActiveCompanion, setUnlockedCompanions, setCustomNames, setSkillTrees, setStats, setMood, setCompletedRituals, setRitualProgress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.id]); // Only run when auth state changes - setters are stable
   
   // Sync to cloud for authenticated users
   useEffect(() => {
@@ -444,29 +449,19 @@ export function CompanionProvider({ children }: CompanionProviderProps) {
    * Requirements: 14.5
    */
   const switchCompanion = useCallback((type: CompanionType) => {
-    console.log('🔍 switchCompanion called:', {
-      requestedType: type,
-      unlockedCompanions,
-      isUnlocked: unlockedCompanions.includes(type),
-      currentActive: activeCompanion
-    });
-    
     // Auto-unlock companion if not already unlocked (for first-time selection)
     if (!unlockedCompanions.includes(type)) {
-      console.log(`🔓 Auto-unlocking companion: ${type}`);
       setUnlockedCompanions(prev => [...prev, type]);
     }
     
     // Initialize skill tree if it doesn't exist for this companion
     if (!skillTrees[type]) {
-      console.log(`🌳 Initializing skill tree for: ${type}`);
       setSkillTrees(prev => ({
         ...prev,
         [type]: initializeSkillTree(type)
       }));
     }
     
-    console.log('🔍 Switching to:', type);
     setActiveCompanion(type);
   }, [unlockedCompanions, setActiveCompanion, setUnlockedCompanions, activeCompanion, skillTrees, setSkillTrees]);
   

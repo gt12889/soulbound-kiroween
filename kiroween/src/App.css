@@ -101,8 +101,24 @@ body {
 
 /* Prevent any transforms from flipping text */
 *:not(svg):not(path):not(circle):not(rect):not(line):not(polyline):not(polygon) {
-  transform: scaleX(1) !important;
-  -webkit-transform: scaleX(1) !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+}
+
+/* Extra enforcement for contentEditable elements */
+[contenteditable],
+[contenteditable="true"],
+[contenteditable="plaintext-only"] {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  text-align: left !important;
 }
 
 /* ===================================
@@ -121,6 +137,10 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: margin-left var(--timing-normal) var(--ease-standard), opacity var(--timing-transition) var(--ease-in-out), background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .main-content.sidebar-collapsed {

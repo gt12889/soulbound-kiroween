@@ -5,6 +5,13 @@
   background: transparent;
   color: #e0e0e0;
   overflow: hidden;
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  writing-mode: horizontal-tb !important;
 }
 
 /* Editor Toolbar - Cleaner, more minimal */
@@ -12,8 +19,7 @@
   display: flex;
   gap: 6px;
   padding: 12px 20px;
-  background: rgba(26, 26, 46, 0.4);
-  backdrop-filter: blur(8px);
+  background: var(--bg-tertiary);
   border-bottom: 1px solid rgba(139, 92, 246, 0.15);
 }
 
@@ -57,6 +63,27 @@
   overflow-y: auto;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* Force all contentEditable elements to display correctly */
+.blocksContainer [contenteditable],
+.blocksContainer [contenteditable="true"],
+.blocksContainer [contenteditable="plaintext-only"] {
+  direction: ltr !important;
+  unicode-bidi: normal !important;
+  writing-mode: horizontal-tb !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+  -moz-transform: none !important;
+  -ms-transform: none !important;
+  text-align: left !important;
 }
 
 /* Custom scrollbar - Elegant */
@@ -87,8 +114,7 @@
   justify-content: flex-end;
   align-items: center;
   padding: 10px 20px;
-  background: rgba(26, 26, 46, 0.4);
-  backdrop-filter: blur(8px);
+  background: var(--bg-tertiary);
   border-top: 1px solid rgba(139, 92, 246, 0.15);
 }
 

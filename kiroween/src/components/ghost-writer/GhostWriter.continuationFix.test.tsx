@@ -154,11 +154,11 @@ describe('GhostWriter - Continuation and Dialogue Box Fixes', () => {
             candidates: [{
               content: {
                 parts: [{
-                  text: callCount === 1 ? 'automatic response' : 'manual response'
-                }]
-              }]
-            }]
-          })
+                  text: callCount === 1 ? 'automatic response' : 'manual response',
+                }],
+              },
+            }],
+          }),
         });
       });
       global.fetch = mockFetch;

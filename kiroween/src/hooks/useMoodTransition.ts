@@ -6,7 +6,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { MoodState, getMoodTransitionAnimation } from '../types/companionMood';
+import type { MoodState } from '../types/companionMood';
+import { getMoodTransitionAnimation } from '../types/companionMood';
 
 interface UseMoodTransitionOptions {
   /**
@@ -74,7 +75,7 @@ export function useMoodTransition(
   const [transitionClass, setTransitionClass] = useState('');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const previousMoodRef = useRef<MoodState>(currentMood);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   
   // Trigger transition when mood changes
   useEffect(() => {

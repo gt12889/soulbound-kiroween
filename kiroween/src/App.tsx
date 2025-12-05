@@ -10,6 +10,8 @@ import { NotesProvider } from './contexts/NotesContext';
 import { TasksProvider } from './contexts/TasksContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { TimerProvider } from './contexts/TimerContext';
+import { StreakProvider } from './contexts/StreakContext';
+import { GhostArchiveProvider } from './contexts/GhostArchiveContext';
 import Navigation from './components/common/Navigation';
 import AudioController from './components/common/AudioController';
 import { KeyboardShortcutsPanel } from './components/common/KeyboardShortcutsPanel';
@@ -30,7 +32,9 @@ import PasswordReset from './components/auth/PasswordReset';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useUndoRedoShortcuts } from './hooks/useUndoRedoShortcuts';
 import { useSettingsInitialization, useSettingsPersistence } from './hooks/useSettingsInitialization';
+import { useDailyLoginNotification } from './hooks/useDailyLoginNotification';
 import { DEFAULT_SHORTCUTS } from './utils/keyboardShortcuts';
+import { ComposeProviders } from './utils/ComposeProviders';
 import './App.css';
 
 // Lazy load main application routes for code splitting
@@ -42,6 +46,7 @@ const GraveyardDashboard = lazy(() => import('./components/graveyard-dashboard/G
 const CursedCalendar = lazy(() => import('./components/cursed-calendar/CursedCalendar').then(module => ({ default: module.CursedCalendar })));
 const AchievementsPage = lazy(() => import('./components/achievements/AchievementsPage').then(module => ({ default: module.AchievementsPage })));
 const FocusedTimerPage = lazy(() => import('./components/focused-timer/FocusedTimerPage').then(module => ({ default: module.FocusedTimerPage })));
+const StreakDashboard = lazy(() => import('./components/streaks/StreakDashboard').then(module => ({ default: module.StreakDashboard })));
 
 // Component to redirect authenticated users away from auth pages
 const AuthRedirect: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -87,6 +92,7 @@ const AppContent: React.FC = () => {
     'navigate-necronomicon-notes': () => navigate('/necronomicon-notes'),
     'navigate-graveyard-dashboard': () => navigate('/graveyard-dashboard'),
     'navigate-cursed-calendar': () => navigate('/cursed-calendar'),
+    'navigate-streaks': () => navigate('/achievements'),
     'navigate-achievements': () => navigate('/achievements'),
     'navigate-search': () => setShowGlobalSearch(true),
   });
@@ -105,6 +111,9 @@ const AppContent: React.FC = () => {
   // Register undo/redo keyboard shortcuts (Ctrl+Z, Ctrl+Y)
   // Requirements: 8.2, 8.3, 8.4
   useUndoRedoShortcuts();
+
+  // Show daily login streak notification
+  useDailyLoginNotification();
 
   // Bootup animation handler disabled for performance
   // const handleBootupComplete = () => {
@@ -252,6 +261,11 @@ const AppContent: React.FC = () => {
                                                         </ErrorBoundary>
                                                       } 
                                                     />
+                                                    {/* Redirect /streaks to /achievements - merged pages */}
+                                                    <Route 
+                                                      path="/streaks" 
+                                                      element={<Navigate to="/achievements" replace />}
+                                                    />
                                                     <Route path="/search" element={<Navigate to="/" replace />} />
                                                   </Routes>
                         </div>
@@ -270,27 +284,26 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  // Ensure StreakProvider is before TimerProvider and TasksProvider (both depend on StreakContext)
+  const providers = [
+    AuthProvider,
+    AppProvider,
+    ThemeProvider,
+    ToastProvider,
+    StreakProvider, // Must be before TimerProvider and TasksProvider
+    TimerProvider, // Depends on StreakContext
+    KeyboardProvider,
+    NotesProvider,
+    CompanionProvider,
+    TasksProvider, // Depends on StreakContext
+    GhostArchiveProvider, // Ghost Archive context
+  ];
+
   return (
     <Router>
-      <AuthProvider>
-        <AppProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <TimerProvider>
-                <KeyboardProvider>
-                  <NotesProvider>
-                    <CompanionProvider>
-                      <TasksProvider>
-                        <AppContent />
-                      </TasksProvider>
-                    </CompanionProvider>
-                  </NotesProvider>
-                </KeyboardProvider>
-              </TimerProvider>
-            </ToastProvider>
-          </ThemeProvider>
-        </AppProvider>
-      </AuthProvider>
+      <ComposeProviders providers={providers}>
+        <AppContent />
+      </ComposeProviders>
     </Router>
   );
 };

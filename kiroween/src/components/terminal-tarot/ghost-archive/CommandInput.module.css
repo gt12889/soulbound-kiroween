@@ -1,0 +1,62 @@
+.commandInputForm {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(0, 255, 0, 0.2);
+  flex-shrink: 0; /* Prevent input from shrinking */
+}
+
+.prompt {
+  font-family: 'Courier New', 'Courier', 'Consolas', monospace;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  color: #00ff88;
+  user-select: none;
+}
+
+.input {
+  flex: 1;
+  font-family: 'Courier New', 'Courier', 'Consolas', monospace;
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+  caret-color: #00ff00;
+}
+
+.input::placeholder {
+  color: rgba(0, 255, 0, 0.3);
+}
+
+.cursor {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 2px;
+  animation: blink 0.75s step-end infinite;
+  text-shadow: 0 0 5px rgba(0, 255, 136, 0.8);
+}
+
+.cursorBlock {
+  width: 8px;
+  height: 1em;
+}
+
+.cursorUnderline {
+  width: 0.7em;
+  height: 2px;
+  margin-top: 0.8em;
+}
+
+@keyframes blink {
+  from, to {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+

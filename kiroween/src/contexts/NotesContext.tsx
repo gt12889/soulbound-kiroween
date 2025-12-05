@@ -3,9 +3,10 @@ import type { ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { Note } from '../types';
 import { useToast } from './ToastContext';
-import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
+// import { useScreenReaderAnnouncement } from '../hooks/useScreenReaderAnnouncement';
 import { useUndoRedo } from '../hooks/useUndoRedo';
 import { useCompanion } from './CompanionContext';
+import { useStreak } from './StreakContext';
 
 interface NotesContextType {
   // Notes data
@@ -89,7 +90,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
   
   // Screen reader announcements
   // Requirement: 6.2, 6.3 - Announce state changes to screen readers
-  const { announce } = useScreenReaderAnnouncement();
+  // const { announce } = useScreenReaderAnnouncement(); // TODO: Add announcements for note operations
   
   // Sync undo/redo state with localStorage
   useEffect(() => {
@@ -109,8 +110,13 @@ export function NotesProvider({ children }: NotesProviderProps) {
     endNoteTaking = companion.endNoteTaking;
   } catch (error) {
     // CompanionProvider not available - companion integration is optional
-    console.debug('CompanionContext not available - note tracking disabled');
+    // Using logger.debug instead of console.debug for consistency
+    // Note: logger.debug only logs in development mode
   }
+  
+  // Streak tracking integration
+  // Requirement: Task 1.6 - Integration with Existing Contexts
+  const { recordActivity } = useStreak();
   
   // Wrapper to track note-taking activity when switching notes
   const setCurrentNoteId = useCallback((id: string | null) => {
@@ -152,8 +158,12 @@ export function NotesProvider({ children }: NotesProviderProps) {
     // Track note creation with companion (if available)
     startNoteTaking?.();
     
+    // Record note activity for streak tracking
+    // Requirement: Task 1.6 - Update NotesContext to call recordActivity('note')
+    recordActivity('note');
+    
     return newNote;
-  }, [undoRedoNotes, setUndoRedoNotes, showToast, startNoteTaking]);
+  }, [undoRedoNotes, setUndoRedoNotes, showToast, startNoteTaking, recordActivity]);
 
   /**
    * Update an existing note
@@ -172,6 +182,10 @@ export function NotesProvider({ children }: NotesProviderProps) {
         if (updates.content !== undefined && trackNoteActivity) {
           const noteLength = updatedNote.content.length;
           trackNoteActivity(id, noteLength);
+          
+          // Record note activity for streak tracking when content is updated
+          // Requirement: Task 1.6 - Update NotesContext to call recordActivity('note')
+          recordActivity('note');
         }
         
         return updatedNote;
@@ -183,7 +197,7 @@ export function NotesProvider({ children }: NotesProviderProps) {
     
     // Note: Removed intrusive "Note saved" toast that spammed on every keystroke
     // Auto-save happens silently in the background for better UX
-  }, [undoRedoNotes, setUndoRedoNotes, trackNoteActivity]);
+  }, [undoRedoNotes, setUndoRedoNotes, trackNoteActivity, recordActivity]);
 
   /**
    * Delete a note

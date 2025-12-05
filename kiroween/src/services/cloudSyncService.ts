@@ -48,6 +48,35 @@ class CloudSyncService {
   }
 
   /**
+   * Remove undefined values from an object recursively
+   * Firebase doesn't support undefined values, so we filter them out
+   */
+  private removeUndefinedValues(obj: any): any {
+    if (obj === null || obj === undefined) {
+      return null;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.removeUndefinedValues(item)).filter(item => item !== null && item !== undefined);
+    }
+    
+    if (typeof obj === 'object') {
+      const cleaned: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined) {
+          const cleanedValue = this.removeUndefinedValues(value);
+          if (cleanedValue !== null && cleanedValue !== undefined) {
+            cleaned[key] = cleanedValue;
+          }
+        }
+      }
+      return cleaned;
+    }
+    
+    return obj;
+  }
+
+  /**
    * Sync a note to Firestore
    */
   async syncNote(userId: string, note: Note): Promise<void> {
@@ -466,7 +495,6 @@ class CloudSyncService {
    */
   private handleOnline(): void {
     this.isOnline = true;
-    console.log('Connection restored, processing sync queue...');
     // Note: processSyncQueue needs userId, will be called by hook
   }
 
@@ -475,7 +503,6 @@ class CloudSyncService {
    */
   private handleOffline(): void {
     this.isOnline = false;
-    console.log('Connection lost, queuing changes for later sync...');
   }
 
   /**
@@ -526,7 +553,6 @@ class CloudSyncService {
     const delay = RETRY_DELAY_MS * Math.pow(2, currentAttempts);
     
     const timeout = setTimeout(() => {
-      console.log(`Retry attempt ${currentAttempts + 1} for ${type} ${id}...`);
       this.retryAttempts.set(retryKey, currentAttempts + 1);
       this.retryTimeouts.delete(retryKey);
       // Note: Actual retry logic should be implemented by the caller
@@ -556,10 +582,12 @@ class CloudSyncService {
     if (!db) throw new Error('Firebase is not initialized.');
     try {
       const companionRef = doc(db, 'users', userId, 'companion', 'data');
-      await setDoc(companionRef, {
+      // Remove undefined values before syncing (Firebase doesn't support undefined)
+      const cleanedData = this.removeUndefinedValues({
         ...companionData,
         syncedAt: serverTimestamp(),
-      }, { merge: true });
+      });
+      await setDoc(companionRef, cleanedData, { merge: true });
       this.clearRetryState('companion', 'data');
     } catch (error) {
       this.handleSyncError(error, 'companion', 'data');

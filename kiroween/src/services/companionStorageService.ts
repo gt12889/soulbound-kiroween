@@ -199,8 +199,6 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
 
         // Validate cloud type (NFR-4)
         if (cloudType && validateCompanionType(cloudType)) {
-          console.log('Companion type loaded from Firebase:', cloudType);
-          
           // Update localStorage with cloud data for offline access
           storageService.set(COMPANION_TYPE_KEY, cloudType);
           
@@ -220,7 +218,6 @@ export async function loadCompanionType(userId?: string): Promise<CompanionType 
 
     // Validate local type (NFR-4)
     if (localType && validateCompanionType(localType)) {
-      console.log('Companion type loaded from localStorage:', localType);
       return localType;
     } else if (localType) {
       console.warn('Invalid companion type from localStorage:', localType);
@@ -277,7 +274,6 @@ export function clearCompanionSelection(): void {
   try {
     storageService.remove(COMPANION_TYPE_KEY);
     storageService.remove(COMPANION_SELECTION_TIMESTAMP_KEY);
-    console.log('Companion selection cleared');
   } catch (error) {
     console.error('Error clearing companion selection:', error);
   }
@@ -319,18 +315,15 @@ export async function syncCompanionType(userId: string): Promise<CompanionType |
     if (isValidCloud && isValidLocal) {
       // Both exist - prefer cloud as source of truth
       if (cloudType !== localType) {
-        console.log(`Syncing companion type from cloud (${cloudType}) to local (${localType})`);
         storageService.set(COMPANION_TYPE_KEY, cloudType);
       }
       return cloudType;
     } else if (isValidCloud && !isValidLocal) {
       // Cloud has data, local doesn't - sync from cloud to local
-      console.log('Syncing companion type from cloud to local:', cloudType);
       storageService.set(COMPANION_TYPE_KEY, cloudType);
       return cloudType;
     } else if (!isValidCloud && isValidLocal) {
       // Local has data, cloud doesn't - sync from local to cloud with retry
-      console.log('Syncing companion type from local to cloud:', localType);
       await retryWithBackoff(
         async () => {
           await cloudSyncService.syncCompanionData(userId, {
@@ -374,7 +367,6 @@ export async function migrateExistingUser(userId?: string): Promise<boolean> {
   try {
     // Check if user already has a companion selection
     if (hasCompanionSelection()) {
-      console.log('User already has companion selection, no migration needed');
       return false;
     }
 
@@ -386,7 +378,6 @@ export async function migrateExistingUser(userId?: string): Promise<boolean> {
       storageService.get('tarot_readings') !== null;
 
     if (hasExistingData) {
-      console.log('Migrating existing user to Shadow Spirit companion');
       // Use retry logic for migration save
       await retryWithBackoff(
         async () => {
@@ -398,7 +389,6 @@ export async function migrateExistingUser(userId?: string): Promise<boolean> {
       return true;
     }
 
-    console.log('No existing data found, no migration needed');
     return false;
   } catch (error) {
     console.error('Failed to migrate existing user after retries:', error);

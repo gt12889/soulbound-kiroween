@@ -6,6 +6,34 @@
 export type { CompanionType, EvolutionStage, CompanionDefinition } from './companion';
 export { COMPANION_TYPES } from './companion';
 
+// Re-export streak types
+export type {
+  ActivityType,
+  StreakType,
+  ActivityLevel,
+  StreakInfo,
+  TaskStreakInfo,
+  FocusStreakInfo,
+  TokenData,
+  MilestoneData,
+  ActivityRecord,
+  StreakData,
+  HeatmapData,
+  StreakNotification,
+  WeeklyStats,
+  StreakGoals,
+  ActivityMetadata,
+  TokenValidation,
+  StreakRecoveryRequest,
+  StreakStatistics,
+  MilestoneDay,
+  MilestoneRewardType,
+  MilestoneReward,
+  MilestoneConfig,
+  MilestoneProgress,
+} from './streak';
+export { TOKEN_RULES, MILESTONE_DAYS, MILESTONE_CONFIGS } from './streak';
+
 export interface User {
   id: string;
   email: string;
@@ -125,6 +153,7 @@ export interface AppSettings {
   lastModule: string;
   theme?: string;
   keyboardShortcuts?: KeyboardShortcut[];
+  hapticsEnabled?: boolean;
 }
 
 export interface SyncStatus {

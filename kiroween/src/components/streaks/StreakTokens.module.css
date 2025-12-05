@@ -1,0 +1,345 @@
+/* Token Container */
+.tokenContainer {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.tokenContainer:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2);
+}
+
+.tokenContainer:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Token Display */
+.tokenDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tokenLabel {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.tokenIcons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tokenIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+  transition: all 0.3s ease;
+}
+
+.tokenAvailable {
+  color: var(--accent-color);
+  filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.5));
+  animation: tokenPulse 2s ease-in-out infinite;
+}
+
+.tokenEmpty {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.tokenCount {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Token Pulse Animation */
+@keyframes tokenPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(var(--accent-rgb), 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.8));
+  }
+}
+
+/* Token Earning Celebration Animation */
+@keyframes tokenEarnBounce {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes tokenEarnGlow {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.6), 0 0 36px rgba(var(--accent-rgb), 0.4);
+  }
+}
+
+@keyframes tokenEarnShine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200%) rotate(45deg);
+    opacity: 0;
+  }
+}
+
+/* Celebrating State */
+.celebrating {
+  animation: tokenEarnGlow 2s ease-in-out;
+}
+
+.celebrating .tokenIcon.tokenAvailable {
+  animation: tokenEarnBounce 0.6s ease-in-out, tokenPulse 2s ease-in-out infinite;
+}
+
+.celebrating::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--accent-rgb), 0.3) 50%,
+    transparent 100%
+  );
+  animation: tokenEarnShine 1s ease-in-out;
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  width: max-content;
+  max-width: 320px;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bg-tertiary);
+}
+
+.tooltipHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.tooltipIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.tooltipTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tooltipContent {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tooltipText {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.tooltipDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.75rem 0;
+}
+
+.tooltipSection {
+  margin-bottom: 0.75rem;
+}
+
+.tooltipSection:last-child {
+  margin-bottom: 0;
+}
+
+.tooltipSubtitle {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tooltipList {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.tooltipList li {
+  margin-bottom: 0.25rem;
+}
+
+.tooltipList li:last-child {
+  margin-bottom: 0;
+}
+
+.tooltipProgress {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.tooltipProgress strong {
+  color: var(--accent-color);
+}
+
+/* Milestone Info */
+.milestoneInfo {
+  display: flex;
+  align-items: center;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--border-color);
+}
+
+.milestoneText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.milestoneText strong {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tokenContainer {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .tokenIcon {
+    font-size: 1.25rem;
+  }
+
+  .tooltip {
+    max-width: 280px;
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(-8px);
+  }
+
+  .tooltip::before {
+    left: auto;
+    right: 1rem;
+    transform: translateX(0);
+  }
+
+  .milestoneInfo {
+    display: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tokenAvailable {
+    animation: none;
+  }
+
+  .tokenContainer,
+  .tokenIcon,
+  .tooltip {
+    transition: none;
+  }
+
+  .celebrating {
+    animation: none;
+  }
+
+  .celebrating .tokenIcon.tokenAvailable {
+    animation: none;
+  }
+
+  .celebrating::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .tokenContainer {
+    border-width: 2px;
+  }
+
+  .tokenAvailable {
+    filter: none;
+    font-weight: bold;
+  }
+
+  .tokenEmpty {
+    opacity: 0.6;
+  }
+}

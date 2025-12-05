@@ -8,7 +8,7 @@
 /**
  * Available companion types
  */
-export type CompanionType = 'shadow' | 'zombie' | 'ember';
+export type CompanionType = 'shadow' | 'forest' | 'ember';
 
 /**
  * Represents a single stage in a companion's evolution
@@ -99,11 +99,11 @@ export const COMPANION_TYPES: Record<CompanionType, CompanionDefinition> = {
       },
     ],
   },
-  zombie: {
-    type: 'zombie',
-    name: 'Zombie Companion',
+  forest: {
+    type: 'forest',
+    name: 'Forest Spirit',
     personality: 'Loyal and persistent, never giving up no matter the challenge',
-    theme: 'Undead Resilience',
+    theme: 'Natural Resilience',
     colorPrimary: '#22c55e',
     colorSecondary: '#14532d',
     stages: [
@@ -132,16 +132,10 @@ export const COMPANION_TYPES: Record<CompanionType, CompanionDefinition> = {
         requiredPoints: 50,
       },
       {
-        name: 'Lich Companion',
-        emoji: '👑',
-        description: 'Eternal wisdom',
-        requiredPoints: 100,
-      },
-      {
         name: 'Death Lord',
         emoji: '☠️',
         description: 'Master of undeath',
-        requiredPoints: 200,
+        requiredPoints: 100,
       },
     ],
   },

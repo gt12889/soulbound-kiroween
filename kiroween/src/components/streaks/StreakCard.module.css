@@ -1,0 +1,252 @@
+/**
+ * StreakCard Component Styles
+ * Requirements: Task 1.5 - Style with theme variables, add pulse animation
+ */
+
+/* Card Container */
+.card {
+  background: var(--bg-secondary, #1a1a1a);
+  border: 2px solid var(--border-primary, #2d1b4e);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover State */
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-purple-light, #4a2d6e);
+  box-shadow: 0 8px 24px var(--shadow-medium, rgba(45, 27, 78, 0.5));
+}
+
+/* Focus State for Accessibility */
+.card:focus {
+  outline: 2px solid var(--accent-purple-light, #4a2d6e);
+  outline-offset: 2px;
+}
+
+/* Active Streak - Pulse Animation */
+.card.active {
+  border-color: var(--accent-purple-light, #4a2d6e);
+  box-shadow: 0 0 20px var(--glow-purple, rgba(74, 45, 110, 0.6));
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--glow-purple, rgba(74, 45, 110, 0.6));
+  }
+  50% {
+    box-shadow: 0 0 30px var(--glow-purple, rgba(74, 45, 110, 0.8)),
+                0 0 40px var(--glow-purple, rgba(74, 45, 110, 0.4));
+  }
+}
+
+/* Broken Streak - Grayscale */
+.card.broken {
+  filter: grayscale(0.7);
+  opacity: 0.8;
+  border-color: var(--border-secondary, #1a1a1a);
+}
+
+.card.broken:hover {
+  filter: grayscale(0.5);
+  opacity: 0.9;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Icon */
+.icon {
+  font-size: 3rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px var(--glow-purple, rgba(74, 45, 110, 0.6)));
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.card.active .icon {
+  animation: iconFloat 3s ease-in-out infinite, iconGlow 2s ease-in-out infinite;
+}
+
+@keyframes iconGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px var(--glow-purple, rgba(74, 45, 110, 0.6)));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px var(--glow-purple, rgba(74, 45, 110, 0.9)));
+  }
+}
+
+/* Streak Count */
+.streakCount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.currentStreak {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent-purple-light, #4a2d6e);
+  line-height: 1;
+  font-family: 'Cinzel', serif;
+}
+
+.card.active .currentStreak {
+  color: var(--text-primary, #e0e0e0);
+  text-shadow: 0 0 10px var(--glow-purple, rgba(74, 45, 110, 0.8));
+}
+
+.streakLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #b0b0b0);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Streak Name */
+.name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary, #e0e0e0);
+  font-family: 'Cinzel', serif;
+}
+
+/* Subtitle */
+.subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #b0b0b0);
+  font-style: italic;
+}
+
+/* Progress Section */
+.progressSection {
+  margin-top: 0.5rem;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #808080);
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--bg-tertiary, #242424);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border-secondary, #1a1a1a);
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--accent-purple, #2d1b4e),
+    var(--accent-purple-light, #4a2d6e)
+  );
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px var(--glow-purple, rgba(74, 45, 110, 0.6));
+}
+
+.card.active .progressFill {
+  background: linear-gradient(
+    90deg,
+    var(--accent-purple-light, #4a2d6e),
+    var(--highlight-blue-light, #5a7fa0)
+  );
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+@keyframes progressGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--glow-purple, rgba(74, 45, 110, 0.6));
+  }
+  50% {
+    box-shadow: 0 0 12px var(--glow-purple, rgba(74, 45, 110, 0.9));
+  }
+}
+
+/* Broken Message */
+.brokenMessage {
+  font-size: 0.875rem;
+  color: var(--text-muted, #606060);
+  text-align: center;
+  padding: 0.5rem;
+  background: var(--bg-tertiary, #242424);
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .card {
+    padding: 1.25rem;
+  }
+
+  .icon {
+    font-size: 2.5rem;
+  }
+
+  .currentStreak {
+    font-size: 2rem;
+  }
+
+  .name {
+    font-size: 1rem;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card.active,
+  .icon,
+  .card.active .icon,
+  .progressFill,
+  .card.active .progressFill {
+    animation: none;
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .card {
+    border-width: 3px;
+  }
+
+  .card.active {
+    border-color: var(--text-primary, #e0e0e0);
+  }
+
+  .currentStreak {
+    color: var(--text-primary, #e0e0e0);
+  }
+}

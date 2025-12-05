@@ -1,0 +1,47 @@
+[
+  {
+    "id": "shakespeare-sonnet",
+    "type": "poetry",
+    "title": "Sonnet Fragment",
+    "corruptedText": "Shall I compare thee to a [MISSING] day?\nThou art more [MISSING] and more temperate:\nRough winds do shake the darling [MISSING] of May,\nAnd [MISSING]'s lease hath all too short a date;",
+    "difficulty": "easy",
+    "personalityId": "shakespeare",
+    "progress": 0
+  },
+  {
+    "id": "einstein-formula",
+    "type": "formula",
+    "title": "Relativity Notes",
+    "corruptedText": "E = [MISSING]²\nWhere E is energy, m is mass, and [MISSING] is the speed of light.\nThis equation shows the equivalence of [MISSING] and energy.",
+    "difficulty": "medium",
+    "personalityId": "einstein",
+    "progress": 0
+  },
+  {
+    "id": "cleopatra-letter",
+    "type": "letter",
+    "title": "Diplomatic Correspondence",
+    "corruptedText": "To my most esteemed [MISSING],\n\nThe sands of time have shown us that [MISSING] is the foundation of all great [MISSING]. I trust that our [MISSING] will serve both our peoples well.\n\nWith the wisdom of the Nile,\n[MISSING]",
+    "difficulty": "hard",
+    "personalityId": "cleopatra",
+    "progress": 0
+  },
+  {
+    "id": "tesla-invention",
+    "type": "manuscript",
+    "title": "Alternating Current Notes",
+    "corruptedText": "The principle of [MISSING] current allows for efficient transmission over great [MISSING]. By reversing the direction of [MISSING] flow, we can achieve [MISSING] without significant [MISSING] loss.",
+    "difficulty": "medium",
+    "personalityId": "tesla",
+    "progress": 0
+  },
+  {
+    "id": "curie-research",
+    "type": "research",
+    "title": "Radioactivity Observations",
+    "corruptedText": "Our experiments have revealed that certain [MISSING] emit rays that can penetrate [MISSING]. This phenomenon, which I have named [MISSING], appears to be a property of the [MISSING] itself, not dependent on external [MISSING].",
+    "difficulty": "hard",
+    "personalityId": "marie-curie",
+    "progress": 0
+  }
+]

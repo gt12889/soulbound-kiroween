@@ -1,0 +1,102 @@
+/* Moon Phase Lighting System */
+.graveyardContainer {
+  position: relative;
+  min-height: 100vh;
+  background: 
+    radial-gradient(
+      ellipse at var(--moon-x, 50%) var(--moon-y, 20%),
+      rgba(255, 255, 255, var(--moon-glow, 0.1)) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(20, 20, 30, 0.95) 0%,
+      rgba(10, 10, 15, 1) 100%
+    );
+  filter: 
+    brightness(var(--moon-brightness, 0.5))
+    hue-rotate(var(--moon-hue-rotate, 0deg));
+  transition: filter 1s ease-in-out;
+}
+
+/* Moon phase specific lighting */
+.graveyardContainer[data-moon-phase="new"] {
+  --moon-brightness: 0.1;
+  --moon-hue-rotate: 220deg;
+  --moon-glow: 0.05;
+  --shadow-opacity: 0.9;
+}
+
+.graveyardContainer[data-moon-phase="full"] {
+  --moon-brightness: 1.0;
+  --moon-hue-rotate: 0deg;
+  --moon-glow: 0.3;
+  --shadow-opacity: 0.2;
+}
+
+.graveyardContainer[data-moon-phase="waxing-crescent"] {
+  --moon-brightness: 0.25;
+  --moon-hue-rotate: 200deg;
+  --moon-glow: 0.1;
+  --shadow-opacity: 0.75;
+}
+
+.graveyardContainer[data-moon-phase="first-quarter"] {
+  --moon-brightness: 0.5;
+  --moon-hue-rotate: 180deg;
+  --moon-glow: 0.15;
+  --shadow-opacity: 0.6;
+}
+
+.graveyardContainer[data-moon-phase="waxing-gibbous"] {
+  --moon-brightness: 0.75;
+  --moon-hue-rotate: 90deg;
+  --moon-glow: 0.2;
+  --shadow-opacity: 0.4;
+}
+
+.graveyardContainer[data-moon-phase="waning-gibbous"] {
+  --moon-brightness: 0.75;
+  --moon-hue-rotate: 90deg;
+  --moon-glow: 0.2;
+  --shadow-opacity: 0.4;
+}
+
+.graveyardContainer[data-moon-phase="last-quarter"] {
+  --moon-brightness: 0.5;
+  --moon-hue-rotate: 180deg;
+  --moon-glow: 0.15;
+  --shadow-opacity: 0.6;
+}
+
+.graveyardContainer[data-moon-phase="waning-crescent"] {
+  --moon-brightness: 0.25;
+  --moon-hue-rotate: 200deg;
+  --moon-glow: 0.1;
+  --shadow-opacity: 0.75;
+}
+
+/* Shadow direction based on moon phase */
+.graveyardContainer[data-moon-phase="waxing-crescent"] .tombstone,
+.graveyardContainer[data-moon-phase="first-quarter"] .tombstone,
+.graveyardContainer[data-moon-phase="waxing-gibbous"] .tombstone {
+  --shadow-offset-x: -8px;
+}
+
+.graveyardContainer[data-moon-phase="waning-gibbous"] .tombstone,
+.graveyardContainer[data-moon-phase="last-quarter"] .tombstone,
+.graveyardContainer[data-moon-phase="waning-crescent"] .tombstone {
+  --shadow-offset-x: 8px;
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .graveyardContainer {
+    transition: none;
+    filter: brightness(0.5);
+  }
+}
+
+
+
+

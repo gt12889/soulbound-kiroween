@@ -3,9 +3,9 @@
  * Manages editor state including blocks, selection, and history
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { ContentBlock } from '../types';
-import { generateBlockId, splitBlock, mergeBlocks, createEmptyBlock } from '../utils/blockUtils';
+import { splitBlock, mergeBlocks, createEmptyBlock } from '../utils/blockUtils';
 
 interface EditorState {
   blocks: ContentBlock[];
@@ -35,6 +35,27 @@ export const useEditorState = (initialBlocks: ContentBlock[]): UseEditorStateRet
     blocks: initialBlocks.length > 0 ? initialBlocks : [createEmptyBlock()],
     activeBlockId: null,
   });
+
+  // Track the previous initialBlocks to detect note changes
+  const prevInitialBlocksRef = useRef<ContentBlock[]>(initialBlocks);
+
+  // Update blocks when initialBlocks changes (e.g., when switching notes)
+  useEffect(() => {
+    // Only update if the blocks have actually changed (different note)
+    const hasChanged = 
+      initialBlocks.length !== prevInitialBlocksRef.current.length ||
+      initialBlocks[0]?.id !== prevInitialBlocksRef.current[0]?.id;
+    
+    if (hasChanged) {
+      setState({
+        blocks: initialBlocks.length > 0 ? initialBlocks : [createEmptyBlock()],
+        activeBlockId: null,
+      });
+      // Clear history when switching notes
+      historyRef.current = { past: [], future: [] };
+      prevInitialBlocksRef.current = initialBlocks;
+    }
+  }, [initialBlocks]);
 
   // History management
   const historyRef = useRef<{

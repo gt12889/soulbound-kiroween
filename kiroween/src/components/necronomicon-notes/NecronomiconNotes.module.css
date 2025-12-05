@@ -1,10 +1,14 @@
 .necronomiconNotes {
-  width: 100%;
+  width: calc(100% + 4rem);
   height: 100%;
+  min-height: 100vh;
+  flex: 1;
   display: flex;
   background: radial-gradient(ellipse at center, var(--bg-secondary) 0%, var(--bg-primary) 100%);
   overflow: hidden;
   transition: background 0.3s ease;
+  margin: -2rem;
+  padding: 0;
 }
 
 .sidebar {
