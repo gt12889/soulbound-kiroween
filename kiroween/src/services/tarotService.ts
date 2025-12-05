@@ -479,6 +479,35 @@ Now generate YOUR roast:`;
 }
 
 /**
+ * Calculate grade from 0-100 based on value and thresholds
+ */
+function calculateGrade(value: number, excellent: number, good: number): { score: number; emoji: string; label: string } {
+  let score: number;
+  let emoji: string;
+  let label: string;
+
+  if (value >= excellent) {
+    score = 95;
+    emoji = '🌟';
+    label = 'Excellent';
+  } else if (value >= good) {
+    score = 80;
+    emoji = '✨';
+    label = 'Good';
+  } else if (value >= good * 0.5) {
+    score = 65;
+    emoji = '🔮';
+    label = 'Fair';
+  } else {
+    score = 45;
+    emoji = '💀';
+    label = 'Needs Improvement';
+  }
+
+  return { score, emoji, label };
+}
+
+/**
  * Creates interpretation text based on commit statistics
  * @param stats - Commit statistics
  * @param cards - Selected tarot cards
@@ -487,58 +516,94 @@ Now generate YOUR roast:`;
 export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): string {
   const lines: string[] = [];
 
-  // Opening
-  lines.push('The cards reveal the story of your coding journey...\n');
+  // Calculate grades for different aspects
+  const activityGrade = calculateGrade(stats.averageCommitsPerDay, 3, 1.5);
+  const consistencyGrade = calculateGrade(stats.totalCommits, 20, 10);
+  const qualityGrade = calculateGrade(stats.sentimentScore, 0.6, 0.3);
 
-  // Past interpretation
-  lines.push(`In the PAST, ${cards[0].name} appears.`);
-  if (stats.totalCommits < 5) {
-    lines.push('Your journey was just beginning, full of potential and uncertainty.');
-  } else if (stats.averageCommitsPerDay > 3) {
-    lines.push('You charged forward with determination, making steady progress.');
-  } else {
-    lines.push('Your path has been one of cycles and changes.');
-  }
+  // Overall score
+  const overallScore = Math.round((activityGrade.score + consistencyGrade.score + qualityGrade.score) / 3);
+  const overallEmoji = overallScore >= 85 ? '👑' : overallScore >= 70 ? '⭐' : overallScore >= 55 ? '🔥' : '🌙';
+
+  // SUMMARY SECTION
+  lines.push('═══════════════════════════════════════════════════════');
+  lines.push('                    📊 SUMMARY                          ');
+  lines.push('═══════════════════════════════════════════════════════\n');
+
+  // Three-card reading summary
+  lines.push(`${cards[0].name} (Past) → ${cards[1].name} (Present) → ${cards[2].name} (Future)`);
   lines.push('');
-
-  // Present interpretation
-  lines.push(`In the PRESENT, ${cards[1].name} stands before you.`);
-  if (stats.sentimentScore > 0.3) {
-    lines.push('Your current work shines with success and positive energy.');
-  } else if (stats.sentimentScore < -0.3) {
-    lines.push('You face challenges that demand transformation and growth.');
-  } else if (stats.mostActiveHour >= 22 || stats.mostActiveHour <= 5) {
-    lines.push('You work in the quiet hours, guided by intuition and focus.');
-  } else {
-    lines.push('You maintain balance and steady progress in your craft.');
-  }
-  lines.push('');
-
-  // Future interpretation
-  lines.push(`Looking to the FUTURE, ${cards[2].name} emerges.`);
-  const hasFixKeyword = stats.topKeywords.some(k => k.includes('fix') || k.includes('bug'));
-  const hasFeatureKeyword = stats.topKeywords.some(k => k.includes('add') || k.includes('feature'));
   
-  if (hasFeatureKeyword) {
-    lines.push('New creations await, ready to be manifested into reality.');
-  } else if (hasFixKeyword) {
-    lines.push('Balance will be restored as you resolve what needs attention.');
-  } else if (stats.averageCommitsPerDay > 2.5) {
-    lines.push('Completion and achievement are within your reach.');
+  if (stats.totalCommits < 5) {
+    lines.push('🌱 The journey begins with tentative steps into the codebase.');
+  } else if (stats.averageCommitsPerDay > 3) {
+    lines.push('⚡ A relentless force drives forward, commits flowing like lightning.');
   } else {
-    lines.push('Continued growth and wisdom await on your path ahead.');
+    lines.push('🎯 Measured progress marks the path, each commit carefully considered.');
   }
-  lines.push('');
 
-  // Closing with stats
-  lines.push('═══════════════════════════════════════');
-  lines.push(`Total Commits: ${stats.totalCommits}`);
-  lines.push(`Daily Average: ${stats.averageCommitsPerDay}`);
-  lines.push(`Most Active Hour: ${stats.mostActiveHour}:00`);
-  lines.push(`Sentiment: ${stats.sentimentScore > 0 ? 'Positive' : stats.sentimentScore < 0 ? 'Negative' : 'Neutral'} (${stats.sentimentScore})`);
-  if (stats.topKeywords.length > 0) {
-    lines.push(`Top Keywords: ${stats.topKeywords.join(', ')}`);
+  if (stats.sentimentScore > 0.5) {
+    lines.push('✨ Positive energy radiates from your work, bugs vanquished with confidence.');
+  } else if (stats.sentimentScore > 0) {
+    lines.push('⚖️ Balance maintained through challenges, neither rushed nor stagnant.');
+  } else {
+    lines.push('🌑 The shadows gather, but even dark commits teach valuable lessons.');
   }
+
+  const mostActiveHour = stats.mostActiveHour;
+  if (mostActiveHour >= 22 || mostActiveHour <= 5) {
+    lines.push('🦉 Night owl wisdom: your best work emerges when the world sleeps.');
+  } else if (mostActiveHour >= 6 && mostActiveHour <= 12) {
+    lines.push('🌅 Morning clarity: fresh perspective guides your most active hours.');
+  } else {
+    lines.push('☀️ Afternoon warrior: steady progress built in daylight hours.');
+  }
+
+  // GRADING SYSTEM
+  lines.push('\n═══════════════════════════════════════════════════════');
+  lines.push(`            ${overallEmoji} DETAILED ANALYSIS (${overallScore}/100)           `);
+  lines.push('═══════════════════════════════════════════════════════\n');
+
+  // Activity × Consistency = Productivity
+  lines.push(`🔥 ${activityGrade.emoji} Activity (${activityGrade.score}/100) + 📅 ${consistencyGrade.emoji} Consistency (${consistencyGrade.score}/100)`);
+  lines.push(`   = 🚀 Productivity Score: ${Math.round((activityGrade.score + consistencyGrade.score) / 2)}/100`);
+  lines.push(`   ${stats.averageCommitsPerDay.toFixed(1)} commits/day × ${stats.totalCommits} total commits = ${activityGrade.label} work cadence\n`);
+
+  // Quality × Sentiment = Code Health
+  lines.push(`⚡ ${qualityGrade.emoji} Code Quality (${qualityGrade.score}/100) + 😊 Sentiment (${(stats.sentimentScore * 100).toFixed(0)}/100)`);
+  lines.push(`   = 💎 Code Health: ${Math.round((qualityGrade.score + stats.sentimentScore * 100) / 2)}/100`);
+  lines.push(`   ${qualityGrade.label} quality + ${stats.sentimentScore > 0.5 ? 'Positive' : stats.sentimentScore > 0 ? 'Neutral' : 'Negative'} vibes = ${qualityGrade.label} codebase\n`);
+
+  // Timing × Keywords = Work Style
+  const nightOwl = mostActiveHour >= 22 || mostActiveHour <= 5;
+  const morningPerson = mostActiveHour >= 6 && mostActiveHour <= 12;
+  const timingScore = nightOwl ? 90 : morningPerson ? 85 : 75;
+  const timingEmoji = nightOwl ? '🌙' : morningPerson ? '🌅' : '☀️';
+  
+  lines.push(`${timingEmoji} Peak Hour: ${stats.mostActiveHour}:00 + 🔑 Keywords: ${stats.topKeywords.slice(0, 3).join(', ')}`);
+  lines.push(`   = 🎨 Work Style: ${nightOwl ? 'Night Owl Wizard' : morningPerson ? 'Morning Strategist' : 'Steady Warrior'} (${timingScore}/100)`);
+  lines.push(`   ${nightOwl ? 'Creative chaos in dark hours' : morningPerson ? 'Structured clarity at dawn' : 'Reliable rhythm through the day'}\n`);
+
+  // MYSTICAL INSIGHTS
+  lines.push('═══════════════════════════════════════════════════════');
+  lines.push('              🔮 MYSTICAL INSIGHTS                      ');
+  lines.push('═══════════════════════════════════════════════════════\n');
+
+  const keywords = stats.topKeywords;
+  if (keywords.includes('fix') || keywords.includes('bug')) {
+    lines.push('🐛 The Bug Slayer: Your commits whisper of battles won against elusive errors');
+  }
+  if (keywords.includes('add') || keywords.includes('new') || keywords.includes('feature')) {
+    lines.push('✨ The Innovator: New features bloom like flowers in your garden of code');
+  }
+  if (keywords.includes('update') || keywords.includes('improve')) {
+    lines.push('♻️ The Refiner: Continuous improvement is your sacred ritual');
+  }
+  if (keywords.includes('refactor')) {
+    lines.push('🔧 The Architect: You reshape code like clay, seeking perfect form');
+  }
+
+  lines.push('\n💀 The spirits have spoken. May your commits be ever in your favor. 💀');
 
   return lines.join('\n');
 }

@@ -26,7 +26,7 @@ const TarotReader: React.FC = () => {
   }, [error]);
 
   const generateDemoReading = async () => {
-    console.log('🔮 TAROT: Starting demo reading, setting loading=true');
+    console.log('🔮 Generating demo tarot reading...');
     setLoading(true);
     setError(null);
     setReading(null);
@@ -35,22 +35,16 @@ const TarotReader: React.FC = () => {
     try {
       // Use demo data
       const commits = generateDemoCommits();
-
-      // Analyze commits
       const stats = analyzeCommits(commits);
-
-      // Generate tarot reading (now async with AI)
       const newReading = await generateTarotReading(commits, stats);
       
-      // Simulate a brief delay for dramatic effect
-      setTimeout(() => {
-        console.log('🔮 TAROT: Demo reading complete, setting loading=false');
-        setReading(newReading);
-        setLoading(false);
-      }, 1000);
+      // Set reading immediately
+      setReading(newReading);
+      setLoading(false);
+      console.log('✅ Demo reading generated successfully');
 
     } catch (err) {
-      console.error('🔮 TAROT ERROR:', err);
+      console.error('❌ Error generating demo reading:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate reading');
       setLoading(false);
     }
@@ -127,9 +121,9 @@ const TarotReader: React.FC = () => {
   return (
     <div className={styles.tarotReader}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Terminal Tarot</h1>
+        <h1 className={styles.title}>Mystic Oracle</h1>
         <p className={styles.subtitle}>
-          Mystical insights from your git commit history
+          Divine insights revealed through your creative journey
         </p>
       </div>
 
@@ -158,8 +152,49 @@ const TarotReader: React.FC = () => {
       </div>
 
       {/* Tab Panels */}
-      {activeTab === 'tarot' && (
-        <div id="tarot-panel" role="tabpanel" aria-labelledby="tarot-tab">
+        {activeTab === 'tarot' && (
+          <div id="tarot-panel" role="tabpanel" aria-labelledby="tarot-tab">
+          
+          {/* Commit Stats Display - shown when we have reading data */}
+          {reading && reading.commitStats && (
+            <div className={styles.statsDisplay}>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📊</div>
+                  <div className={styles.statValue}>{reading.commitStats.totalCommits}</div>
+                  <div className={styles.statLabel}>Total Commits</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📅</div>
+                  <div className={styles.statValue}>{reading.commitStats.averageCommitsPerDay.toFixed(2)}</div>
+                  <div className={styles.statLabel}>Daily Average</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>⏰</div>
+                  <div className={styles.statValue}>{reading.commitStats.mostActiveHour}:00</div>
+                  <div className={styles.statLabel}>Most Active Hour</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>
+                    {reading.commitStats.sentimentScore > 0.5 ? '😊' : reading.commitStats.sentimentScore > 0 ? '😐' : '😔'}
+                  </div>
+                  <div className={styles.statValue}>
+                    {reading.commitStats.sentimentScore > 0.5 ? 'Positive' : reading.commitStats.sentimentScore > 0 ? 'Neutral' : 'Negative'}
+                    {' '}({reading.commitStats.sentimentScore.toFixed(2)})
+                  </div>
+                  <div className={styles.statLabel}>Sentiment</div>
+                </div>
+                <div className={`${styles.statCard} ${styles.statCardWide}`}>
+                  <div className={styles.statIcon}>🔑</div>
+                  <div className={styles.statValue}>
+                    {reading.commitStats.topKeywords.join(', ')}
+                  </div>
+                  <div className={styles.statLabel}>Top Keywords</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!reading && !loading && (
         <>
           <div className={styles.githubInput}>
@@ -260,6 +295,34 @@ const TarotReader: React.FC = () => {
             </div>
           </div>
 
+          {reading.commitStats && (
+            <div className={styles.statsPanel}>
+              <h3 className={styles.statsTitle}>Commit Analysis</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Total Commits</div>
+                  <div className={styles.statValue}>{reading.commitStats.totalCommits}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Daily Average</div>
+                  <div className={styles.statValue}>{reading.commitStats.averageCommitsPerDay.toFixed(1)}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Sentiment Score</div>
+                  <div className={styles.statValue}>{reading.commitStats.sentimentScore.toFixed(2)}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Top Keywords</div>
+                  <div className={styles.statKeywords}>
+                    {reading.commitStats.topKeywords.map((keyword, idx) => (
+                      <span key={idx} className={styles.keyword}>{keyword}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={styles.actions}>
             <button 
               className={`${styles.newReadingButton} button-primary`}
@@ -289,7 +352,19 @@ const TarotReader: React.FC = () => {
       )}
 
           {activeTab === 'ghost-archive' && (
-            <div id="ghost-archive-panel" role="tabpanel" aria-labelledby="ghost-archive-tab">
+            <div 
+              id="ghost-archive-panel" 
+              role="tabpanel" 
+              aria-labelledby="ghost-archive-tab"
+              style={{
+                backgroundImage: 'url(/terminal-bg.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center top',
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: '#0a0a0a',
+                minHeight: '100vh',
+              }}
+            >
               <ErrorBoundary
                 fallback={
                   <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}>
