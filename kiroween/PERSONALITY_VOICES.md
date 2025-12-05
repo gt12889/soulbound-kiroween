@@ -5,9 +5,9 @@ Each personality in the Ghost Archive has a unique ElevenLabs voice that automat
 ## Current Voice Assignments
 
 ### Albert Einstein
-- **Voice ID:** `pNInz6obpgDQGcFmaJgB` (Adam - Deep, thoughtful male voice)
+- **Voice ID:** `onwK4e9ZLuTAKqWW03F9` (Onyx - Deep, mature old man voice)
 - **Personality:** Wise, curious, philosophical
-- **Voice Characteristics:** Deep, thoughtful, with a scholarly tone
+- **Voice Characteristics:** Deep, mature, elderly male voice with scholarly wisdom
 
 ### Cleopatra
 - **Voice ID:** `EXAVITQu4vr4xnSDxMaL` (Bella - Elegant female voice)
