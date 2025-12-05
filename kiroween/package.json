@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "deb": "vite",
     "build": "tsc -b && vite build",
     "build:analyze": "ANALYZE=true npm run build",
     "lint": "eslint .",

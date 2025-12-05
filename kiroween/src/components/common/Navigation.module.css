@@ -1,10 +1,18 @@
 .navigation {
   width: var(--nav-width-expanded);
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height - better for mobile/desktop */
   max-height: 100vh;
+  max-height: 100dvh;
   background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   border-right: 1px solid var(--border-primary);
-  padding: 1.5rem 1rem;
+  /* Use box-sizing to include padding in height calculation */
+  box-sizing: border-box;
+  /* Mac safe area support - prevents overlap with menu bar/notch */
+  padding-top: max(1.5rem, calc(env(safe-area-inset-top, 0px) + 1rem));
+  padding-left: max(1rem, calc(env(safe-area-inset-left, 0px) + 1rem));
+  padding-right: max(1rem, calc(env(safe-area-inset-right, 0px) + 1rem));
+  padding-bottom: max(1rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
   position: fixed;
   left: 0;
   top: 0;
@@ -60,7 +68,7 @@
 
 .toggleButton {
   position: absolute;
-  top: 1.5rem;
+  top: max(1rem, calc(env(safe-area-inset-top, 0px) + 1rem));
   right: -1rem; /* Adjust to be partially outside the nav */
   width: 2rem;
   height: 2rem;
@@ -76,6 +84,8 @@
   z-index: 10001;
   box-shadow: 0 2px 8px var(--shadow-medium);
   transition: transform var(--timing-micro) var(--ease-standard), background var(--timing-micro) var(--ease-standard);
+  /* Mac safe area support */
+  margin-right: env(safe-area-inset-right, 0px);
 }
 
 .toggleButton:hover {
@@ -98,6 +108,9 @@
   transition: all var(--timing-hover) var(--ease-in-out);
   display: block;
   flex-shrink: 0;
+  /* Prevent header from being cut off */
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .navigation.collapsed .navHeader {
@@ -183,6 +196,9 @@
   min-height: 0;
   position: relative;
   overflow: visible;
+  /* Ensure list can scroll if content overflows */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .navList::before {
@@ -353,6 +369,9 @@
   gap: 0.5rem;
   margin-top: auto;
   flex-shrink: 0;
+  /* Ensure footer is always visible and not cut off */
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .navigation.collapsed .navFooter {
@@ -590,5 +609,14 @@
   
   .exportButton {
     width: 100%;
+  }
+}
+
+/* Mac-specific fixes */
+@supports (-webkit-touch-callout: none) {
+  /* Safari/WebKit on Mac - ensure proper spacing without overflow */
+  .navigation {
+    /* Use box-sizing to ensure padding is included in height */
+    box-sizing: border-box;
   }
 }
