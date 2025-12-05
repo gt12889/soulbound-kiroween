@@ -79,6 +79,9 @@ export const GitHubConnectButton: React.FC<GitHubConnectButtonProps> = ({
       
       // Sign in with GitHub using Firebase auth and get the credential
       // Add scopes to access GitHub API (read user data and public repos)
+      if (!auth) {
+        throw new Error('Firebase auth is not initialized');
+      }
       const provider = new GithubAuthProvider();
       provider.addScope('read:user');
       provider.addScope('public_repo');

@@ -54,16 +54,30 @@ export async function getGitHubConnection(userId: string): Promise<GitHubConnect
       };
     }
     
-    console.log('[GitHubService] No connection data found in Firestore');
+    console.log('[GitHubService] No connection data found in Firestore (document does not exist)');
     return null;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[GitHubService] Error fetching GitHub connection:', error);
+    
+    // Handle Firestore errors gracefully
+    if (error?.code === 'permission-denied' || error?.code === 7) {
+      console.error('[GitHubService] Permission denied. Check Firestore security rules for users/{userId}/settings/github');
+      return null;
+    }
+    
+    // Handle NOT_FOUND errors (404) - document doesn't exist, which is fine
+    if (error?.code === 'not-found' || error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+      console.log('[GitHubService] Document not found (404) - this is expected for new users');
+      return null;
+    }
+    
+    // For any other error, log and return null
     if (error instanceof Error) {
-      // Check if it's a permission error
       if (error.message.includes('permission') || error.message.includes('Permission')) {
         console.error('[GitHubService] Permission denied. Check Firestore security rules for users/{userId}/settings/github');
       }
     }
+    
     return null;
   }
 }
