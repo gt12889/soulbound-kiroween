@@ -26,7 +26,7 @@ const TarotReader: React.FC = () => {
   }, [error]);
 
   const generateDemoReading = async () => {
-    console.log('🔮 TAROT: Starting demo reading, setting loading=true');
+    console.log('🔮 Generating demo tarot reading...');
     setLoading(true);
     setError(null);
     setReading(null);
@@ -35,22 +35,16 @@ const TarotReader: React.FC = () => {
     try {
       // Use demo data
       const commits = generateDemoCommits();
-
-      // Analyze commits
       const stats = analyzeCommits(commits);
-
-      // Generate tarot reading (now async with AI)
       const newReading = await generateTarotReading(commits, stats);
       
-      // Simulate a brief delay for dramatic effect
-      setTimeout(() => {
-        console.log('🔮 TAROT: Demo reading complete, setting loading=false');
-        setReading(newReading);
-        setLoading(false);
-      }, 1000);
+      // Set reading immediately
+      setReading(newReading);
+      setLoading(false);
+      console.log('✅ Demo reading generated successfully');
 
     } catch (err) {
-      console.error('🔮 TAROT ERROR:', err);
+      console.error('❌ Error generating demo reading:', err);
       setError(err instanceof Error ? err.message : 'Failed to generate reading');
       setLoading(false);
     }
@@ -91,8 +85,25 @@ const TarotReader: React.FC = () => {
       // Analyze commits
       const stats = analyzeCommits(commits);
 
-      // Generate tarot reading (now async with AI)
-      const newReading = await generateTarotReading(commits, stats);
+      // Perform deep repository analysis if enabled
+      let projectAnalysis;
+      if (deepAnalysis) {
+        try {
+          console.log('🔬 Performing deep repository analysis...');
+          const urlMatch = trimmedUrl.match(/github\.com\/([^\/]+)\/([^\/\?#]+)/);
+          if (urlMatch) {
+            const [, owner, repo] = urlMatch;
+            projectAnalysis = await analyzeRepository(owner, repo.replace(/\.git$/, ''));
+            console.log('✅ Repository analysis complete');
+          }
+        } catch (analyzeError) {
+          console.warn('⚠️ Deep analysis failed, continuing with commit analysis only:', analyzeError);
+          // Continue without deep analysis
+        }
+      }
+
+      // Generate tarot reading (now async with AI + optional deep analysis)
+      const newReading = await generateTarotReading(commits, stats, projectAnalysis);
       
       // Simulate a brief delay for dramatic effect
       setTimeout(() => {
@@ -127,9 +138,9 @@ const TarotReader: React.FC = () => {
   return (
     <div className={styles.tarotReader}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Terminal Tarot</h1>
+        <h1 className={styles.title}>Mystic Oracle</h1>
         <p className={styles.subtitle}>
-          Mystical insights from your git commit history
+          Divine insights revealed through your creative journey
         </p>
       </div>
 
@@ -158,8 +169,49 @@ const TarotReader: React.FC = () => {
       </div>
 
       {/* Tab Panels */}
-      {activeTab === 'tarot' && (
-        <div id="tarot-panel" role="tabpanel" aria-labelledby="tarot-tab">
+        {activeTab === 'tarot' && (
+          <div id="tarot-panel" role="tabpanel" aria-labelledby="tarot-tab">
+          
+          {/* Commit Stats Display - shown when we have reading data */}
+          {reading && reading.commitStats && (
+            <div className={styles.statsDisplay}>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📊</div>
+                  <div className={styles.statValue}>{reading.commitStats.totalCommits}</div>
+                  <div className={styles.statLabel}>Total Commits</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📅</div>
+                  <div className={styles.statValue}>{reading.commitStats.averageCommitsPerDay.toFixed(2)}</div>
+                  <div className={styles.statLabel}>Daily Average</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>⏰</div>
+                  <div className={styles.statValue}>{reading.commitStats.mostActiveHour}:00</div>
+                  <div className={styles.statLabel}>Most Active Hour</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>
+                    {reading.commitStats.sentimentScore > 0.5 ? '😊' : reading.commitStats.sentimentScore > 0 ? '😐' : '😔'}
+                  </div>
+                  <div className={styles.statValue}>
+                    {reading.commitStats.sentimentScore > 0.5 ? 'Positive' : reading.commitStats.sentimentScore > 0 ? 'Neutral' : 'Negative'}
+                    {' '}({reading.commitStats.sentimentScore.toFixed(2)})
+                  </div>
+                  <div className={styles.statLabel}>Sentiment</div>
+                </div>
+                <div className={`${styles.statCard} ${styles.statCardWide}`}>
+                  <div className={styles.statIcon}>🔑</div>
+                  <div className={styles.statValue}>
+                    {reading.commitStats.topKeywords.join(', ')}
+                  </div>
+                  <div className={styles.statLabel}>Top Keywords</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {!reading && !loading && (
         <>
           <div className={styles.githubInput}>
@@ -183,6 +235,22 @@ const TarotReader: React.FC = () => {
               <span className={styles.buttonIcon} aria-hidden="true">🔮</span>
               Generate Reading
             </button>
+          </div>
+          
+          <div className={styles.deepAnalysisToggle}>
+            <label>
+              <input
+                type="checkbox"
+                checked={deepAnalysis}
+                onChange={(e) => setDeepAnalysis(e.target.checked)}
+              />
+              <span className={styles.toggleLabel}>
+                🔬 Deep Repository Analysis
+                <span className={styles.toggleHint}>
+                  Analyze files, code structure, and tech stack (slower but comprehensive)
+                </span>
+              </span>
+            </label>
           </div>
           
           <div className={styles.controls}>
@@ -254,11 +322,178 @@ const TarotReader: React.FC = () => {
           </div>
 
           <div className={styles.interpretation}>
-            <h2 className={styles.interpretationTitle}>Your Reading</h2>
-            <div className={styles.interpretationText}>
-              {reading.interpretation}
+            <div className={styles.interpretationHeader}>
+              <h2 className={styles.interpretationTitle}>Your Mystical Reading</h2>
+              <p className={styles.interpretationSubtitle}>
+                The cards have spoken • Analysis complete • {new Date().toLocaleDateString()}
+              </p>
+            </div>
+            <div className={styles.interpretationContent}>
+              {(() => {
+                // Parse the interpretation into sections
+                const text = reading.interpretation;
+                console.log('📖 Full interpretation text:', text);
+                console.log('📖 Text length:', text.length);
+                
+                // If parsing fails, show the raw text
+                if (!text.includes('═══════════════════════════════════════════════════════')) {
+                  console.log('⚠️ No section separators found, showing raw text');
+                  return (
+                    <div className={styles.readingSection}>
+                      <div className={styles.sectionBody}>
+                        <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', margin: 0 }}>
+                          {text}
+                        </pre>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                const sections = text.split('═══════════════════════════════════════════════════════');
+                console.log('📖 Number of sections:', sections.length);
+                
+                // Pair up titles with their content
+                const pairedSections: Array<{ title: string; content: string }> = [];
+                for (let i = 0; i < sections.length; i++) {
+                  const current = sections[i].trim();
+                  if (!current) continue;
+                  
+                  const lines = current.split('\n');
+                  const firstLine = lines[0].trim();
+                  const restContent = lines.slice(1).join('\n').trim();
+                  
+                  // If this section has a title-like first line and no/little content,
+                  // pair it with the next section
+                  if (restContent.length < 50 && i + 1 < sections.length) {
+                    const nextSection = sections[i + 1].trim();
+                    pairedSections.push({
+                      title: firstLine,
+                      content: nextSection
+                    });
+                    i++; // Skip the next section since we just used it
+                  } else {
+                    pairedSections.push({
+                      title: firstLine,
+                      content: restContent
+                    });
+                  }
+                }
+                
+                console.log('📖 Paired sections:', pairedSections.length);
+                pairedSections.forEach((s, i) => 
+                  console.log(`📋 Paired ${i} - Title: "${s.title.substring(0, 50)}", Content: ${s.content.length} chars`)
+                );
+                
+                return pairedSections.map((section, idx) => {
+                  const sectionTitle = section.title;
+                  const sectionContent = section.content;
+                  
+                  // Summary Section
+                  if (sectionTitle.includes('SUMMARY')) {
+                    return (
+                      <div key={idx} className={styles.readingSection}>
+                        <div className={styles.sectionHeader}>
+                          <h3 className={styles.sectionTitle}>📊 Summary</h3>
+                          <span className={styles.sectionBadge}>Overview</span>
+                        </div>
+                        <div className={styles.sectionBody}>
+                          {sectionContent.split('\n').filter(line => line.trim()).map((line, i) => (
+                            <p key={i} className={styles.summaryLine}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Detailed Analysis Section
+                  if (sectionTitle.includes('DETAILED ANALYSIS')) {
+                    const scoreMatch = sectionTitle.match(/\((\d+)\/100\)/);
+                    const score = scoreMatch ? scoreMatch[1] : '0';
+                    const emoji = sectionTitle.match(/[👑⭐🔥🌙]/)?.[0] || '⭐';
+                    
+                    return (
+                      <div key={idx} className={styles.readingSection}>
+                        <div className={styles.sectionHeader}>
+                          <h3 className={styles.sectionTitle}>{emoji} Detailed Analysis</h3>
+                          <span className={styles.sectionBadge}>{score}/100</span>
+                        </div>
+                        <div className={styles.sectionBody}>
+                          {sectionContent.split('\n\n').filter(block => block.trim()).map((block, i) => (
+                            <div key={i} className={styles.analysisBlock}>
+                              {block.split('\n').map((line, j) => {
+                                if (line.includes(' = ')) {
+                                  const parts = line.split(' = ');
+                                  return (
+                                    <div key={j} className={styles.formulaLine}>
+                                      <span className={styles.formulaPart}>{parts[0]}</span>
+                                      <span>=</span>
+                                      <span className={styles.formulaResult}>{parts[1]}</span>
+                                    </div>
+                                  );
+                                }
+                                return line.trim() ? <p key={j} className={styles.analysisText}>{line}</p> : null;
+                              })}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  // Mystical Insights Section
+                  if (sectionTitle.includes('MYSTICAL INSIGHTS')) {
+                    return (
+                      <div key={idx} className={styles.readingSection}>
+                        <div className={styles.sectionHeader}>
+                          <h3 className={styles.sectionTitle}>🔮 Mystical Insights</h3>
+                          <span className={styles.sectionBadge}>Oracle Wisdom</span>
+                        </div>
+                        <div className={styles.sectionBody}>
+                          <ul className={styles.insightsList}>
+                            {sectionContent.split('\n').filter(line => 
+                              line.trim() && !line.includes('═') && !line.includes('spirits have spoken')
+                            ).map((line, i) => (
+                              <li key={i} className={styles.insightItem}>{line}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  }
+                  
+                  return null;
+                }).filter(Boolean);
+              })()}
             </div>
           </div>
+
+          {reading.commitStats && (
+            <div className={styles.statsPanel}>
+              <h3 className={styles.statsTitle}>Commit Analysis</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Total Commits</div>
+                  <div className={styles.statValue}>{reading.commitStats.totalCommits}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Daily Average</div>
+                  <div className={styles.statValue}>{reading.commitStats.averageCommitsPerDay.toFixed(1)}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Sentiment Score</div>
+                  <div className={styles.statValue}>{reading.commitStats.sentimentScore.toFixed(2)}</div>
+                </div>
+                <div className={styles.statItem}>
+                  <div className={styles.statLabel}>Top Keywords</div>
+                  <div className={styles.statKeywords}>
+                    {reading.commitStats.topKeywords.map((keyword, idx) => (
+                      <span key={idx} className={styles.keyword}>{keyword}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className={styles.actions}>
             <button 
@@ -289,7 +524,19 @@ const TarotReader: React.FC = () => {
       )}
 
           {activeTab === 'ghost-archive' && (
-            <div id="ghost-archive-panel" role="tabpanel" aria-labelledby="ghost-archive-tab">
+            <div 
+              id="ghost-archive-panel" 
+              role="tabpanel" 
+              aria-labelledby="ghost-archive-tab"
+              style={{
+                backgroundImage: 'url(/terminal-bg.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center top',
+                backgroundRepeat: 'no-repeat',
+                backgroundColor: '#0a0a0a',
+                minHeight: '100vh',
+              }}
+            >
               <ErrorBoundary
                 fallback={
                   <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-primary)' }}>

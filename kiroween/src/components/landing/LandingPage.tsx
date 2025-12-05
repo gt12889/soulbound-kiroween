@@ -83,29 +83,8 @@ const LandingPage: React.FC = () => {
             Choose wisely, traveler, for the forest remembers all who enter.
           </p>
           <button className={`${styles.ctaButton} button-primary`} onClick={handleGetStarted}>
-            <span className={styles.ctaIcon}>🌙</span>
             <span>Enter the Forest</span>
           </button>
-        </div>
-        
-        {/* Floating elements with parallax */}
-        <div className={styles.floatingElements}>
-          <div 
-            className={`${styles.floatingIcon} ${styles.float1}`}
-            style={{ transform: `translateY(${parallaxOffset * 0.2}px)` }}
-          >🍂</div>
-          <div 
-            className={`${styles.floatingIcon} ${styles.float2}`}
-            style={{ transform: `translateY(${parallaxOffset * 0.4}px)` }}
-          >🌙</div>
-          <div 
-            className={`${styles.floatingIcon} ${styles.float3}`}
-            style={{ transform: `translateY(${parallaxOffset * 0.15}px)` }}
-          >🦉</div>
-          <div 
-            className={`${styles.floatingIcon} ${styles.float4}`}
-            style={{ transform: `translateY(${parallaxOffset * 0.35}px)` }}
-          >🌿</div>
         </div>
       </section>
 
@@ -360,22 +339,23 @@ const LandingPage: React.FC = () => {
 
       {/* Editorial Section - Join the Forest */}
       <section className={styles.editorialSection}>
-        <div className={styles.editorialImage}>
-          <div className={styles.videoWrapper}>
-            <video
-              className={styles.editorialVideo}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-            >
-              <source src="/flower.mp4" type="video/mp4" />
-            </video>
+        <div className={styles.editorialContent}>
+          <div className={styles.editorialImage}>
+            <div className={styles.videoWrapper}>
+              <video
+                className={styles.editorialVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+              >
+                <source src="/flower.mp4" type="video/mp4" />
+              </video>
+            </div>
           </div>
-        </div>
-        <div className={styles.editorialText}>
-          <div className={styles.editorialContent}>
+          <div className={styles.editorialText}>
+            <div className={styles.editorialContentInner}>
             <AnimatedSlide delay={0}>
               <h2 className={styles.editorialSubheading}>Dark Forest Ecosystem</h2>
             </AnimatedSlide>
@@ -393,6 +373,7 @@ const LandingPage: React.FC = () => {
                 <span className={styles.buttonInner}>Begin Your Journey</span>
               </button>
             </AnimatedSlide>
+            </div>
           </div>
         </div>
       </section>
