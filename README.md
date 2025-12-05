@@ -121,4 +121,4 @@ Steering docs in `.kiro/steering/`:
 * **Documentation:** Video tutorials, interactive guides
 * **Internationalization:** Multi-language support
 
-## Built with 🖤 and Kiro
+## Built with KIRO IDE !!
