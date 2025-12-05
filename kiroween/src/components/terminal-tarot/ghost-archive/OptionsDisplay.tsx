@@ -13,10 +13,17 @@ interface OptionsDisplayProps {
     textColor: string;
     glowColor: string;
   };
+  onOptionClick?: (command: string) => void;
 }
 
-export const OptionsDisplay: React.FC<OptionsDisplayProps> = ({ options, theme }) => {
+export const OptionsDisplay: React.FC<OptionsDisplayProps> = ({ options, theme, onOptionClick }) => {
   if (options.length === 0) return null;
+
+  const handleOptionClick = (option: TerminalOption) => {
+    if (onOptionClick && option.command) {
+      onOptionClick(option.command);
+    }
+  };
 
   return (
     <div className={styles.optionsPanel}>
@@ -25,19 +32,22 @@ export const OptionsDisplay: React.FC<OptionsDisplayProps> = ({ options, theme }
       </div>
       <div className={styles.optionsGrid}>
         {options.map((option) => (
-          <div
+          <button
             key={option.number}
+            type="button"
             className={styles.optionItem}
+            onClick={() => handleOptionClick(option)}
             style={{
               borderColor: theme?.textColor || '#00ff00',
               color: theme?.textColor || '#00ff00',
             }}
+            title={`Click to execute: ${option.command}`}
           >
             <span className={styles.optionNumber} style={{ color: theme?.glowColor || '#00ff88' }}>
               {option.number}
             </span>
             <span className={styles.optionDescription}>{option.description}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

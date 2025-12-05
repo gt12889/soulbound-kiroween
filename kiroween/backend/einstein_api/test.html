@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Einstein API Tester</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #8b5cf6;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        h1 {
+            color: #8b5cf6;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-weight: 600;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border-left: 4px solid #8b5cf6;
+        }
+        .result h3 {
+            color: #8b5cf6;
+            margin-top: 0;
+        }
+        .result pre {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: #00ff88;
+            font-size: 13px;
+        }
+        .error {
+            border-left-color: #ef4444;
+            color: #ff6b6b;
+        }
+        .success {
+            border-left-color: #00ff88;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .status.healthy {
+            background: #00ff88;
+            color: #000;
+        }
+        .status.error {
+            background: #ef4444;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Einstein API Tester</h1>
+        
+        <div class="input-group">
+            <label for="apiUrl">API URL:</label>
+            <input 
+                type="text" 
+                id="apiUrl" 
+                placeholder="https://einstein-ai-api.onrender.com"
+                value="https://einstein-ai-api.onrender.com"
+            />
+        </div>
+
+        <button onclick="testHealth()">1️⃣ Test Health</button>
+        <div id="healthResult"></div>
+
+        <div class="input-group" style="margin-top: 30px;">
+            <label for="question">Question for Einstein:</label>
+            <textarea 
+                id="question" 
+                placeholder="What is relativity?"
+            >What is relativity?</textarea>
+        </div>
+
+        <button onclick="testGenerate()">2️⃣ Generate Response</button>
+        <div id="generateResult"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const resultDiv = document.getElementById('healthResult');
+            
+            if (!apiUrl) {
+                resultDiv.innerHTML = '<div class="result error"><h3>❌ Error</h3><p>Please enter an API URL</p></div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="result"><h3>⏳ Testing...</h3><p>Checking health endpoint...</p></div>';
+
+            try {
+                const response = await fetch(`${apiUrl}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>✅ Health Check Passed 
+                                <span class="status healthy">HEALTHY</span>
+                            </h3>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Health Check Failed 
+                                <span class="status error">ERROR</span>
+                            </h3>
+                            <pre>Status: ${response.status}\n${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Connection Error 
+                            <span class="status error">FAILED</span>
+                        </h3>
+                        <pre>${error.message}\n\nMake sure:\n1. API URL is correct\n2. Service is deployed on Render\n3. Service is not sleeping (first request wakes it)</pre>
+                    </div>
+                `;
+            }
+        }
+
+        async function testGenerate() {
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const question = document.getElementById('question').value.trim();
+            const resultDiv = document.getElementById('generateResult');
+            
+            if (!apiUrl || !question) {
+                resultDiv.innerHTML = '<div class="result error"><h3>❌ Error</h3><p>Please enter both API URL and question</p></div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="result"><h3>⏳ Generating...</h3><p>Asking Einstein: "' + question + '"</p><p>This may take 10-30 seconds...</p></div>';
+
+            try {
+                const response = await fetch(`${apiUrl}/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        history: [],
+                        max_length: 150,
+                        temperature: 0.7
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>✅ Response Generated 
+                                <span class="status healthy">SUCCESS</span>
+                            </h3>
+                            <p><strong>Model:</strong> ${data.model || 'N/A'}</p>
+                            <p><strong>Einstein says:</strong></p>
+                            <pre style="color: #8b5cf6; font-size: 15px; line-height: 1.6;">${data.response}</pre>
+                            <pre style="margin-top: 15px; font-size: 11px;">${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Generation Failed 
+                                <span class="status error">ERROR</span>
+                            </h3>
+                            <pre>Status: ${response.status}\n${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Request Error 
+                            <span class="status error">FAILED</span>
+                        </h3>
+                        <pre>${error.message}\n\nPossible issues:\n1. API URL incorrect\n2. Service sleeping (first request takes 30s)\n3. Network timeout\n4. Hugging Face API key not set</pre>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-test health on load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 1000);
+        });
+    </script>
+</body>
+</html>
+

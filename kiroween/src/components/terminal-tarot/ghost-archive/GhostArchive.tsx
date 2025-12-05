@@ -74,7 +74,6 @@ export const GhostArchive: React.FC = () => {
 
             <div className={styles.mainTerminal}>
               <TerminalDisplay outputs={terminalOutput} theme={theme} />
-              <OptionsDisplay options={availableOptions} theme={theme} />
               <CommandInput
                 onExecute={executeCommand}
                 history={commandHistory}
@@ -83,6 +82,13 @@ export const GhostArchive: React.FC = () => {
             </div>
           </div>
         </div>
+        {availableOptions.length > 0 && (
+          <OptionsDisplay 
+            options={availableOptions} 
+            theme={theme}
+            onOptionClick={executeCommand}
+          />
+        )}
       </CRTEffects>
     </div>
   );

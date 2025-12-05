@@ -543,8 +543,8 @@
   border: 1px solid rgba(157, 78, 221, 0.4);
   border-radius: 100vw;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accent-purple-light);
+  font-weight: 600;
+  color: #e9d5ff;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -886,18 +886,18 @@
   flex: 0 0 45%;
   max-width: 500px;
   position: relative;
-  min-height: 350px;
-  max-height: 400px;
+  height: 500px;
+  margin-top: 6rem;
   background: 
     radial-gradient(ellipse at center, rgba(139, 92, 246, 0.2) 0%, transparent 70%),
     linear-gradient(135deg, rgba(45, 27, 78, 0.4) 0%, rgba(26, 26, 26, 0.6) 100%);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid var(--accent-purple);
+  border: 1px solid var(--accent-purple);
   box-shadow: 
     0 10px 40px rgba(0, 0, 0, 0.5),
     0 0 30px var(--glow-purple),
-    inset 0 0 20px rgba(139, 92, 246, 0.2);
+    inset 0 0 10px rgba(139, 92, 246, 0.2);
   /* Fallback: animated gradient when video doesn't load */
   animation: glowPulseBackground 4s ease-in-out infinite;
 }
@@ -920,14 +920,17 @@
 .videoWrapper {
   width: 100%;
   height: 100%;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
 }
 
 .editorialVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 70%;
   opacity: 0.9;
   -webkit-mask-image: radial-gradient(
     ellipse 70% 70% at center,

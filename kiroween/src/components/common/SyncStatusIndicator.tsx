@@ -85,8 +85,8 @@ export const SyncStatusIndicator = () => {
               {syncStatus.pendingChanges} pending
             </span>
           ) : (
-            <span className={styles.synced}>
-              Synced {formatLastSync(syncStatus.lastSync)}
+            <span className={styles.synced} title={`Synced ${formatLastSync(syncStatus.lastSync)}`}>
+              {formatLastSync(syncStatus.lastSync)}
             </span>
           )}
         </div>

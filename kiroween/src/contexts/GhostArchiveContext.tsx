@@ -16,7 +16,6 @@ import type { WorkItem } from '../services/testGenerationService';
 import { codebaseReviewService } from '../services/codebaseReviewService';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { useAudio } from '../hooks/useAudio';
-import { useAuth } from './AuthContext';
 import { isQuestion, detectQuestionIntent, isCommand, detectInputType } from '../utils/questionDetection';
 import { terminalGuideService } from '../services/terminalGuideService';
 import type { GuideState } from '../services/terminalGuideService';
@@ -67,7 +66,6 @@ interface GhostArchiveProviderProps {
 }
 
 export const GhostArchiveProvider: React.FC<GhostArchiveProviderProps> = ({ children }) => {
-  const { user } = useAuth();
   const { playTerminalConnect, playTerminalDisconnect, playWorkflowComplete, playLoreEvent } = useAudio();
 
   // Initialize service
@@ -87,22 +85,22 @@ export const GhostArchiveProvider: React.FC<GhostArchiveProviderProps> = ({ chil
     });
   }, []);
 
-  // State - user-scoped for data isolation
+  // State
   const [activeAgents, setActiveAgents] = useState<string[]>([]);
   const [connectedAgent, setConnectedAgent] = useState<string | undefined>();
-  const [terminalOutput, setTerminalOutput] = useLocalStorage<TerminalOutput[]>('ghost-archive-output', [], user?.id);
-  const [fragments, setFragments] = useLocalStorage<Fragment[]>('ghost-archive-fragments', [], user?.id);
+  const [terminalOutput, setTerminalOutput] = useLocalStorage<TerminalOutput[]>('ghost-archive-output', []);
+  const [fragments, setFragments] = useLocalStorage<Fragment[]>('ghost-archive-fragments', []);
   const [activeFragment, setActiveFragment] = useState<string | undefined>();
   const [loreEvents, setLoreEvents] = useState<LoreEvent[]>([]);
   const [workflows, setWorkflows] = useState<Record<string, WorkflowResult>>({});
-  const [commandHistory, setCommandHistory] = useLocalStorage<string[]>('ghost-archive-history', [], user?.id);
+  const [commandHistory, setCommandHistory] = useLocalStorage<string[]>('ghost-archive-history', []);
   const [availableOptions, setAvailableOptions] = useState<TerminalOption[]>([]);
   const [guideState, setGuideState] = useLocalStorage<GuideState>('ghost-archive-guide-state', {
     stage: 'new',
     featuresDiscovered: [],
     interactionCount: 0,
     lastInteraction: Date.now(),
-  }, user?.id);
+  });
 
   // Clean up terminal output on mount - filter out old lore events and limit history
   useEffect(() => {
@@ -303,7 +301,7 @@ What would you like to explore?`,
 
       // Get codebase structure info (this would be enhanced with actual file reading)
       const structureInfo = `
-Soul Bound Codex Codebase Structure:
+Kiroween Codebase Structure:
 - React TypeScript application
 - Component-based architecture
 - Context API for state management
@@ -487,7 +485,7 @@ Soul Bound Codex Codebase Structure:
     }
   }, [addOutput]);
 
-  const executeCommand = useCallback(async (command: string, skipHistory: boolean = false) => {
+  const executeCommand = useCallback(async (command: string) => {
     const trimmed = command.trim();
     if (!trimmed) return;
 
@@ -498,19 +496,17 @@ Soul Bound Codex Codebase Structure:
       lastInteraction: Date.now(),
     }));
 
-    // Add to command history (unless we're processing a number-to-command conversion)
-    if (!skipHistory) {
-      setCommandHistory(prev => {
-        const newHistory = [...prev, trimmed];
-        return newHistory.slice(-100); // Keep last 100 commands
-      });
+    // Add to command history
+    setCommandHistory(prev => {
+      const newHistory = [...prev, trimmed];
+      return newHistory.slice(-100); // Keep last 100 commands
+    });
 
-      // Add command to output
-      addOutput({
-        type: 'command',
-        content: trimmed,
-      });
-    }
+    // Add command to output
+    addOutput({
+      type: 'command',
+      content: trimmed,
+    });
 
     const parts = trimmed.split(' ');
     const cmd = parts[0].toLowerCase();
@@ -564,28 +560,13 @@ Soul Bound Codex Codebase Structure:
       // NOT CONNECTED - Handle as before
       const inputType = detectInputType(trimmed);
 
-      // Handle numeric input - check if it matches an available option
+      // Handle numbers that didn't match an option
       if (inputType === 'number') {
-        const optionNumber = parseInt(trimmed, 10);
-        const matchedOption = availableOptions.find(opt => opt.number === optionNumber);
-        
-        if (matchedOption) {
-          // Add the number selection to output, then execute the matched option's command
-          addOutput({
-            type: 'command',
-            content: trimmed,
-          });
-          // Execute the matched option's command (skip history to avoid duplicate)
-          await executeCommand(matchedOption.command, true);
-          return;
-        } else {
-          // Number doesn't match any available option
-          addOutput({
-            type: 'error',
-            content: `Invalid option number: ${trimmed}\n\n💡 Try one of the numbered options above, or type "help" to see available commands`,
-          });
-          return;
-        }
+        addOutput({
+          type: 'error',
+          content: `Invalid option number: ${trimmed}\n\n💡 Try one of the numbered options above, or type "help" to see available commands`,
+        });
+        return;
       }
 
       // Handle greetings
@@ -984,7 +965,7 @@ Soul Bound Codex Codebase Structure:
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
       });
     }
-  }, [addOutput, connectAgent, disconnectAgent, commandHistory, fragments, setCommandHistory, executeTestGeneration, executeCodebaseReview, setAvailableOptions, clearTerminal, startFragmentRestoration, guideState, setGuideState, connectedAgent, activeAgents, availableOptions]);
+  }, [addOutput, connectAgent, disconnectAgent, commandHistory, fragments, setCommandHistory, executeTestGeneration, executeCodebaseReview, setAvailableOptions, clearTerminal, startFragmentRestoration, guideState, setGuideState, connectedAgent, activeAgents]);
 
   const getPersonalities = useCallback(() => {
     return ghostArchiveService.getPersonalities();

@@ -79,8 +79,8 @@ const LandingPage: React.FC = () => {
             A mystical realm where productivity dwells in shadow
           </p>
           <p className={styles.heroDescription}>
-            Three paths lie before you, each leading to ancient powers. 
-            Choose wisely, traveler, for the codex remembers all who enter.
+            Where ancient powers converge with modern intelligence. Connect with historical minds, 
+            orchestrate multi-agent workflows, and experience AI with voice. The codex remembers all who enter.
           </p>
           <button className={`${styles.ctaButton} button-primary`} onClick={handleGetStarted}>
             <span>Enter the Codex</span>
@@ -98,8 +98,8 @@ const LandingPage: React.FC = () => {
               <span className={styles.titleMain}>Await Your Command</span>
             </h2>
             <p className={styles.contentSubtitle}>
-              Three mystical paths converge in the darkness, each offering unique capabilities 
-              to enhance your journey through the realm of productivity.
+              Powerful features converge in the darkness, from multi-agent collaboration to voice-powered interactions, 
+              each offering unique capabilities to enhance your journey through the realm of productivity.
             </p>
           </div>
 
@@ -146,6 +146,20 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
             </AnimatedSlide>
+
+            <AnimatedSlide delay={600}>
+              <div className={styles.featureCard}>
+                <div className={styles.cardIcon}>👻</div>
+                <div className={styles.cardContent}>
+                  <h3 className={styles.cardTitle}>Ghost Archive</h3>
+                  <p className={styles.cardDescription}>
+                    Connect with historical minds through multi-agent collaboration. Orchestrate workflows, 
+                    get code reviews, and experience voice-powered conversations with AI personalities.
+                  </p>
+                  <div className={styles.cardBadge}>Multi-Agent</div>
+                </div>
+              </div>
+            </AnimatedSlide>
           </div>
 
           {/* Additional Info Section */}
@@ -173,10 +187,10 @@ const LandingPage: React.FC = () => {
             <AnimatedSlide delay={400}>
               <div className={styles.infoCard}>
                 <div className={styles.infoIcon}>🔮</div>
-                <h4 className={styles.infoTitle}>AI Enhanced</h4>
+                <h4 className={styles.infoTitle}>Multi-Agent Intelligence</h4>
                 <p className={styles.infoText}>
-                  Ancient intelligence powers assist your every move, learning 
-                  from your patterns to better serve your needs.
+                  Orchestrate multiple AI agents working in harmony. From collaborative workflows to 
+                  voice-powered conversations, experience the future of AI assistance.
                 </p>
               </div>
             </AnimatedSlide>
@@ -255,15 +269,28 @@ const LandingPage: React.FC = () => {
                           <span className={styles.numberDeco}>(</span>3<span className={styles.numberDeco}>)</span>
                         </span>
                         <div className={styles.itemContent}>
-                          <h3 className={styles.itemTitle}>Mystic Oracle Readings</h3>
+                          <h3 className={styles.itemTitle}>Ghost Archive - Multi-Agent System</h3>
                           <p className={styles.itemDescription}>
-                            Receive divine insights and connect with historical minds through the Ghost Archive for wisdom.
+                            Connect with historical minds and orchestrate collaborative workflows. Multiple AI agents work together 
+                            to provide comprehensive insights, code reviews, and creative collaboration.
                           </p>
                         </div>
                       </li>
                       <li className={styles.strategyItem}>
                         <span className={styles.itemNumber}>
                           <span className={styles.numberDeco}>(</span>4<span className={styles.numberDeco}>)</span>
+                        </span>
+                        <div className={styles.itemContent}>
+                          <h3 className={styles.itemTitle}>Voice-Powered Interactions</h3>
+                          <p className={styles.itemDescription}>
+                            Experience AI conversations with natural voice synthesis. Hear responses from historical personalities 
+                            and agents with lifelike speech, making interactions more immersive and accessible.
+                          </p>
+                        </div>
+                      </li>
+                      <li className={styles.strategyItem}>
+                        <span className={styles.itemNumber}>
+                          <span className={styles.numberDeco}>(</span>5<span className={styles.numberDeco}>)</span>
                         </span>
                         <div className={styles.itemContent}>
                           <h3 className={styles.itemTitle}>Spirit Companion</h3>

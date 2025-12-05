@@ -21,10 +21,13 @@ class HuggingFaceEinsteinService {
 
   constructor() {
     // Get API URL from environment or use default
-    this.apiUrl = import.meta.env.VITE_EINSTEIN_API_URL || 'http://localhost:5000';
+    this.apiUrl = import.meta.env.VITE_EINSTEIN_API_URL || 'https://kiroween-dk87.onrender.com';
     
     // Remove trailing slash
     this.apiUrl = this.apiUrl.replace(/\/$/, '');
+    
+    console.log('[Einstein API] Initialized with URL:', this.apiUrl);
+    console.log('[Einstein API] VITE_EINSTEIN_API_URL from env:', import.meta.env.VITE_EINSTEIN_API_URL);
   }
 
   /**
@@ -32,6 +35,7 @@ class HuggingFaceEinsteinService {
    */
   async isAvailable(): Promise<boolean> {
     try {
+      console.log('[Einstein API] Checking health at:', `${this.apiUrl}/health`);
       const response = await fetch(`${this.apiUrl}/health`, {
         method: 'GET',
         headers: {
@@ -39,13 +43,17 @@ class HuggingFaceEinsteinService {
         },
       });
       
+      console.log('[Einstein API] Health check response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('[Einstein API] Health check data:', data);
         return data.status === 'healthy';
       }
+      console.warn('[Einstein API] Health check failed - response not OK:', response.status);
       return false;
     } catch (error) {
-      console.warn('[Einstein API] Health check failed:', error);
+      console.warn('[Einstein API] Health check failed with error:', error);
       return false;
     }
   }
@@ -76,7 +84,14 @@ class HuggingFaceEinsteinService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API error: ${response.status}`);
+        const errorMessage = errorData.error || errorData.message || `API error: ${response.status}`;
+        
+        // Don't throw for missing API key - let it fall through gracefully
+        if (errorMessage.includes('HUGGINGFACE_API_KEY') || response.status === 500) {
+          throw new Error('API_NOT_CONFIGURED');
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data: EinsteinResponse = await response.json();

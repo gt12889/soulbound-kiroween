@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Dark Forest Theme Favicon -->
+  <defs>
+    <linearGradient id="treeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d1b4e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="moonGrad" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#ffcc44;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffaa00;stop-opacity:0.8" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="64" height="64" fill="url(#treeGrad)" rx="8"/>
+  
+  <!-- Moon -->
+  <circle cx="48" cy="16" r="8" fill="url(#moonGrad)" opacity="0.9"/>
+  <circle cx="50" cy="14" r="6" fill="#0a0a0a"/>
+  
+  <!-- Tree Trunk -->
+  <rect x="28" y="40" width="8" height="20" fill="#1a0f2e" rx="2"/>
+  
+  <!-- Tree Branches -->
+  <path d="M 32 40 Q 20 35 18 25 Q 16 20 20 18 Q 18 15 22 12 Q 20 10 24 8 Q 22 6 26 4" 
+        stroke="#4a2d6e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 32 40 Q 44 35 46 25 Q 48 20 44 18 Q 46 15 42 12 Q 44 10 40 8 Q 42 6 38 4" 
+        stroke="#4a2d6e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  
+  <!-- Mystical Glow -->
+  <circle cx="32" cy="32" r="30" fill="none" stroke="rgba(139, 92, 246, 0.2)" stroke-width="1"/>
+  <circle cx="32" cy="32" r="25" fill="none" stroke="rgba(139, 92, 246, 0.1)" stroke-width="0.5"/>
+</svg>
+

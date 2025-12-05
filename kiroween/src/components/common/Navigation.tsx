@@ -193,9 +193,6 @@ const Navigation: React.FC = () => {
         </ul>
         
         <div className={styles.navFooter}>
-          {/* Sync Status Indicator - Requirements: 17.7 */}
-          <SyncStatusIndicator />
-          
           {/* Quick Note Button - Compact icon-only design */}
           <button 
             className={styles.quickNoteButton}
@@ -244,6 +241,9 @@ const Navigation: React.FC = () => {
           )}
           
           <div className={styles.ornament} aria-hidden="true">🍂</div>
+          
+          {/* Sync Status Indicator - Requirements: 17.7 - Moved to bottom */}
+          <SyncStatusIndicator />
         </div>
       </nav>
       

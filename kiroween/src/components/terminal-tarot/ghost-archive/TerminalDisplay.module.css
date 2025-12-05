@@ -11,6 +11,7 @@
   background: #0a2e0a;
   color: #00ff00;
   text-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+  scroll-behavior: auto; /* Let JavaScript handle smooth scrolling */
 }
 
 .terminalDisplay::-webkit-scrollbar {
@@ -192,5 +193,320 @@
   50% {
     border-color: currentColor;
   }
+}
+
+/* Terminal Display Wrapper */
+.terminalDisplayWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Message Blocks */
+.messageBlock {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border-radius: 4px;
+  animation: fadeIn 0.3s ease-in;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.userMessage {
+  background: rgba(0, 255, 136, 0.05);
+  border-left: 2px solid rgba(0, 255, 136, 0.3);
+}
+
+.agentMessage {
+  background: rgba(136, 204, 255, 0.05);
+  border-left: 2px solid rgba(136, 204, 255, 0.3);
+}
+
+.systemMessage {
+  background: rgba(255, 170, 0, 0.05);
+  border-left: 2px solid rgba(255, 170, 0, 0.3);
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.messagePrefix {
+  font-weight: bold;
+}
+
+.messageTime {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.messageContent {
+  margin-top: 0.5rem;
+}
+
+.messageText {
+  margin: 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.expandButton {
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.expandButton:hover {
+  opacity: 1;
+}
+
+.reasoningDetails {
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 170, 0, 0.05);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 170, 0, 0.2);
+}
+
+.reasoningSummary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #ffaa00;
+  user-select: none;
+}
+
+.reasoningSteps {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(255, 170, 0, 0.3);
+}
+
+.reasoningStep {
+  margin: 0.5rem 0;
+  padding: 0.25rem 0;
+}
+
+.stepNumber {
+  color: #ffaa00;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+.stepThought {
+  color: #ffcc88;
+}
+
+.alternatives {
+  margin-top: 0.25rem;
+  margin-left: 1rem;
+  opacity: 0.8;
+}
+
+.alternative {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #ffaa88;
+}
+
+/* Scroll to Latest Button */
+.scrollToLatest {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  z-index: 10;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.scrollToLatest:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Voice Controls */
+.voiceControls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 20;
+  align-items: center;
+}
+
+.voiceButton,
+.voiceStopButton,
+.voiceSettingsButton {
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.voiceButton:hover,
+.voiceStopButton:hover,
+.voiceSettingsButton:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.voiceButtonActive {
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.voiceSettingsPanel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 280px;
+  padding: 1rem;
+  border: 2px solid;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 30;
+}
+
+.voiceSettingsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.voiceSettingsHeader h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.voiceSettingsClose {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.voiceSettingsClose:hover {
+  opacity: 1;
+}
+
+.voiceSetting {
+  margin-bottom: 1rem;
+}
+
+.voiceSetting label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.voiceSetting select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.voiceSetting select:hover {
+  opacity: 0.9;
+}
+
+.voiceSetting select:focus {
+  box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+}
+
+.voiceSetting input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.voiceSetting input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 255, 136, 0.5);
+}
+
+.voiceSetting input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 4px rgba(0, 255, 136, 0.5);
+}
+
+.voiceTestButton {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+}
+
+.voiceTestButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
 }
 
