@@ -6,6 +6,7 @@ import { useSpiritCompanion } from '../../hooks/useSpiritCompanion';
 import { useToast } from '../../contexts/ToastContext';
 import { useStreak } from '../../contexts/StreakContext';
 import { useCompanion } from '../../contexts/CompanionContext';
+import { useApp } from '../../contexts/AppContext';
 import { MILESTONE_CONFIGS, MILESTONE_DAYS } from '../../types/streak';
 import { EMBER_SKILLS, SHADOW_SKILLS, ZOMBIE_SKILLS } from '../../types/skillTree';
 import { StreakCard } from '../streaks/StreakCard';
@@ -13,7 +14,10 @@ import { ActivityHeatmap } from '../streaks/ActivityHeatmap';
 import { StreakTokens } from '../streaks/StreakTokens';
 import { GitHubConnectButton } from '../streaks/GitHubConnectButton';
 import { GitHubCommitHeatmap } from '../streaks/GitHubCommitHeatmap';
-import { useMemo, useState } from 'react';
+import { CompanionSelectionModal } from '../spirit-companion/CompanionSelectionModal';
+import type { CompanionType } from '../../types/companion';
+import { COMPANION_TYPES } from '../../types/companion';
+import { useMemo, useState, useEffect } from 'react';
 import styles from './AchievementsPage.module.css';
 import streakStyles from '../streaks/StreakDashboard.module.css';
 
@@ -24,9 +28,36 @@ export function AchievementsPage() {
   const { showToast } = useToast();
   const { streaks } = useStreak();
   const { activeCompanion, skillTree } = useCompanion();
+  const { hasSelectedCompanion, setCompanionType } = useApp();
 
   const [activeTab, setActiveTab] = useState<'achievements' | 'streaks'>('achievements');
   const [activeFilter, setActiveFilter] = useState<'all' | 'milestone' | 'skill' | 'achievement'>('all');
+  const [showCompanionModal, setShowCompanionModal] = useState(false);
+
+  // Show companion selection modal if user hasn't selected a companion
+  useEffect(() => {
+    if (!hasSelectedCompanion) {
+      setShowCompanionModal(true);
+    }
+  }, [hasSelectedCompanion]);
+
+  // Handle companion selection
+  const handleCompanionSelect = async (type: CompanionType) => {
+    try {
+      await setCompanionType(type);
+      setShowCompanionModal(false);
+      showToast({
+        message: `Your ${COMPANION_TYPES[type].name} has bonded with you!`,
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Failed to save companion selection:', error);
+      showToast({
+        message: 'Failed to save your companion choice. Please try again.',
+        type: 'error'
+      });
+    }
+  };
 
   const completedTasks = tasks.filter(t => t.completed).length;
   const totalNotes = notes.length;
@@ -181,6 +212,12 @@ export function AchievementsPage() {
 
   return (
     <div className={styles.achievementsContainer}>
+      {/* Companion Selection Modal */}
+      <CompanionSelectionModal
+        isOpen={showCompanionModal}
+        onSelect={handleCompanionSelect}
+      />
+
       <h1 className={styles.title}>Deeds & Flames</h1>
       <p className={styles.subtitle}>Your legend echoes through the forest...</p>
 

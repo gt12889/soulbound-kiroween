@@ -86,8 +86,8 @@ const RegisterPage: React.FC = () => {
       await register(email, password);
       playUIClick();
       
-      // Automatic login after registration - navigate to main app
-      navigate('/graveyard-dashboard');
+      // Automatic login after registration - navigate to achievements page to select companion
+      navigate('/achievements');
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {

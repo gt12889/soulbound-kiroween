@@ -48,9 +48,16 @@ const LoginPage: React.FC = () => {
     try {
       await login(email, password);
       playUIClick();
-      // Navigate to the page user was trying to access, or default to graveyard-dashboard
-      const from = (location.state as any)?.from?.pathname || '/graveyard-dashboard';
-      navigate(from, { replace: true });
+      // Check if user has selected a companion - if not, redirect to achievements page
+      const companionType = localStorage.getItem('companionType');
+      const hasCompanion = companionType !== null && companionType !== '';
+      const from = (location.state as any)?.from?.pathname;
+      
+      if (!hasCompanion) {
+        navigate('/achievements', { replace: true });
+      } else {
+        navigate(from || '/graveyard-dashboard', { replace: true });
+      }
     } catch (err: any) {
       setError(err.message || 'Login failed. Please try again.');
     } finally {
