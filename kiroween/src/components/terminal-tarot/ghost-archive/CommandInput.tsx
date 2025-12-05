@@ -3,7 +3,7 @@
  * Handles command input with history navigation
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useAudio } from '../../../hooks/useAudio';
 import { useGhostArchive } from '../../../contexts/GhostArchiveContext';
 import styles from './CommandInput.module.css';

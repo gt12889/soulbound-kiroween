@@ -1,8 +1,10 @@
 /**
- * Tarot service for generating readings based on commit patterns
+ * Tarot service for generating readings based on commit patterns and code analysis
  */
 import type { TarotCard, TarotReading, CommitStats } from '../types';
 import type { GitCommit } from './gitService';
+import type { ProjectStructure } from './repositoryAnalysisService';
+import { generateProjectInsights } from './repositoryAnalysisService';
 
 /**
  * Tarot card database with ASCII art and meanings
@@ -508,21 +510,47 @@ function calculateGrade(value: number, excellent: number, good: number): { score
 }
 
 /**
- * Creates interpretation text based on commit statistics
+ * Creates interpretation text based on commit statistics and optional repository analysis
  * @param stats - Commit statistics
  * @param cards - Selected tarot cards
+ * @param projectAnalysis - Optional deep repository analysis
  * @returns Interpretation text
  */
-export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): string {
+export function generateInterpretation(stats: CommitStats, cards: TarotCard[], projectAnalysis?: ProjectStructure): string {
   const lines: string[] = [];
 
-  // Calculate grades for different aspects
+  // Calculate comprehensive grades
   const activityGrade = calculateGrade(stats.averageCommitsPerDay, 3, 1.5);
   const consistencyGrade = calculateGrade(stats.totalCommits, 20, 10);
   const qualityGrade = calculateGrade(stats.sentimentScore, 0.6, 0.3);
+  
+  // Additional technical metrics
+  const keywords = stats.topKeywords;
+  const bugFixCount = keywords.filter(k => k.includes('fix') || k.includes('bug')).length;
+  const featureCount = keywords.filter(k => k.includes('add') || k.includes('feature') || k.includes('new')).length;
+  const refactorCount = keywords.filter(k => k.includes('refactor') || k.includes('improve') || k.includes('optimize')).length;
+  const updateCount = keywords.filter(k => k.includes('update')).length;
+  
+  // Technical Quality Scores
+  const bugFixRatio = stats.totalCommits > 0 ? (bugFixCount / keywords.length) * 100 : 0;
+  const featureRatio = stats.totalCommits > 0 ? (featureCount / keywords.length) * 100 : 0;
+  const refactorRatio = stats.totalCommits > 0 ? (refactorCount / keywords.length) * 100 : 0;
+  
+  const messageQualityGrade = calculateGrade(keywords.length, 7, 4);
+  const bugFixGrade = calculateGrade(bugFixRatio, 30, 15);
+  const featureGrade = calculateGrade(featureRatio, 40, 20);
+  const codeHealthGrade = calculateGrade(refactorRatio, 25, 10);
 
-  // Overall score
-  const overallScore = Math.round((activityGrade.score + consistencyGrade.score + qualityGrade.score) / 3);
+  // Overall score (weighted average)
+  const overallScore = Math.round(
+    (activityGrade.score * 0.15) + 
+    (consistencyGrade.score * 0.15) + 
+    (qualityGrade.score * 0.2) +
+    (messageQualityGrade.score * 0.15) +
+    (bugFixGrade.score * 0.1) +
+    (featureGrade.score * 0.15) +
+    (codeHealthGrade.score * 0.1)
+  );
   const overallEmoji = overallScore >= 85 ? '👑' : overallScore >= 70 ? '⭐' : overallScore >= 55 ? '🔥' : '🌙';
 
   // SUMMARY SECTION
@@ -532,6 +560,13 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): 
 
   // Three-card reading summary
   lines.push(`${cards[0].name} (Past) → ${cards[1].name} (Present) → ${cards[2].name} (Future)`);
+  lines.push('');
+  
+  // Quick Stats Overview
+  lines.push(`📈 Overall Health Score: ${overallScore}/100 ${overallEmoji}`);
+  lines.push(`📊 Commits: ${stats.totalCommits} total | ${stats.averageCommitsPerDay.toFixed(1)}/day average`);
+  lines.push(`🎯 Top Focus: ${featureRatio > bugFixRatio ? 'Feature Development' : 'Bug Fixes & Maintenance'} (${Math.max(featureRatio, bugFixRatio).toFixed(0)}%)`);
+  lines.push(`⏰ Peak Hour: ${stats.mostActiveHour}:00 | Sentiment: ${(stats.sentimentScore * 100).toFixed(0)}% positive`);
   lines.push('');
   
   if (stats.totalCommits < 5) {
@@ -564,32 +599,59 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): 
   lines.push(`            ${overallEmoji} DETAILED ANALYSIS (${overallScore}/100)           `);
   lines.push('═══════════════════════════════════════════════════════\n');
 
-  // Activity × Consistency = Productivity
+  // 1. Productivity Metrics
   lines.push(`🔥 ${activityGrade.emoji} Activity (${activityGrade.score}/100) + 📅 ${consistencyGrade.emoji} Consistency (${consistencyGrade.score}/100)`);
   lines.push(`   = 🚀 Productivity Score: ${Math.round((activityGrade.score + consistencyGrade.score) / 2)}/100`);
-  lines.push(`   ${stats.averageCommitsPerDay.toFixed(1)} commits/day × ${stats.totalCommits} total commits = ${activityGrade.label} work cadence\n`);
+  lines.push(`   ${stats.averageCommitsPerDay.toFixed(1)} commits/day × ${stats.totalCommits} total commits`);
+  lines.push(`   Assessment: ${activityGrade.label} work cadence, ${consistencyGrade.label} commitment level\n`);
 
-  // Quality × Sentiment = Code Health
+  // 2. Code Quality & Sentiment
   lines.push(`⚡ ${qualityGrade.emoji} Code Quality (${qualityGrade.score}/100) + 😊 Sentiment (${(stats.sentimentScore * 100).toFixed(0)}/100)`);
   lines.push(`   = 💎 Code Health: ${Math.round((qualityGrade.score + stats.sentimentScore * 100) / 2)}/100`);
-  lines.push(`   ${qualityGrade.label} quality + ${stats.sentimentScore > 0.5 ? 'Positive' : stats.sentimentScore > 0 ? 'Neutral' : 'Negative'} vibes = ${qualityGrade.label} codebase\n`);
+  lines.push(`   Sentiment: ${stats.sentimentScore > 0.5 ? 'Highly Positive' : stats.sentimentScore > 0 ? 'Neutral-Positive' : 'Needs Attention'}`);
+  lines.push(`   Quality Grade: ${qualityGrade.label}\n`);
 
-  // Timing × Keywords = Work Style
+  // 3. Message Quality & Communication
+  lines.push(`📝 ${messageQualityGrade.emoji} Message Quality (${messageQualityGrade.score}/100) + 🔤 Keyword Diversity (${keywords.length} unique)`);
+  lines.push(`   = 📋 Communication Score: ${messageQualityGrade.score}/100`);
+  lines.push(`   Keywords: ${stats.topKeywords.slice(0, 5).join(', ')}`);
+  lines.push(`   Assessment: ${messageQualityGrade.label} commit message discipline\n`);
+
+  // 4. Bug Fixes & Maintenance
+  lines.push(`🐛 ${bugFixGrade.emoji} Bug Fix Ratio (${bugFixRatio.toFixed(1)}%) + 🔧 Updates (${updateCount} occurrences)`);
+  lines.push(`   = 🛠️ Maintenance Score: ${bugFixGrade.score}/100`);
+  lines.push(`   Fix Rate: ${bugFixRatio.toFixed(1)}% of keywords indicate bug fixes`);
+  lines.push(`   Assessment: ${bugFixGrade.label} maintenance hygiene\n`);
+
+  // 5. Feature Development & Innovation
+  lines.push(`✨ ${featureGrade.emoji} Feature Ratio (${featureRatio.toFixed(1)}%) + 🆕 New Additions (${featureCount} indicators)`);
+  lines.push(`   = 🚀 Innovation Score: ${featureGrade.score}/100`);
+  lines.push(`   New Features: ${featureRatio.toFixed(1)}% of work dedicated to innovation`);
+  lines.push(`   Assessment: ${featureGrade.label} feature velocity\n`);
+
+  // 6. Code Health & Refactoring
+  lines.push(`♻️ ${codeHealthGrade.emoji} Refactor Ratio (${refactorRatio.toFixed(1)}%) + 🔬 Optimization (${refactorCount} instances)`);
+  lines.push(`   = 🏗️ Technical Debt Management: ${codeHealthGrade.score}/100`);
+  lines.push(`   Refactoring: ${refactorRatio.toFixed(1)}% of commits improve existing code`);
+  lines.push(`   Assessment: ${codeHealthGrade.label} technical debt management\n`);
+
+  // 7. Work Style & Timing Analysis
   const nightOwl = mostActiveHour >= 22 || mostActiveHour <= 5;
   const morningPerson = mostActiveHour >= 6 && mostActiveHour <= 12;
   const timingScore = nightOwl ? 90 : morningPerson ? 85 : 75;
   const timingEmoji = nightOwl ? '🌙' : morningPerson ? '🌅' : '☀️';
   
-  lines.push(`${timingEmoji} Peak Hour: ${stats.mostActiveHour}:00 + 🔑 Keywords: ${stats.topKeywords.slice(0, 3).join(', ')}`);
+  lines.push(`${timingEmoji} Peak Productivity Hour: ${stats.mostActiveHour}:00 + 📊 Work Pattern Analysis`);
   lines.push(`   = 🎨 Work Style: ${nightOwl ? 'Night Owl Wizard' : morningPerson ? 'Morning Strategist' : 'Steady Warrior'} (${timingScore}/100)`);
-  lines.push(`   ${nightOwl ? 'Creative chaos in dark hours' : morningPerson ? 'Structured clarity at dawn' : 'Reliable rhythm through the day'}\n`);
+  lines.push(`   Schedule: ${nightOwl ? 'Late night creative bursts (22:00-05:00)' : morningPerson ? 'Morning productivity peak (06:00-12:00)' : 'Afternoon steady work (12:00-22:00)'}`);
+  lines.push(`   Pattern: ${nightOwl ? 'Best ideas emerge in quiet hours' : morningPerson ? 'Fresh mind tackles complex problems' : 'Consistent throughout business hours'}\n`);
 
   // MYSTICAL INSIGHTS
   lines.push('═══════════════════════════════════════════════════════');
   lines.push('              🔮 MYSTICAL INSIGHTS                      ');
   lines.push('═══════════════════════════════════════════════════════\n');
 
-  const keywords = stats.topKeywords;
+  // Use keywords already declared above
   if (keywords.includes('fix') || keywords.includes('bug')) {
     lines.push('🐛 The Bug Slayer: Your commits whisper of battles won against elusive errors');
   }
@@ -603,18 +665,84 @@ export function generateInterpretation(stats: CommitStats, cards: TarotCard[]): 
     lines.push('🔧 The Architect: You reshape code like clay, seeking perfect form');
   }
 
+  // REPOSITORY DEEP DIVE (if available)
+  if (projectAnalysis) {
+    lines.push('\n═══════════════════════════════════════════════════════');
+    lines.push('           🔬 REPOSITORY DEEP DIVE                      ');
+    lines.push('═══════════════════════════════════════════════════════\n');
+
+    const insights = generateProjectInsights(projectAnalysis);
+    insights.forEach(insight => lines.push(insight));
+
+    // Code Quality Assessment
+    lines.push('\n📈 CODE QUALITY ASSESSMENT:');
+    
+    const avgCommentRatio = projectAnalysis.files.reduce((sum, f) => {
+      const ratio = f.analysis.linesOfCode > 0 ? (f.analysis.comments / f.analysis.linesOfCode) * 100 : 0;
+      return sum + ratio;
+    }, 0) / projectAnalysis.files.length;
+    
+    lines.push(`   💬 Documentation: ${avgCommentRatio.toFixed(1)}% comment ratio${avgCommentRatio > 15 ? ' (Excellent!)' : avgCommentRatio > 8 ? ' (Good)' : ' (Needs improvement)'}`);
+    
+    if (projectAnalysis.structure.hasTests) {
+      lines.push('   ✅ Testing: Test suite detected - Quality safeguards in place');
+    } else {
+      lines.push('   ⚠️ Testing: No test files detected - Consider adding tests');
+    }
+    
+    if (projectAnalysis.structure.hasCI) {
+      lines.push('   🔄 Automation: CI/CD pipeline configured - Professional workflow');
+    }
+    
+    // Architecture Analysis
+    lines.push('\n🏗️ ARCHITECTURE INSIGHTS:');
+    
+    const totalFunctions = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.functions, 0);
+    const totalClasses = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.classes, 0);
+    const avgComplexity = projectAnalysis.files.reduce((sum, f) => sum + f.analysis.complexity, 0) / projectAnalysis.files.length;
+    
+    lines.push(`   🔧 Functions: ${totalFunctions} total${totalFunctions > 100 ? ' (Large codebase)' : totalFunctions > 30 ? ' (Medium sized)' : ' (Compact)'}`);
+    lines.push(`   📦 Classes: ${totalClasses} total${totalClasses > 50 ? ' (Object-oriented approach)' : totalClasses > 10 ? ' (Moderate OOP)' : ' (Functional style)'}`);
+    lines.push(`   🔀 Complexity: ${avgComplexity.toFixed(1)} avg nesting${avgComplexity > 50 ? ' (High - consider refactoring)' : avgComplexity > 25 ? ' (Moderate)' : ' (Low - clean code!)'}`);
+    
+    // File-by-File Highlights
+    lines.push('\n📂 KEY FILES ANALYZED:');
+    
+    projectAnalysis.files.slice(0, 5).forEach(file => {
+      const fileName = file.path.split('/').pop() || file.path;
+      lines.push(`   📄 ${fileName} (${file.language})`);
+      lines.push(`      ${file.analysis.linesOfCode} LOC | ${file.analysis.functions} functions | ${file.analysis.classes} classes`);
+    });
+    
+    // Technology Stack
+    if (projectAnalysis.framework) {
+      lines.push(`\n🛠️ TECH STACK: ${projectAnalysis.language} + ${projectAnalysis.framework}`);
+    }
+    
+    const depCount = Object.keys(projectAnalysis.dependencies).length;
+    if (depCount > 0) {
+      const topDeps = Object.keys(projectAnalysis.dependencies).slice(0, 5);
+      lines.push(`   📦 ${depCount} dependencies: ${topDeps.join(', ')}${depCount > 5 ? '...' : ''}`);
+    }
+  }
+
   lines.push('\n💀 The spirits have spoken. May your commits be ever in your favor. 💀');
 
   return lines.join('\n');
 }
 
 /**
- * Generates a complete tarot reading
+ * Generates a complete tarot reading with optional repository analysis
  * @param commits - Array of git commits
  * @param stats - Commit statistics
+ * @param projectAnalysis - Optional deep repository analysis
  * @returns Complete tarot reading
  */
-export async function generateTarotReading(commits: GitCommit[], stats: CommitStats): Promise<TarotReading> {
+export async function generateTarotReading(
+  commits: GitCommit[], 
+  stats: CommitStats,
+  projectAnalysis?: ProjectStructure
+): Promise<TarotReading> {
   console.log('[Tarot] Starting tarot reading generation...');
   const cards = generateThreeCardSpread(stats);
   
@@ -624,7 +752,7 @@ export async function generateTarotReading(commits: GitCommit[], stats: CommitSt
   console.log('[Tarot] AI commentary result:', aiCommentary ? 'SUCCESS' : 'EMPTY');
   
   // Generate base interpretation
-  let interpretation = generateInterpretation(stats, cards);
+  let interpretation = generateInterpretation(stats, cards, projectAnalysis);
   
   // Prepend AI commentary if available
   if (aiCommentary) {
