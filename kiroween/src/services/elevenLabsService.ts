@@ -57,7 +57,7 @@ class ElevenLabsService {
     }
 
     // Return cached voices if available
-    if (this.cachedVoices) {
+    if (this.cachedVoices && this.cachedVoices.length > 0) {
       return this.cachedVoices;
     }
 
@@ -75,8 +75,9 @@ class ElevenLabsService {
       }
 
       const data = await response.json();
-      this.cachedVoices = data.voices || [];
-      return this.cachedVoices;
+      const voices = data.voices || [];
+      this.cachedVoices = voices;
+      return voices;
     } catch (error) {
       console.error('Error fetching ElevenLabs voices:', error);
       throw error;
@@ -146,7 +147,6 @@ class ElevenLabsService {
    */
   async playAudio(audioBuffer: ArrayBuffer): Promise<void> {
     return new Promise((resolve, reject) => {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
