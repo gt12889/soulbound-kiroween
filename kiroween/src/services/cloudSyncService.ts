@@ -640,9 +640,27 @@ class CloudSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           callback(snapshot.data());
+        } else {
+          // Document doesn't exist yet - this is fine
+          console.log('[CloudSync] Companion data document does not exist yet');
         }
       },
-      (error) => {
+      (error: any) => {
+        // Handle NOT_FOUND errors gracefully
+        if (error?.code === 'not-found' || error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+          console.log('[CloudSync] Companion data document not found (404) - this is expected for new users');
+          return; // Don't call onError for expected NOT_FOUND errors
+        }
+        
+        // Handle permission errors
+        if (error?.code === 'permission-denied' || error?.code === 7) {
+          console.warn('[CloudSync] Permission denied in companion data subscription. Check Firestore rules.');
+          if (onError) {
+            onError(error);
+          }
+          return;
+        }
+        
         console.error('Error in companion data subscription:', error);
         if (onError) {
           onError(error);
@@ -692,7 +710,19 @@ class CloudSyncService {
       }
 
       return prefDoc.data();
-    } catch (error) {
+    } catch (error: any) {
+      // Handle NOT_FOUND errors gracefully (document doesn't exist)
+      if (error?.code === 'not-found' || error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+        console.log('[CloudSync] Settings document not found (404) - this is expected for new users');
+        return null;
+      }
+      
+      // Handle permission errors
+      if (error?.code === 'permission-denied' || error?.code === 7) {
+        console.warn('[CloudSync] Permission denied when fetching settings. Check Firestore rules.');
+        return null;
+      }
+      
       console.error('Failed to fetch settings from cloud:', error);
       throw new CloudSyncError(
         'Failed to fetch settings from cloud',
@@ -718,9 +748,27 @@ class CloudSyncService {
       (snapshot) => {
         if (snapshot.exists()) {
           callback(snapshot.data());
+        } else {
+          // Document doesn't exist yet - this is fine, just don't call callback
+          console.log('[CloudSync] Settings document does not exist yet');
         }
       },
-      (error) => {
+      (error: any) => {
+        // Handle NOT_FOUND errors gracefully
+        if (error?.code === 'not-found' || error?.code === 5 || error?.message?.includes('NOT_FOUND')) {
+          console.log('[CloudSync] Settings document not found (404) - this is expected for new users');
+          return; // Don't call onError for expected NOT_FOUND errors
+        }
+        
+        // Handle permission errors
+        if (error?.code === 'permission-denied' || error?.code === 7) {
+          console.warn('[CloudSync] Permission denied in settings subscription. Check Firestore rules.');
+          if (onError) {
+            onError(error);
+          }
+          return;
+        }
+        
         console.error('Error in settings subscription:', error);
         if (onError) {
           onError(error);
